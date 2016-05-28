@@ -1,0 +1,89 @@
+﻿@model IEnumerable<Model.MonthlyKPI>
+
+@{
+    ViewBag.Title = "每月指标";
+}
+
+
+<div class="panel no-border">
+    <div class="panel-heading">
+        <div class="panel-title">@Html.ActionLink("创建新数据", "KPI_Input")</div>
+    </div>
+    <div class="panel-body no-padding">
+        <table class="table no-margin">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.MDate)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.RegNum)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.SellCount)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.UsrAdd)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Sku)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Sms)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.OrderCount)
+                    </th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.MDate)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.RegNum)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.SellCount)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.UsrAdd)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Sku)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Sms)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.OrderCount)
+                            </td>
+                            <td>
+                                @*@Html.ActionLink("删除", "DeleteKpi", new { id = item.Id })*@
+                                <a href="../Home/DeleteKpi/@item.Id" onclick="return(confirm('确定删除？'))">删除</a>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="8" style="text-align:center">暂无预设的KPI数据</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        
+    });
+</script>

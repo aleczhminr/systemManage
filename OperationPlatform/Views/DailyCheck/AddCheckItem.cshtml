@@ -1,0 +1,272 @@
+﻿@{
+    ViewBag.Title = "新增日检任务";
+}
+
+@section Style{
+    @Styles.Render("~/style/form")
+<link href="~/css/plugins/bootstrap-tag/bootstrap-tagsinput.css" rel="stylesheet" />
+    <style type="text/css">
+        .select2-drop-active {
+            z-index: 1500 !important; 
+        }
+        .datepicker.dropdown-menu{z-index:1500!important;}
+    </style>
+}
+
+
+
+<div class="panel" >
+    <!-- 容器标题 -->
+    <div class="panel-heading">
+        <!-- 控制组  查询条件位置 -->
+        <div class="panel-controls">
+            <button class="btn btn-complete btn-cons" onclick=" AddCheckShow() ">增加任务</button>
+        </div>
+    </div>
+    <!-- 控件容器 -->
+    <div id="DailyCheckListTable" class="panel-body">
+        <!-- 表格本体 -->
+        <table class="table table-hover DailyCheckTableId"></table>
+        <!-- 分页信息 -->
+        <div class="dataTables_wrapper AccountListPageHtmlId" id="ListPageHtml">
+            <div class="dataTablePagText dataTables_info"></div>
+            <div class="dataTables_paginate paging_bootstrap pagination">
+                <ul>
+                    <li class="prev disabled">
+                        <a href="javascript:void(0)">
+                            <i class="pg-arrow_left"></i>
+                        </a>
+                    </li>
+                    <li class="active">
+                        <a href="javascript:void(0)">1</a>
+                    </li>
+                    <li class="next disabled">
+                        <a href="javascript:void(0)">
+                            <i class="pg-arrow_right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="" id="AddDailyCheckDiv" style=" display:none;">
+    <div class="">
+        <div class="form-group">
+            <label>任务名称</label>
+            <input class="form-control" type="email" required="" id="taskName">
+        </div>
+        <div class="form-group">
+            <label>重复类型</label>
+            <div class="radio radio-success" id="repeatType">
+                <input id="repeatType_1" type="radio" name="repeatType" value="1" onclick="SelectChange(1)" checked="checked">
+                <label for="repeatType_1">提醒一次</label>
+                <input id="repeatType_2" type="radio" name="repeatType" value="2" onclick="SelectChange(2)">
+                <label for="repeatType_2">按工作日重复</label>
+                <input id="repeatType_3" type="radio" name="repeatType" value="3" onclick="SelectChange(3)">
+                <label for="repeatType_3">按日期重复</label>
+            </div>
+        </div>
+
+        <div class="form-group" id="repeat_1">
+            <label>提醒时间</label>
+            <input type="text" class="input-sm form-control" placeholder="单次任务时间" name="once" id="onceTime">
+        </div>
+        <div class="form-group" id="repeat_2" style="display: none">
+            <label>工作日重复</label>
+            <select class="full-width" multiple id="weekTime">
+                <option value="一">周一</option>
+                <option value="二">周二</option>
+                <option value="三">周三</option>
+                <option value="四">周四</option>
+                <option value="五">周五</option>
+                <option value="六">周六</option>
+                <option value="七">周日</option>
+            </select>
+        </div>
+        <div class="form-group" id="repeat_3" style="display: none">
+            <label>日期重复</label>
+            <span class="help">请输入需要出现的天（1-31），例：3  回车增加下一个</span>
+            <input type="text" placeholder="重复任务时间" id="multiTime">
+        </div>
+
+        <div class="form-group">
+            <label>日检操作人：</label>
+            <select class="full-width" multiple id="reminder" style=" display:none;"></select>
+        </div>
+    </div>
+</div>
+
+<script type="text/html" id="DailyCheckListScript">
+    <table class="table table-hover AccountListTableId">
+        <thead>
+            <tr>
+                <th>序号</th>
+                <th>任务名称</th> 
+                <th class="text-center">提醒时间</th>
+                <th class="text-center">需要处理人员</th>
+                <th class="text-center">录入人</th>
+                <th class="text-center">操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{each listData}}
+            <tr>
+                <td class="v-align-middle">{{$value.Id}}</td>
+                <td class="v-align-middle">{{$value.TaskName}}</td> 
+                <td class="text-center v-align-middle">{{$value.RepeatTime}}</td>
+                <td class="text-center v-align-middle">{{$value.Reminder}}</td>
+                <td class="text-center v-align-middle">{{$value.Recorder}}</td>
+                <td class="text-center v-align-middle"><a href="javascript:void(0)" onclick="DeleteCheck({{$value.Id}})">删除</a></td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</script>
+
+@section Scripts{
+<script src="~/Scripts/plugins/boostrapv3/bootstrap-tagsinput.min.js"></script>
+<script src="~/Scripts/plugins/artTemplate/template.js"></script>
+@Scripts.Render("~/js/begin/form")
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        GetDailyCheckList(1);
+
+        $("#onceTime").datepicker();
+        $("#weekTime").select2();
+        $('#multiTime').tagsinput();
+        $('#multiTime').on('itemAdded', function (event) {
+            if (!isNaN(event.item)) {
+                if (Number(event.item)>0 && Number(event.item)<=31) {
+                    return true;
+                }
+            }
+            $('#multiTime').tagsinput('remove', event.item);
+        });
+        GetRemindUsr();
+    });
+
+    function AddCheckShow(){
+        
+        dialog({
+            title:"新增任务",
+            content: document.getElementById("AddDailyCheckDiv"),
+            icon: 'question',
+            okValue: "保存任务信息",
+            ok: function () {
+                SaveTask();
+            },
+            cancelValue: '关闭',
+            cancel: true //为true等价于function(){}
+        }).showModal();
+    }
+
+
+    function GetDailyCheckList(page) {
+        var postJson = {};
+        postJson["page"] = page;
+        var url = "/DailyCheck/GetList";
+        $.doAjax(url, postJson, function (msg) {
+
+
+            if (msg != "null" && msg != "") { 
+                var json = $.parseJSON(msg);
+                $("#DailyCheckListTable table").replaceWith(template("DailyCheckListScript", json));
+                if (page == 1) {
+                    $("#ListPageHtml").attr("rowcount", json.rowCount).attr("maxpage", json.maxPage);
+                    $("#ListPageHtml .dataTablePagText").html("共" + json.rowCount + "条");
+                }
+                var pageHtml = $.listPageHtml(page, $("#ListPageHtml").attr("maxpage"), "GetDailyCheckList", 5);
+                $("#ListPageHtml .dataTables_paginate").html(pageHtml);
+
+            }
+
+        });
+
+    }
+
+
+    function GetRemindUsr() {
+        var url = "/DailyCheck/GetRemindUsr";
+
+        $.doAjax(url, null, function (msg) {
+            if (msg != "") {
+                var json = jQuery.parseJSON(msg);
+
+                $.each(json, function (i, n) {
+                    $("#reminder").append("<option value='" + n.Id + "' >" + n.Name + "</option>");
+                });
+                $("#reminder").show();
+                $("#reminder").select2();
+            }
+        }, true);
+    }
+
+    function SaveTask() {
+        var param = {};
+        param["taskName"] = $("#taskName").val();
+        var repeatType = $("#repeatType input:radio:checked").val();
+        param["repeatType"] = repeatType;
+
+        switch (Number(repeatType)) {
+            case 1:
+                param["repeatTime"] = $("#onceTime").val();
+                break;
+            case 2:
+                param["repeatTime"] = $("#weekTime").val().join(',');
+                break;
+            case 3:
+                param["repeatTime"] = $("#multiTime").val();
+                break;
+        }
+
+        param["reminder"] = $("#reminder").val().join(',');
+
+        var url = "/DailyCheck/AddTask";
+
+        $.doAjax(url, param, function (msg) {
+            if (Number(msg)>0) {
+                alert("增加任务成功");
+                GetDailyCheckList(1);
+            } else {
+                alert("增加任务失败");
+            }
+        }, true);
+    }
+
+    function SelectChange(val) {
+        switch (val) {
+            case 1:
+                $("#repeat_2").hide();
+                $("#repeat_3").hide();
+                $("#repeat_1").show();
+                break;
+            case 2:
+                $("#repeat_1").hide();
+                $("#repeat_3").hide();
+                $("#repeat_2").show();
+                break;
+            case 3:
+                $("#repeat_2").hide();
+                $("#repeat_1").hide();
+                $("#repeat_3").show();
+                break;
+        }
+
+    }
+    function DeleteCheck(id){
+        var url="/DailyCheck/DeleteDailyCheck/" + id;
+        $.doAjax(url,null,function(msg){
+            if(msg=="1"){
+                alert("删除信息成功");
+                GetDailyCheckList(1);
+            }else{
+                alert("删除信息失败");
+            }
+        },true);
+    }
+</script>
+}

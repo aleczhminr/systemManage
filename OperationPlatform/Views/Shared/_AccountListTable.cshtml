@@ -1,0 +1,69 @@
+﻿
+<table class="table table-hover AccountListTableId" id="accountListTable">
+    <thead>
+    <tr>
+        <th>店铺名称</th>
+        @*<th>注册 / 最后登录</th>*@
+        <th class="text-center" onclick=" ChangeOrder('LoginTimeLast') " style="cursor: pointer">注册 / 最后登录<span class="pg-arrow_lright_line_alt" id="LoginTimeLast"></span></th>
+        @*<th class="text-center">版本</th>*@
+        <th class="text-center" onclick="ChangeOrder('active') " style="cursor: pointer">状态<span class="pg-arrow_lright_line_alt" id="active"></span></th>
+        <th class="text-center" onclick="ChangeOrder('userNum') " style="cursor: pointer">会员<span class="pg-arrow_lright_line_alt" id="userNum"></span></th>
+        <th class="text-center" onclick="ChangeOrder('smsNum') " style="cursor: pointer">SMS<span class="pg-arrow_lright_line_alt" id="smsNum"></span></th>
+        <th class="text-center" onclick="ChangeOrder('goodsNum') " style="cursor: pointer">商品<span class="pg-arrow_lright_line_alt" id="goodsNum"></span></th>
+        <th class="text-center" onclick="ChangeOrder('saleNum') " style="cursor: pointer">销售<span class="pg-arrow_lright_line_alt" id="saleNum"></span></th>
+        <th class="text-center" onclick="ChangeOrder('orderMoney') " style="cursor: pointer">订单<span class="pg-arrow_lright_line_alt" id="orderMoney"></span></th>
+        <th class="text-center" onclick="ChangeOrder('outlayNum') " style="cursor: pointer">支出<span class="pg-arrow_lright_line_alt" id="outlayNum"></span></th>
+        <th class="text-center" onclick="ChangeOrder('LoginTimeWeb') " style="cursor: pointer">登录<span class="pg-arrow_minimize_line" id="LoginTimeWeb"></span></th>
+        <th class="text-center">优惠券</th>
+        @*<th class="text-center">登录时间</th>*@
+    </tr>
+    </thead>
+    <tbody>
+    {{each listData}}
+    <tr>
+        <td class=" v-align-middle">
+            <a href="/shopinfo/index/{{$value.ID}}" target="_blank" title="{{$value.CompanyName}}" style="font-weight: bold;">
+                {{if $value.aotjbName=="免费版"}}
+                <img style="margin-top: -2px;" src="../../img/Shop/edi1.png" title="可以用到很久以后"/>
+                {{else}}
+                {{if $value.aotjbName=="标准版"}}
+                <img style="margin-top: -2px;" src="../../img/Shop/edi2.png" title="{{$value.aotjbEndTime}}到期"/>
+                {{else if $value.aotjbName=="高级版"}}
+                <img style="margin-top: -2px;" src="../../img/Shop/edi3.png" title="{{$value.aotjbEndTime}}到期" />
+                {{else}}
+                <img style="margin-top: -2px;" src="../../img/Shop/edi5.png" title="{{$value.aotjbEndTime}}到期"/>
+                {{/if}}
+                {{/if}}
+                {{$value.CompanyName}}【{{$value.ID}}】
+            </a>
+            <span>
+                    {{if $value.FirstActive}}
+                    <img src="../../img/FirstStatus/active.png" title="首次活跃" />
+                    {{else}}
+                    {{if $value.FirstLost}}
+                    <img src="../../img/FirstStatus/lost.png" title="首次流失" />
+                    {{/if}}
+                    {{/if}}
+                </span>
+        </td>
+        <td class="v-align-middle">
+            <p class="hint-text no-margin" title="{{$value.RegTime}}">{{#$value.RegTime | dataFormat:2}}</p>
+            <p class="no-margin">{{#$value.LoginTimeLast | dataFormat:1}}</p>
+        </td>
+        @*<td class="text-center v-align-middle" title="{{$value.aotjbEndTime}}">{{$value.aotjbName}}</td>*@
+        <td class="text-center v-align-middle">{{$value.activeName}}</td>
+        <td class="text-center v-align-middle">{{$value.userNum}}</td>
+        <td class="text-center v-align-middle">{{$value.smsNum}} ( <span class="bold">{{$value.dxunity}}</span> )</td>
+        <td class="text-center v-align-middle">{{$value.goodsNum}}</td>
+        <td class="text-center v-align-middle">{{$value.saleNum}}</td>
+        <td class="text-center v-align-middle">{{$value.orderMoney}}</td>
+        <td class="text-center v-align-middle">{{$value.outlayNum}}</td>
+        <td class="text-center v-align-middle">{{$value.LoginTimeWeb}}</td>
+        <td class="text-center v-align-middle">{{$value.userCount}}/{{$value.allCount}}</td>
+        @*<td class="text-center v-align-middle">{{$value.LoginTimeLast}}</td>*@
+    </tr>
+    {{/each}}
+    </tbody>
+</table>
+
+<script src="~/Scripts/AccountListTable.js"></script>

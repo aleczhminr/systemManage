@@ -1,0 +1,112 @@
+﻿@model Model.AgentModel
+@{
+    ViewBag.Title = "代理商详情";
+}
+
+<div class="panel no-border">
+   
+    <div class="panel-body no-padding">
+        
+        <div class="row">
+            <div class="col-xs-3 col-sm-3 col-md-3 padding-20 shop-profiles b-r b-grey">
+                <div class="row">
+                    <p class="pull-left">代理商编号</p>
+                    <p class="pull-right bold">@Html.DisplayFor(model => model.AgentId)</p>
+                </div>
+                <div class="row">
+                    <p class="pull-left">代理商手机号</p>
+                    <p class="pull-right bold">@Html.DisplayFor(model => model.AgentPhone)</p>
+
+                </div>
+                <div class="row">
+                    <p class="pull-left">固定电话</p>
+                    <p class="pull-right bold">@Html.DisplayFor(model => model.AgentNumber)</p>
+                </div>
+                <div class="row">
+                    <p class="pull-left">登录次数</p>
+                    @if (Model.AgentLoginTimes != null)
+                    {
+                        <p class="pull-right bold">@Html.DisplayFor(model => model.AgentLoginTimes)次</p>
+                    }
+                    else
+                    {
+                        <p class="pull-right bold">0次</p>
+                    }              
+                </div>
+                <div class="row">
+                    <p class="pull-left">生成者</p>
+                    @if (Model.Creater != null)
+                    {
+                        <p class="pull-right bold">@Html.DisplayFor(model => model.Creater)</p>
+                    }
+                    else
+                    {
+                        <p class="pull-right bold">暂无信息</p>
+                    }
+                </div>
+
+                <div>
+                    <a class="btn btn-success" href="~/Agent/AgentModify/@Model.ID">修改信息</a>
+                </div>
+            </div>
+            <div id="AccountInfo" class="col-xs-3 col-sm-3 col-md-3 padding-20 shop-profiles">
+                <div class="row">
+                    <p class="pull-left">代理商姓名</p>
+                    <p class="pull-right bold">@Html.DisplayFor(model => model.AgentName)</p>
+                </div>
+
+                <div class="row">
+                    <p class="pull-left">代理商地址</p>
+                    <p class="pull-right bold">@Html.DisplayFor(model => model.AgentAddress)</p>
+                </div>
+                <div class="row">
+                    <p class="pull-left">电子邮件</p>
+                    <p class="pull-right bold">@Html.DisplayFor(model => model.AgentEmail)</p>
+                </div>
+                <div class="row">
+                    <p class="pull-left">最后登录时间</p>
+                    <p class="pull-right bold">@Html.DisplayFor(model => model.AgentLastLoginTime)</p>
+                </div>
+                <div class="row">
+                    <p class="pull-left">备注</p>
+                    <p class="pull-right bold">@Html.DisplayFor(model => model.Remark)</p>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="col-xs-3 col-sm-3 col-md-3 padding-20 shop-profiles">
+                <div class="row">
+                    <p class="pull-left">代理商等级</p>
+                    <p class="pull-right bold">@Html.DisplayFor(model => model.AgentGrade)</p>
+                </div>
+
+                <div class="row">
+                    <p class="pull-left">身份证号</p>
+                    <p class="pull-right bold">@Html.DisplayFor(model => model.AgentIdCard)</p>
+                </div>
+                <div class="row">
+                    <p class="pull-left">QQ</p>
+                    <p class="pull-right bold">@Html.DisplayFor(model => model.AgentQQ)</p>
+                </div>
+                <div class="row">
+                    <p class="pull-left">加盟时间</p>
+                    <p class="pull-right bold">@Html.DisplayFor(model => model.CreatingDate)</p>
+                </div>
+                <div class="row">
+                    <p class="pull-left">注册链接地址</p>
+                    <p class="pull-right bold">@Html.DisplayFor(model => model.AgentLink)</p>
+                </div>
+                <div class="row">
+                    <p class="pull-left">主站链接地址</p>
+                    <p class="pull-right bold">http://www.i200.cn/index.html?ag=@Html.DisplayFor(model => model.AgentId)</p>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    
+
+        <hr>    
+        
+    </div>
+
+</div>
+

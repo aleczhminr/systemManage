@@ -1,0 +1,259 @@
+﻿@{
+    ViewBag.Title = "用户扩展信息字典";
+}
+
+@Styles.Render("~/style/form")
+
+<div class="col-md-12" id="dic_1">
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <div class="panel-title">
+                首要信息字典
+            </div>
+        </div>
+        <div class="panel-body" id="mainInfo">            
+            <div class="form-group whereitem" id="industryMain">
+                <label>行业（大分类）</label>
+                <div class="select-puppet">
+                    <select class="cs-select cs-skin-slide" onchange="SecondaryList(1)" id="type_1">
+                        <option value='0' rel=''>---</option>
+                    </select>
+                    <a class="tagAdd btn btn-primary no-padding p-l-5 p-r-5" onclick=" AddNewItem('industryMain') " href="javascript:void(0)">
+                        <i class="pg-plus"></i>
+                    </a>
+                    <input id="" class="newItem" type="text" placeholder="行业大分类">
+                    <button class="btn btn-default btn-inquire newItem" value="" onclick="AddItem('industryMain')">确定</button>
+                </div>
+                @*<span id="prefixTips" style="margin-left: 15px; color: #999; font-size: 12px;"></span>*@
+            </div>
+            <div class="form-group whereitem" id="industrySecondary">
+                <label>行业（小分类）</label>
+                <div class="select-puppet">
+                    <select class="cs-select cs-skin-slide" onchange="" id="type_2">
+                        <option value='0' rel=''>---</option>
+                    </select>
+                    <a class="tagAdd btn btn-primary no-padding p-l-5 p-r-5" onclick=" AddNewItem('industrySecondary') " href="javascript:void(0)">
+                        <i class="pg-plus"></i>
+                    </a>
+                    <input id="" class="newItem" type="text" placeholder="行业小分类">
+                    <button class="btn btn-default btn-inquire newItem" value="" onclick="AddItem('industrySecondary')">确定</button>
+                </div>
+                @*<span id="prefixTips" style="margin-left: 15px; color: #999; font-size: 12px;"></span>*@
+            </div>
+
+            <hr />
+
+            <div class="form-group whereitem" id="userSource">
+                <label>用户来源</label>
+                <div class="select-puppet">
+                    <select class="cs-select cs-skin-slide" onchange="SecondaryList(3)" id="type_3">
+                        <option value='0' rel=''>---</option>
+                    </select>
+                    <a class="tagAdd btn btn-primary no-padding p-l-5 p-r-5" onclick=" AddNewItem('userSource') " href="javascript:void(0)">
+                        <i class="pg-plus"></i>
+                    </a>
+                    <input id="" class="newItem" type="text" placeholder="用户来源">
+                    <button class="btn btn-default btn-inquire newItem" value="" onclick="AddItem('userSource')">确定</button>
+                </div>
+                @*<span id="prefixTips" style="margin-left: 15px; color: #999; font-size: 12px;"></span>*@
+            </div>
+            <div class="form-group whereitem" id="sourceKeyword">
+                <label>关键词（用户来源）</label>
+                <div class="select-puppet">
+                    <select class="cs-select cs-skin-slide" onchange="" id="type_4">
+                        <option value='0' rel=''>---</option>
+                    </select>
+                    <a class="tagAdd btn btn-primary no-padding p-l-5 p-r-5" onclick=" AddNewItem('sourceKeyword') " href="javascript:void(0)">
+                        <i class="pg-plus"></i>
+                    </a>
+                    <input id="" class="newItem" type="text" placeholder="来源关键词">
+                    <button class="btn btn-default btn-inquire newItem" value="" onclick="AddItem('sourceKeyword')">确定</button>
+                </div>
+                @*<span id="prefixTips" style="margin-left: 15px; color: #999; font-size: 12px;"></span>*@
+            </div>
+
+            <hr/>
+
+            <div class="form-group whereitem" id="choiceReason">
+                <label>选择我们的理由</label>
+                <div class="select-puppet">
+                    <select class="cs-select cs-skin-slide" onchange="" id="type_5">
+                        <option value='0' rel=''>---</option>
+                    </select>
+                    <a class="tagAdd btn btn-primary no-padding p-l-5 p-r-5" onclick=" AddNewItem('choiceReason') " href="javascript:void(0)">
+                        <i class="pg-plus"></i>
+                    </a>
+                    <input id="" class="newItem" type="text" placeholder="选择我们的理由">
+                    <button class="btn btn-default btn-inquire newItem" value="" onclick="AddItem('choiceReason')">确定</button>
+                </div>
+                @*<span id="prefixTips" style="margin-left: 15px; color: #999; font-size: 12px;"></span>*@
+            </div>
+        </div>
+    </div>
+
+</div>
+<div class="col-md-12" id="dic_2">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <div class="panel-title">
+                次要信息字典
+            </div>
+        </div>
+        <div class="panel-body" id="secondaryInfo">
+
+            <div class="form-group whereitem" id="needType">
+                <label>潜在需求</label>
+                <div class="select-puppet">
+                    <select class="cs-select cs-skin-slide" onchange="" id="type_6">
+                        <option value='0' rel=''>---</option>
+                    </select>
+                    <a class="tagAdd btn btn-primary no-padding p-l-5 p-r-5" onclick=" AddNewItem('needType') " href="javascript:void(0)">
+                        <i class="pg-plus"></i>
+                    </a>
+                    <input id="" class="newItem" type="text" placeholder="潜在需求">
+                    <button class="btn btn-default btn-inquire newItem" value="" onclick="AddItem('needType')">确定</button>
+                </div>
+                @*<span id="prefixTips" style="margin-left: 15px; color: #999; font-size: 12px;"></span>*@
+            </div>
+            <div class="form-group whereitem" id="attitude">
+                <label>对我们的态度</label>
+                <div class="select-puppet">
+                    <select class="cs-select cs-skin-slide" onchange="" id="type_7">
+                        <option value='0' rel=''>---</option>
+                    </select>
+                    <a class="tagAdd btn btn-primary no-padding p-l-5 p-r-5" onclick=" AddNewItem('attitude') " href="javascript:void(0)">
+                        <i class="pg-plus"></i>
+                    </a>
+                    <input id="" class="newItem" type="text" placeholder="对我们的态度">
+                    <button class="btn btn-default btn-inquire newItem" value="" onclick="AddItem('attitude')">确定</button>
+                </div>
+                @*<span id="prefixTips" style="margin-left: 15px; color: #999; font-size: 12px;"></span>*@
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@Scripts.Render("~/js/begin/form")
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        GetData();
+    });
+
+    var globalData = "";
+
+    function GetData() {
+        var url = "/UserPortrait/GetDicItem";
+
+        $("#dic_1 input").val("");
+        $("#dic_2 input").val("");
+
+        for (var i = 1; i < 8; i++) {
+            $("#type_" + i).html("<option value='0' rel=''>---</option>");
+        }
+
+        $.doAjax(url, null, function(msg) {
+            if (msg != "") {
+                var json = jQuery.parseJSON(msg);
+
+                globalData = json;
+
+                $.each(json.DataList, function(i, n) {
+                    $("#type_" + n.ItemType).append("<option value='" + n.Id + "' rel='" + n.ParentId + "'>" + n.Keyword + "</option>");
+                    //$("#prefixAgent").append("<option value='" + n.id + "' rel='" + n.remark + "'>" + n.preName + "[" + n.agentId + "]</option>");
+
+                });
+            }
+        }, true);
+
+    }
+
+    function AddNewItem(name) {
+        $("#dic_1 input").hide();
+        $("#dic_1 button").hide();
+        $("#dic_2 input").hide();
+        $("#dic_2 button").hide();
+
+        $("#" + name + " input").show();
+        $("#" + name + " button").show();
+    }
+
+    function AddItem(name) {
+        var postJson = {};
+        var itemType = 0;
+
+        postJson["parentId"] = 0;
+        postJson["addItemValue"] = $("#" + name + " input").val();
+
+        switch (name) {
+        case "industryMain":
+            itemType = 1;
+            break;
+        case "industrySecondary":
+            itemType = 2;
+            postJson["parentId"] = $("#type_1").val();
+            break;
+        case "userSource":
+            itemType = 3;
+            break;
+        case "sourceKeyword":
+            itemType = 4;
+            postJson["parentId"] = $("#type_3").val();
+            break;
+        case "choiceReason":
+            itemType = 5;
+            break;
+        case "needType":
+            itemType = 6;
+            break;
+        case "attitude":
+            itemType = 7;
+            break;
+        }
+
+        postJson["itemType"] = itemType;
+
+        var url = "/UserPortrait/AddNewDicItem";
+
+        $.doAjax(url, postJson, function(msg) {
+            if (msg != "") {
+                alert("添加成功！");
+                $("#" + name + " input").hide();
+                $("#" + name + " button").hide();
+
+                $("#dic_1 input").val("");
+                $("#dic_2 input").val("");
+                GetData();
+            } else {
+                alert("添加出错！");
+            }
+        }, true);
+
+    }
+
+    function SecondaryList(num) {
+        var typeNum = num + 1;
+        var pId = $("#type_" + num).val();
+
+        $("#type_" + typeNum + " option").remove();
+
+        $("#type_" + typeNum + " option").filter("[value='0']").show();
+        //$("#type_" + typeNum + " option:eq(0)").attr('selected','selected');
+
+        $("#type_" + typeNum + " option").filter("[rel='" + pId + "']").show();
+
+        if (pId != 0) {
+            $.each(globalData.DataList, function (i, n) {
+                if (n.ParentId == pId) {
+                    $("#type_" + typeNum).append("<option value='" + n.Id + "' rel='" + n.ParentId + "'>" + n.Keyword + "</option>");
+                }
+
+                //$("#prefixAgent").append("<option value='" + n.id + "' rel='" + n.remark + "'>" + n.preName + "[" + n.agentId + "]</option>");
+
+            });
+        }
+
+    }
+</script>

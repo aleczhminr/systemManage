@@ -1,0 +1,56 @@
+﻿@{
+    @ViewBag.Title
+}
+
+@Styles.Render("~/style/form")
+
+<div class="row column-seperation m-t-10" id="AccountActiveListTable">
+    <table></table>
+    <div class="dataTables_wrapper AccountListPageHtmlId" id="ListPageHtml">
+        <div class="dataTables_paginate pagination">
+            <ul><li class="prev disabled"><a href="javascript:void(0)"><i class="pg-arrow_left"></i></a></li><li class="active"><a href="javascript:void(0)">1</a></li><li class="next disabled"><a href="javascript:void(0)"><i class="pg-arrow_right"></i></a></li></ul>
+        </div>
+        <div class="dataTablePagText"></div>
+    </div>
+</div>
+
+<input type="hidden" name="page" id="page" value="@ViewBag.Page" />
+<input type="hidden" name="type" id="type" value="@ViewBag.Type" />
+<input type="hidden" name="dayAccids" id="dayAccids" value="@ViewBag.DayAccids" />
+
+<script type="text/html" id="AccountDetailScript">
+    @RenderPage("~/Views/Shared/_AccountListTable.cshtml")
+</script>
+
+@Scripts.Render("~/js/begin/form")
+<script src="~/Scripts/plugins/artTemplate/template.js"></script>
+<script src="~/Scripts/AccountListTable.js"></script>
+
+<script type="text/javascript">
+ 
+        GetActiveDetailInfo(1);
+
+
+    function GetActiveDetailInfo(page) {
+        var url = "/ActiveDetail/GetActiveUsrDetail";
+        var postJson = {};
+
+        postJson["pageIndex"] = page;
+        postJson["type"] = $("#type").val();
+        postJson["dayAccids"] = $("#dayAccids").val();
+
+        $.doAjax(url, postJson, function (msg) {
+            if (msg != "null" && msg != "") {
+                var json = $.parseJSON(msg);
+                $("#AccountActiveListTable table").replaceWith(template("AccountDetailScript", json));
+                if (page == 1) {
+                    $("#ListPageHtml").attr("rowcount", json.rowCount).attr("maxpage", json.maxPage);
+                    $("#ListPageHtml .dataTablePagText").html("共" + json.rowCount + "条");
+                }
+                var pageHtml = $.listPageHtml(page, $("#ListPageHtml").attr("maxpage"), "GetActiveDetailInfo", 5);
+                $("#ListPageHtml .dataTables_paginate").html(pageHtml);
+
+            }
+        }, true);
+    }
+</script>

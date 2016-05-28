@@ -1,0 +1,95 @@
+﻿@{
+    ViewBag.Title = "短信内容管理";
+}
+@section Style{
+
+    @Styles.Render("~/style/form")
+    <link href="~/css/plugins/summernote/summernote.css" rel="stylesheet" />
+}
+
+<div class="panel panel-transparent smsContentMgr">
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs nav-tabs-fillup">
+        <li class="active">
+            <a data-toggle="tab" href="#slide1" onclick=" PageLoad(0) "><span>节日祝福</span></a>
+        </li>
+        <li>
+            <a data-toggle="tab" href="#slide2" onclick=" PageLoad(1) "><span>营销模板</span></a>
+        </li>
+        <li>
+            <a data-toggle="tab" href="#slide3" onclick=" PageLoad(2) "><span>短信秘籍</span></a>
+        </li>
+    </ul>
+
+    @*<input type="button" class="btn btn-sm btn-success m-t-10" name="新增短信" value="新增短信" id="addSms" onclick="AddSms()" />
+    <input type="button" class="btn btn-sm btn-success m-t-10" name="编辑分类" value="编辑分类" id="modifyCate" onclick="ModifyCate()" />*@
+
+    <!-- Tab panes -->
+    <div class="tab-content no-padding ">
+        <div class="tab-pane slide-left active pageIndex" id="slide1">
+
+        </div>
+        <div class="tab-pane slide-left pageIndex" id="slide2">
+
+        </div>
+        <div class="tab-pane slide-left pageIndex" id="slide3">
+
+        </div>
+    </div>
+</div>
+
+@*<input type="hidden" name="currentPage" id="cp" value="" />*@
+<input type="hidden" value="@ViewBag.AccId " id="ShopInfo" />
+<input type="hidden" value="@ViewBag.TaskDailyId" id="taskDailyId" />
+
+@section Scripts{
+    @Scripts.Render("~/js/begin/form")
+    <script src="~/Scripts/plugins/summernote/js/summernote.min.js"></script>
+    <script src="~/Scripts/Sms/Sms.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            PageLoad(0);
+        });
+
+        function PageLoad(e, postData) {
+            var url = "";
+            var html = $.trim($(".smsContentMgr .tab-content .tab-pane.pageIndex").eq(e).html());
+            if (html != "") {
+                return false;
+            }
+            switch (e) {
+            case 0: //节日祝福
+                url = "/Sms/FestivalSms";
+                $("#cp").val(0);
+                break;
+            case 1: //营销模板
+                url = "/Sms/MarketingSms";
+                $("#cp").val(1);
+                break;
+            case 2: //短信秘籍
+                url = "/Sms/SmsTips";
+                $("#cp").val(2);
+                break;
+            default:
+                url = "/Sms/FestivalSms";
+                $("#cp").val(0);
+                break;
+            }
+
+            $.doAjax(url, postData, function(msg) {
+                $(".smsContentMgr .tab-content .tab-pane.pageIndex").eq(e).html(msg);
+            });
+        };
+
+        //function AddSms() {
+        //    var pageVal = $("#cp").val();
+        //    alert(pageVal);
+        //    var ur = "/Sms/SmsAddModal/" + pageVal;
+        //    $.dialog.open(ur, { title: '新增短信', lock: true, opacity: 0.3, width: "500px", height: "300px" });
+        //}
+
+        //function ModifyCate() {
+
+        //}
+    </script>
+}

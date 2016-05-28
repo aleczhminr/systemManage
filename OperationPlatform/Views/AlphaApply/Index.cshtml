@@ -1,0 +1,279 @@
+﻿@{
+    ViewBag.Title = "内测用户管理";
+}
+@section Style{
+    @Styles.Render("~/style/form")
+}
+
+<div class="panel">
+    <div class="panel-heading page-where orderWhere">
+        <div class="panel-title">
+
+            <div class="cs-wrapper pull-left m-r-10">
+                <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" name="alphaStatus" id="alphaStatus">
+                    <option value="-99">内测状态</option>
+                    <option value="0">已申请</option>
+                    <option value="1">审核通过</option>
+                    <option value="2">审核不通过</option>
+                    <option value="3">提前申请结束</option>
+                    <option value="4">正常内测结束</option>
+                </select>
+            </div>
+
+            @*<div class="cs-wrapper pull-left m-r-10">
+                    <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" name="payType" id="payType">
+                        <option value="-99">提现账户类型</option>
+                        <option value="0">支付宝</option>
+                        <option value="1">银行卡</option>
+                    </select>
+                </div>*@
+            <input type="hidden" id="timeType" value="" name="timePeriod" />
+            <div class="b tn-group page-where-othertime" style="float: left; margin-right: 10px">
+                <div class="page-where-time-input">
+                    <div class="input-daterange input-group">
+                        <input type="text" class="input-sm form-control" placeholder="内测申请时间" name="start">
+                        <span class="input-group-addon">to</span>
+                        <input type="text" class="input-sm form-control" placeholder="内测申请时间" name="end">
+                    </div>
+                </div>
+            </div>
+            <div style="float: left; margin-right: 10px; width: 130px">
+                <input class="form-control" type="text" placeholder="用户手机号码" name="userPhone" id="userPhone">
+            </div>
+            <div style="float: left; margin-right: 10px; width: 130px">
+                <input class="form-control" type="text" placeholder="用户店铺编号" name="accId" id="accId">
+            </div>
+            <div style="float: left; margin-right: 10px; width: 130px">
+                <input class="form-control" type="text" placeholder="内测版本编号" name="alphaVersion" id="alphaVersion">
+            </div>
+            <button type="button" value="select" class="btn btn-default btn-inquire" onclick=" GetAlphaApplyRecordList(1) ">查询</button>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+
+    <div class="panel-body no-padding">
+        <div class="table-responsive">
+            <table class="table table-hover table-detailed dataTable" id="ListTable">
+                <thead>
+                    <tr>
+                        <th>内测申请编号 </th>
+                        <th class="text-center">内测版本号</th>
+                        <th class="text-center">所属行业</th>
+                        <th class="text-center">店铺名称</th>
+                        <th class="text-center">店铺编号</th>
+                        <th class="text-center">手机号码</th>
+                        <th class="text-center">状态</th>
+                        <th class="text-center">内测申请时间</th>
+                        <th class="text-center">内测版本方式</th>
+                        <th class="text-center">操作</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <div class="dataTables_wrapper m-t-10" id="ListPageHtml">
+                <div class="dataTables_paginate pagination no-padding">
+                    <ul>
+                        <li class="prev disabled">
+                            <a href="javascript:void(0)">
+                                <i class="pg-arrow_left"></i>
+                            </a>
+                        </li>
+                        <li class="active">
+                            <a href="javascript:void(0)">1</a>
+                        </li>
+                        <li class="next disabled">
+                            <a href="javascript:void(0)">
+                                <i class="pg-arrow_right">
+                                </i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="dataTablePagText p-l-20"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div style="display: none;">
+    <div id="confirmShowDiv" style="width: 300px;">
+        <table class="table table-bordered removeBottom">
+            <tr>
+                <th id="content" style="line-height: 60px; text-align: center;"></th>
+            </tr>
+            <tr>
+                <td>
+                    <button id="btnConfirm" class="btn btn-success btn-sm m-l-10 pull-left m-r-10" data-toggle="modal" data-target="#modalSlideUp" onclick=" "></button>
+                    <button id="btnCancel" class="btn btn-sm m-l-10 pull-right m-r-10" data-toggle="modal" data-target="#modalSlideUp" onclick=" "></button>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+<script type="text/html" id="ListTableScript">
+    {{each list}}
+    <tr class="odd" role="row">
+        <td class="v-align-middle">{{$value.id}}</td>
+        <td class="v-align-middle">{{$value.alphaVersion}}</td>
+        <td>{{$value.userJob}}</td>
+        <td>{{$value.userAccName}}</td>
+        <td class="v-align-middle text-center">{{$value.userAccId}}</td>
+        <td class="v-align-middle text-center">{{$value.userPhone}}</td>
+        <td class="v-align-middle text-center">{{$value.statusName}}</td>
+        <td class="v-align-middle text-center">{{$value.createTime}}</td>
+        <td class="v-align-middle text-center">{{$value.userAlphaClient}}</td>
+        <td class="v-align-middle text-center">            
+            {{if $value.status=="0"}}
+            <button class="btn btn-success btn-sm m-l-10" data-toggle="modal" data-target="#modalSlideUp" name="{{$value.id}}" onclick=" allowAlphaApply('{{$value.id}}') ">
+                审核
+            </button>
+            {{else if $value.status=="1"}}
+            <button class="btn btn-success btn-sm m-l-10" data-toggle="modal" data-target="#modalSlideUp" name="{{$value.id}}" onclick=" transferWithdrawal('{{$value.id}}') ">
+                结束
+            </button>
+            {{else }}
+            <button class="btn btn-sm m-l-10" data-toggle="modal" data-target="#modalSlideUp" name="{{$value.id}}" disabled="disabled">
+                备注
+            </button>
+            {{/if}}
+        </td>
+    </tr>
+    {{/each}}
+</script>
+
+<script src="~/Scripts/plugins/artTemplate/template.js"></script>
+
+@section Scripts{
+    @Scripts.Render("~/js/begin/form")
+    <script type="text/javascript">
+        $(function () {
+            $('.orderWhere .input-daterange').datepicker({ format: 'yyyy-mm-dd' });
+            GetAlphaApplyRecordList(1);
+        });
+
+        function GetAlphaApplyRecordList(pageIndex) {
+            var postJson = {};
+            //int pageIndex = 1, int withdrawStatus = -99, int payType = -99, string withdrawalNo = "", string accId = "", string start = "", string end = ""
+            var alphaStatus = $("#alphaStatus").val();
+            var alphaVersion = $("#alphaVersion").val();
+            var accId = $("#accId").val();
+            var userPhone = $("#userPhone").val();
+            var statTime = $(".orderWhere input[name='start']").val();
+            var endTime = $(".orderWhere input[name='end']").val();
+
+            var stDate = new Date();
+            var edDate = new Date();
+            if (statTime.length === 0 && endTime.length === 0) {
+                postJson["start"] = stDate.toLocaleDateString();
+                postJson["end"] = edDate.toLocaleDateString(-1);
+            } else {
+                if (statTime.length > 0) {
+                    postJson["start"] = statTime;
+                } else {
+                    postJson["start"] = stDate.toLocaleDateString();
+                }
+                if (endTime.length > 0) {
+                    postJson["end"] = endTime;
+                } else {
+                    postJson["end"] = edDate.toLocaleDateString();
+                }
+            }
+            postJson["pageIndex"] = pageIndex;
+            postJson["alphaStatus"] = alphaStatus;
+            postJson["alphaVersion"] = alphaVersion;
+            postJson["accId"] = accId;
+            postJson["userPhone"] = userPhone;
+
+            var url = "/AlphaApply/getAlphaApplyRecord";
+
+            $.doAjax(url, postJson, function (msg) {
+                //console.log(msg);
+                if (msg != "") {
+                    var json = jQuery.parseJSON(msg);
+                    $("#ListTable tbody").html(template("ListTableScript", { "list": jQuery.parseJSON(json.list) }));
+
+                    if (pageIndex == 1) {
+                        $("#ListPageHtml").attr("rowcount", parseInt(json.RowCount)).attr("maxpage", parseInt(json.PageCount));
+                        $("#ListPageHtml .dataTablePagText").html("共" + parseInt(json.RowCount) + "条");
+                    }
+                    var pageHtml = $.listPageHtml(pageIndex, $("#ListPageHtml").attr("maxpage"), "GetAlphaApplyRecordList", 5);
+                    $("#ListPageHtml .dataTables_paginate").html(pageHtml);
+                }
+            }, true);
+        }
+
+        //function withdrawalInfoShow(id) {
+        //    $("#ListTable tbody tr.row-details").hide().filter("[name='withdrawalinfo_" + id + "']").show();
+        //}
+
+        function allowAlphaApply(id) {
+            $("#confirmShowDiv #content").html("我已审核本次申请内测");
+            $("#confirmShowDiv #btnConfirm").html("允许参与内测");
+            $("#confirmShowDiv #btnConfirm").attr('onclick', 'certUrl(' + id + ', 1)');
+            $("#confirmShowDiv #btnCancel").html("审核不通过");
+            $("#confirmShowDiv #btnCancel").attr('onclick', 'certUrl(' + id + ', 2)');
+            dialog({
+                id: "allowAlphaApplyDivdialog",
+                title: "审核本次申请内测",
+                lock: true,
+                background: '#fff', // 背景色
+                opacity: 0.5, // 透明度
+                content: document.getElementById("confirmShowDiv"),
+            }).showModal();
+        }
+
+        function certUrl(id, status) {
+            var postJson = {};
+            postJson["id"] = id;
+            postJson["status"] = status;
+            var url = "/AlphaApply/updateAlphaApplyRecord";
+            $.doAjax(url, postJson, function (msg) {
+                if (msg == "1") {
+                    dialog({
+                        content: '状态修改成功',
+                        quickClose: true // 点击空白处快速关闭
+                    }).show();
+                    GetAlphaApplyRecordList(1);
+                    dialog.list['allowAlphaApplyDivdialog'].close();
+                } else {
+                    alert("内测状态修改处理失败，请联系技术人员");
+                }
+            }, true);
+        }
+
+        function transferWithdrawal(id) {
+            $("#confirmShowDiv #content").html("我已确认提前结束该用户本次内测");
+            $("#confirmShowDiv #btnConfirm").html("确认结束");
+            $("#confirmShowDiv #btnConfirm").attr('onclick', 'transferUrl(' + id + ', 3)');
+            $("#confirmShowDiv #btnCancel").html("我再想想~");
+            $("#confirmShowDiv #btnCancel").attr('onclick', ' dialog.list["allowAlphaApplyDivdialog"].close();');
+            dialog({
+                id: "allowAlphaApplyDivdialog",
+                title: "确认结束",
+                lock: true,
+                background: '#fff', // 背景色
+                opacity: 0.5, // 透明度
+                content: document.getElementById("confirmShowDiv")
+            }).showModal();
+        }
+
+        function transferUrl(id, status) {
+            var postJson = {};
+            postJson["id"] = id;
+            postJson["status"] = status;
+            var url = "/AlphaApply/updateAlphaApplyRecord";
+            $.doAjax(url, postJson, function (msg) {
+                //console.log(msg);
+                if (msg == "1") {
+                    dialog({
+                        content: '提前结束该用户本次内测成功',
+                        quickClose: true // 点击空白处快速关闭
+                    }).show();
+                    GetAlphaApplyRecordList(1);
+                    dialog.list['allowAlphaApplyDivdialog'].close();
+                } else {
+                    alert("修改处理失败，请联系技术人员");
+                }
+            }, true);
+        }
+    </script>
+}

@@ -1,0 +1,77 @@
+﻿
+@{
+    Layout = null;
+    ViewBag.Title = "店铺支出";
+}
+<div class="panel">
+    <div class="panel-heading">
+        <div class="panel-title">
+            <div class="page-where outPayWhere" style=" margin-top:10px;">
+                <div class="pull-left">
+                    <div class="form-group m-b-10 whereitem">
+                        <input type="text" placeholder="支出名称" class="form-control width120" id="outPayName" onkeyup="OutPayInputOnKeyUp(event)" />
+                    </div>
+                    <div class="form-group  whereitem page-where-othertime ">
+                        <div class="input-daterange input-group">
+                            <input type="text" placeholder="录入时间" class="input-sm form-control" name="start" id="outPayStartTime" />
+                            <span class="input-group-addon">to</span>
+                            <input type="text" placeholder="录入时间" class="input-sm form-control" name="end" id="outPayEndTime" />
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </div>            
+        </div>
+    </div>
+    <div class="panel-body">
+        <div class="row column-seperation">
+            <table class="table table-hover table-condensed  no-footer" id="outPayListTable">
+                <thead>
+                    <tr>
+                        <th style="width: 120px;">支出分类 </th>
+                        <th style="width: 180px;">支出名称</th>
+                        <th style="width: 150px;">支出金额</th>
+                        <th style="width: 120px;">支出时间</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <div class="dataTables_wrapper m-l-10" id="outPayListPageHtml">
+                <div class="dataTables_paginate pagination">
+                    <ul><li class="prev disabled"><a href="javascript:void(0)"><i class="pg-arrow_left"></i></a></li><li class="active"><a href="javascript:void(0)">1</a></li><li class="next disabled"><a href="javascript:void(0)"><i class="pg-arrow_right"></i></a></li></ul>
+                </div>
+                <div class="dataTablePagText"></div>
+            </div>
+        </div>        
+    </div>
+</div>
+
+<script type="text/javascript">
+    var timeOut = 0;
+    $(function () {
+        GetOutPayList(1);
+        $.Pages.initSelectFxPlugin();
+        $('.outPayWhere .page-where-othertime .input-daterange').datepicker({ orientation: "top auto" }).on({
+            'hide': function (ev) {
+                var oldValue = $(ev.target);
+                if (oldValue.val() != oldValue.attr("old")) {
+                    timeOut = setTimeout("GetOutPayList(1)", 500);
+                    oldValue.attr("old", oldValue.val());
+                }
+            }, 'show': function (ev) {
+                clearTimeout(timeOut);
+            }
+        });
+    })
+</script>
+<script type="text/html" id="ShopoutPayListScript">
+    {{each listData}}
+    <tr class="odd" role="row">
+        <td class="v-align-middle">{{$value.PayMaxType}} - {{$value.PayMinType}}</td>
+        <td class="v-align-middle">{{$value.PayName}}</td>
+        <td class="v-align-middle">{{$value.PaySum}}</td>
+        <td class="v-align-middle">{{$value.PayDate}}</td>
+    </tr>
+    {{/each}}
+</script>
+

@@ -1,0 +1,78 @@
+﻿
+ .ShopInfoTitle h5{display:inline-block}
+.sysAccounttable tbody tr td {
+padding: 8px;
+line-height: 30px;
+text-align: left;
+vertical-align: middle;
+border-top: 1px solid #dddddd;
+}
+
+.tabletext-center{text-align:center;}
+.tabletext-center tbody tr td{text-align:center;}
+.tabletext-center thead tr th{text-align:center;}
+
+.shopsys{ padding:0px;}
+.shopsys table{border-left:1px solid #ddd; border-top:1px solid #ddd;}
+.shopsys .sitd{ padding:3px 5px; border-bottom:1px solid #ddd; border-right:1px solid #ddd; line-height:26px; }
+.shopsys .sititle{ width:100px;font-weight:bold; text-align:right;}
+.shopsys .sicontent{ width:200px;}
+
+.AddVisitInfoDiv{} 
+.AddVisitInfoDiv table tr td{padding:12px 12px;border-bottom:1px solid #ddd; border-right:1px solid #ddd; line-height:26px; }
+.AddVisitInfoDiv .radio label{margin-bottom:0px;}
+.AddVisitInfoDiv .checkbox,.AddVisitInfoDiv  .radio{ margin:0px;}
+ .AddVisitInfoDiv .bootstrap-tagsinput{margin-bottom:0px; border-width:0px;}
+.AddVisitInfoDiv  .bootstrap-tagsinput .tag{line-height:35px; margin-right:10px;}
+.AddVisitInfoDiv .addTag{color:#000080; cursor:pointer;}
+.bootstrap-tagsinput .tag [data-role="remove"] {
+  margin-left: 8px;
+  cursor: pointer;
+}
+.bootstrap-tagsinput .tag [data-role="remove"]:after { 
+  padding: 0px 2px;
+}
+
+.selectVisitTagList .tag{ cursor:pointer;}
+.selectVisitTagList .tag:hover{background-color: #48b0f7;color: #fff;}
+
+.titleLabel .tag{margin-right:10px;}
+.titleLabel .input-group-addon .fa{ cursor:pointer;}
+/*.SysTagListDiv{width: 400px;position:absolute; background-color:#fff; border:1px solid #E6E6E6; padding:5px;list-style-type: none;bottom: 22px;left: -125px;}
+.SysTagListDiv li{margin:5px;white-space:nowrap;  float:left;}*/
+
+ul.SysTagListDiv {
+ 	height: 100px;
+	overflow: hidden;
+}
+ul.SysTagListDiv li.tagItem:first-child {
+	border: 0;
+}
+.SelectTag a{color: red;}
+.input-group-addon:hover .hover-highlight {
+	color: #8a7dbe;
+}
+#VisitContent table tr td{   
+    padding: 0px;
+  border-width: 0px;
+  line-height: 20px;}
+
+.visitReplyItem {
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
+.visitReplyItem .itemName {
+	padding-right: 10px;
+	color: #000080;
+}
+
+.visitReplyItem .itemContent {
+	padding: 10px;
+	color: #000;
+}
+
+#needVisitContent table tr td{   
+    padding: 0px;
+  border-width: 0px;
+  line-height: 20px;}

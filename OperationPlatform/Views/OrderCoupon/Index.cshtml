@@ -1,0 +1,220 @@
+﻿
+@{
+    ViewBag.Title = "优惠券管理";
+}
+@section Style{
+
+    @Styles.Render("~/style/form")
+    <style type="text/css">
+        .shopsys {
+            padding: 0px;
+        }
+
+            .shopsys table {
+                border-left: 1px solid #ddd;
+                border-top: 1px solid #ddd;
+            }
+
+            .shopsys .sitd {
+                padding: 3px 5px;
+                border-bottom: 1px solid #ddd;
+                border-right: 1px solid #ddd;
+                line-height: 26px;
+            }
+
+            .shopsys .sititle {
+                width: 100px;
+                font-weight: bold;
+                text-align: right;
+            }
+
+            .shopsys .sicontent {
+                width: 200px;
+            }
+    </style>
+}
+<div class="panel no-border">
+    <div class="panel-heading">
+        <div class="panel-title">
+            <div class="page-where couponWhere" style="">
+                <div>
+                    <div class="pull-left">
+                        <div class=" whereitem">
+                            <input type="text" placeholder="优惠券名称" class="form-control width200" id="couponDesc" onkeyup="CouponKeyUp(event)">
+                        </div>
+                        <div class="whereitem" id="insertTime">
+                            <div class="input-daterange input-group">
+                                <input type="text" placeholder="开始时间" class="input-sm form-control" name="start" />
+                                <span class="input-group-addon">to</span>
+                                <input type="text" placeholder="结束时间" class="input-sm form-control" name="end" />
+                            </div>
+                        </div>
+                        <div class="whereitem">
+                            <input type="text" placeholder="录入人" class="form-control width120" id="InsertName" onkeyup="CouponKeyUp(event)">
+                        </div>
+                        <div class="whereitem checkbox check-success">
+                            <input type="checkbox" value="" id="expiration" onchange="GetCouponList(1)"/>
+                            <label for="expiration">显示过期优惠券</label>
+                        </div>
+                        <div class="clear"></div>
+                    </div>
+                </div> 
+            </div>
+        </div>
+        <div class="panel-controls">
+            <div class="btn-group" data-toggle="buttons" id="insertNameType">
+                <label class="btn btn-complete active" onclick="GetCouponList(1,1)">
+                    <input type="radio" name="insertNameType" id="insertNameType1" value="1" checked="">人工增加
+                </label>
+                <label class="btn btn-complete" onclick="GetCouponList(1,0)">
+                    <input type="radio" name="insertNameType" id="insertNameType2" value="0">系统生成
+                </label>
+            </div>
+        </div>
+    </div>
+    <div class="panel-body no-padding">
+        <div class="row column-seperation">
+            <table class="table table-hover  no-footer table-border-right" id="ListTable">
+                <thead>
+                    <tr>
+                        <th style=" width:300px ">优惠券名称 </th>
+                        <th style="width: 110px;" class="text-center">数量</th>
+                        <th style="width: 110px;" class="text-center">绑定/使用</th>
+                        <th style="width: 120px;" class="text-center">生成时间</th>
+                        <th style="width: 120px;" class="text-center">结束时间</th>
+                        <th style="width: 80px;" class="text-center">状态</th>
+                        <th style="width: 230px;" class="text-center">备注说明</th>
+                        <th style="width: 80px;" class="text-center">录入人</th>
+                        <th style="width: 110px;" class="text-center">操作</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <div class="dataTables_wrapper" id="ListPageHtml">
+                <div class="dataTables_paginate pagination no-padding">
+                    <ul><li class="prev disabled"><a href="javascript:void(0)"><i class="pg-arrow_left"></i></a></li><li class="active"><a href="javascript:void(0)">1</a></li><li class="next disabled"><a href="javascript:void(0)"><i class="pg-arrow_right"></i></a></li></ul>
+                </div>
+                <div class="dataTablePagText v-align-middle p-l-20"></div>
+            </div>
+        </div>
+        <div id="CouponInfoList" class="shopsys" style="display:none;">
+            <div class="couponInfoTable">
+
+            </div>
+            <div class="couponinfoList">
+                <table class="table table-hover  no-footer table-border-right" id="CouponInfoListTable">
+                    <thead>
+                        <tr>
+                            <th style=" width: 225px;" class="text-center">优惠券编号 </th>
+                            <th style="width: 110px;" class="text-center">状态</th>
+                            <th style="width: 160px;" class="text-center">绑定时间</th>
+                            <th style="width: 160px;" class="text-center">使用时间</th>
+                            <th style="width: 120px;" class="text-center">绑定使用</th>
+                            <th style="width: 80px;" class="text-center">店铺ID</th>
+                            <th style="width: 110px;" class="text-center">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <div class="dataTables_wrapper" id="CouponInfoListPageHtml">
+                    <div class="dataTables_paginate pagination no-padding">
+                        <ul><li class="prev disabled"><a href="javascript:void(0)"><i class="pg-arrow_left"></i></a></li><li class="active"><a href="javascript:void(0)">1</a></li><li class="next disabled"><a href="javascript:void(0)"><i class="pg-arrow_right"></i></a></li></ul>
+                    </div>
+                    <div class="dataTablePagText v-align-middle p-l-20"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/html" id="orderCounponListScript">
+    {{each listData}}
+        <tr>
+            <td>{{$value.couponDesc}}</td>
+            <td class="text-center">{{$value.produceNum}}/{{$value.maxLimitNum}}</td>
+            <td class="text-center">{{$value.bindingNum}}/{{$value.useNum}}</td>
+            <td class="text-center">{{$value.createDate}}</td>
+            <td class="text-center">{{$value.endDate}}</td>
+            <td class="text-center">{{$value.couponStatusName}}</td>
+            <td>{{$value.remark}}</td>
+            <td class="text-center">{{$value.opertorName}}</td>
+            <td class="text-center"><a href="javascript:void(0)" onclick="CouponInfoClick({{$value.id}})">查看详情</a></td>
+        </tr>
+    {{/each}}
+</script>
+<script type="text/html" id="CouponInfoScript">
+    <table class="table table-hover  no-footer table-border-right fs-12">
+        <tbody>
+            <tr>
+                <td class="sitd sititle">优惠券：</td>
+                <td class="sitd sicontent" colspan="5">{{couponDesc}}</td>
+            </tr>
+            <tr>
+                <td class="sitd sititle">限制条件：</td>
+                <td class="sitd sicontent">{{bindTypeName}}【金额：{{ruleTypeName}}】</td>
+                <td class="sitd sititle">创建时间：</td>
+                <td class="sitd sicontent">{{createDate}}</td>
+                <td class="sitd sititle">过期时间：</td>
+                <td class="sitd sicontent">{{endDate}}</td>
+            </tr>
+            <tr>
+                <td class="sitd sititle">数量：</td>
+                <td colspan="5">
+                    当前优惠券 [ {{produceNum}}个 ] 已绑定 [ {{bindingNum}}个 ] 已使用 [ {{useNum}}个 ] 最大数量 [ {{maxLimitNum}}个 ] <span class=" label label-success " style=" margin-left: 20px; cursor: pointer; background-color: #6DC0F9;" onclick="generateCoupon()">生成优惠券</span>
+                </td>
+            </tr>
+            <tr>
+                <td class="sitd sititle">备注：</td>
+                <td colspan="5">{{remark}}</td>
+            </tr>
+        </tbody>
+    </table>
+</script>
+<script type="text/html" id="couponInfoListScript">
+    {{each listData}}
+        <tr>
+            <td class="text-center">{{$value.couponId}}</td>
+            <td class="text-center">{{$value.couponStatusName}}</td>
+            <td class="text-center">{{$value.receiveDate}}</td>
+            <td class="text-center">{{$value.usedDate}}</td>
+            <td class="text-center">{{$value.toAccName}}</td>
+            <td class="text-center">{{$value.toAccId}}</td>
+            <td class="text-center">
+                {{ if $value.couponStatus==0 }}
+                <a href="javascript:volid(0)" onclick="bindingCoupon('{{$value.couponId}}')" >绑定</a>
+                {{/if}}
+            </td>
+        </tr>
+    {{/each}}
+</script>
+@section Scripts{
+    @Scripts.Render("~/js/begin/form")
+    <script src="~/Scripts/plugins/artTemplate/template.js"></script>
+<script src="~/Scripts/OrderCoupon/index.js"></script>
+
+    <script type="text/javascript">
+
+        var timeOut = 0;
+        $(function() {
+            GetCouponList(1);
+
+            $('.couponWhere .pull-left .input-daterange').datepicker({ orientation: "top auto" }).on({
+                'hide': function(ev) {
+                    var oldValue = $(ev.target);
+                    if (oldValue.val() != oldValue.attr("old")) {
+                        timeOut = setTimeout("GetCouponList(1)", 500);
+                        oldValue.attr("old", oldValue.val());
+                    }
+                },
+                'show': function(ev) {
+                    clearTimeout(timeOut);
+                }
+            });
+        });
+
+        template.helper('$ContentTxt', function (Content) {
+            return $("<div>" + Content + "</div>").text();
+        });
+
+    </script>
+}
+

@@ -1,0 +1,48 @@
+﻿@model IEnumerable<Model.Sys_TaskDailyInfo>
+
+<table class="table table-hover   no-footer  fs-12">
+    <thead>
+        <tr>
+            <th>店铺名称</th>
+            <th>回访原因</th>
+            <th>备注</th>
+            <th class="text-center">来源</th>
+            <th class="text-center">操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Any())
+        {
+
+            foreach (var item in Model)
+            {
+                <tr>
+
+                    <td class="font-montserrat all-caps fs-12">
+                        <a href="/shopinfo/index/@Html.DisplayFor(modelItem => item.accountid)" target="_blank"> @Html.DisplayFor(modelItem => item.CompanyName)【@Html.DisplayFor(modelItem => item.accountid)】</a>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.t_mk)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.dt_remark)
+                    </td>
+                    <td class="text-center">
+                        @Html.DisplayFor(modelItem => item.dt_Source)
+                    </td>
+                    <td class="text-center">
+                        @Html.ActionLink("回访", "../Shopinfo/index", new {id = item.accountid, td = item.id}, new {target = "_blank"}) |
+                        <a href="javascript:void(0)" onclick="CloseVisit(@item.id,@item.accountid )">关闭</a>
+                    </td>
+                </tr>
+
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="7"><div class="DataNull">无需要回访的信息</div></td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,61 @@
+﻿@{
+    ViewBag.Title = "拉新";
+    Layout = null;
+}
+
+
+<table id="newAccount" class="table table-bordered" style="width: 800px">
+    <thead>
+        <tr>
+            <th colspan='2'>新增</th>
+            <th>本周期</th>
+            <th>上周期</th>
+            <th>增长</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+
+<script type="text/html" id="NewAccountScript">
+    {{each list}}
+    {{if $value.GroupName!="Not Support"}}
+    <tr>
+        <td rowspan='{{$value.RowSpan}}' colspan='{{$value.ColSpan}}'>{{$value.GroupName}}</td>
+        {{each $value.DataList as data i}}
+        {{if i==0}}
+        {{if $value.ColSpan>1}}
+        {{else}}
+        <td>{{data.SourceName}}</td>
+        {{/if}}
+        <td>{{data.ThisWeekVal}}</td>
+        <td>{{data.LastWeekVal}}</td>
+        <td>{{data.Percent}}</td>
+        {{/if}}
+        {{/each}}
+        @*<td>{{$value.SourceName}}</td>
+            <td>{{$value.ThisWeekVal}}</td>
+            <td>{{$value.LastWeekVal}}</td>*@
+    </tr>
+    {{each $value.DataList as data i}}
+    {{if i>0}}
+    <tr>
+        <td>{{data.SourceName}}</td>
+        <td>{{data.ThisWeekVal}}</td>
+        <td>{{data.LastWeekVal}}</td>
+        <td>{{data.Percent}}</td>
+    </tr>
+    {{/if}}
+    {{/each}}
+    {{/if}}
+    {{/each}}
+</script>
+
+<script src="~/Scripts/plugins/artTemplate/template.js"></script>
+<script type="text/javascript">
+    $(function () {
+        //GetNewAccountReport();
+    });
+
+
+</script>

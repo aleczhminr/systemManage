@@ -1,0 +1,125 @@
+﻿@model Model.T_OutLink
+
+@{
+    ViewBag.Title = "AddPromotion";
+    Layout = null;
+}
+<div class="row">
+    <div class="col-md-6">
+        <div class="panel-body" style="background-color: #fff!important;">
+            <div class="form-group">
+                <label>类别</label>
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+                         <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" id="addTypeMajor" onchange="GetAddMinorType(this)">
+                            <option value="1">百度</option>
+                            <option value="2">发帖</option>
+                            <option value="3">博客</option>
+                            <option value="4">官方</option>
+                            <option value="5">其他</option>
+                        </select>
+                        <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" id="addTypeMinor" onchange="">
+                            <option value="0">全部小分类</option>
+                            <option value="6">百科</option>
+                            <option value="7">知道</option>
+                            <option value="8">文库</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div class="form-group">
+                <label>名称</label>
+                <input type="text" placeholder="名称" class="form-control" id="linkAddName" onkeyup="">
+            </div>
+            <div class="form-group">
+                <label>地址</label>
+                <input type="text" placeholder="地址" class="form-control" id="linkUrl" onkeyup="">
+            </div>
+            <hr>
+            <div class="form-group">
+                <label>短地址</label>
+                <div class="row">
+                    <div class="col-xs-3 col-sm-3 col-md-3">
+                        <button id="generateShortUrl" class="btn btn-primary btn-cons" onclick="GenShortUrl()">生成短地址</button>
+                    </div>
+                    <div class="col-xs-9 col-sm-9 col-md-9">
+                        <input type="text" placeholder="短地址" class="form-control form-control" id="linkShortUrl" onkeyup="">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>说明</label>
+                <input type="text" placeholder="说明" class="form-control" id="remark" onkeyup="">
+            </div>
+            <div class="m-t-10">
+                <button id="create" class="btn btn-success btn-cons" onclick="AddNewPromotion()">创建</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $.Pages.initSelectFxPlugin();
+    });
+    function GetAddMinorType(e) {
+        var ur = "/Promote/GetMinorType";
+
+        var postJson = {};
+        postJson["id"] = e.value;
+
+        $.doAjax(ur, postJson, function(msg) {
+            if (msg != "") {
+                $("#addTypeMinor").html("");
+                $("#addTypeMinor").append("<option value='0'>全部小分类</option>");
+                $.each(jQuery.parseJSON(msg), function(i, n) {
+                    $("#addTypeMinor").append("<option value='" + n.id + "'>" + n.name + "</option>");
+                });
+            }
+        }, true);
+    }
+
+    function AddNewPromotion() {
+        var ur = "/Promote/AddNewPromotion";
+        var param = {};
+        //int linkType,string linkUrl,string remark,string linkName,string shortUrl
+        if ($("#addTypeMinor").val() != "0") {
+            param["linkType"] = $("#addTypeMinor").val();
+        } else
+            param["linkType"] = $("#addTypeMajor").val();
+
+        param["linkUrl"] = $("#linkUrl").val();
+        param["remark"] = $("#remark").val();
+        param["linkName"] = $("#linkAddName").val();
+
+        param["shortUrl"] = $("#linkShortUrl").val();
+
+        $.doAjax(ur, param, function(msg) {
+            if (msg != "1") {
+                alert(msg);
+            } else {
+                alert("新增成功！");
+                location.href = '/Promote/Index';
+            }
+        }, true);
+
+    }
+
+    function GenShortUrl() {
+        var ur = "/Promote/GetBaiduUrl";
+        var postUrl = {};
+
+        postUrl["url"] = $("#linkUrl").val();
+
+        $.doAjax(ur, postUrl, function (msg) {
+            if (msg != "") {
+                $("#linkShortUrl").val(msg);
+            }
+        }, true);
+    }
+</script>

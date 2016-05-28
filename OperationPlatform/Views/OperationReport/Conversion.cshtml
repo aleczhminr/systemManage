@@ -1,0 +1,65 @@
+﻿@{
+    ViewBag.Title = "转化";
+    Layout = null;
+}
+
+
+<table id="conversion" class="table table-bordered" style="width: 1200px">
+    <thead>
+        <tr>
+            <th rowspan='2'>渠道漏斗</th>
+            <th colspan="2">iOS</th>
+            <th colspan="11">Android</th>
+            <th rowspan='2'>PC客户端</th>
+            <th rowspan='2'>网页</th>
+        </tr>
+        <tr>
+            <th>iPhone</th>
+            <th>iPad</th>
+            <th>主站</th>
+            <th>360</th>
+            <th>应用宝</th>
+            <th>小米</th>
+            <th>华为</th>
+            <th>百度</th>
+            <th>魅族</th>
+            <th>OPPO</th>
+            <th>安智</th>
+            <th>豌豆荚</th>
+            <th>其他</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+
+<script type="text/html" id="conversionScript">
+    {{each list}}
+    <tr>
+        <td>{{$value.NameStr}}</td>
+        <td>{{$value.iPhoneNum}}</td>
+        <td>{{$value.iPadNum}}</td>
+        <td>{{$value.ZhuzhanNum}}</td>
+        <td>{{$value.QihuNum}}</td>
+        <td>{{$value.TengxunNum}}</td>
+        <td>{{$value.XiaomiNum}}</td>
+        <td>{{$value.HuaweiNum}}</td>
+        <td>{{$value.BaiduNum}}</td>
+        <td>{{$value.MeizuNum}}</td>
+        <td>{{$value.OppoNum}}</td>
+        <td>{{$value.AnzhiNum}}</td>
+        <td>{{$value.WandoujiaNum}}</td>
+        <td>{{$value.Other}}</td>
+        <td>{{$value.PcClientNum}}</td>
+        <td>{{$value.WebNum}}</td>
+    </tr>
+    {{/each}}
+</script>
+<script src="~/Scripts/plugins/artTemplate/template.js"></script>
+<script type="text/javascript">
+    $(function () {
+        //GetNewAccountReport();
+    });
+
+
+</script>

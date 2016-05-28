@@ -1,0 +1,123 @@
+﻿@model IEnumerable<Model.SmsNotifyItem>
+
+@{
+    Layout = null;
+}
+
+<table class="table table-hover table-condensed  no-footer table-border-right fs-12">
+    <thead>
+        <tr>
+            <th class="text-center" style="width: 80px;">
+                @Html.DisplayNameFor(model => model.PriorityName)
+            </th>
+            <th style="width:180px;">
+                @Html.DisplayNameFor(model => model.StoreName)
+            </th>
+            <th class="text-center" style="width: 60px;">
+                @Html.DisplayNameFor(model => model.UserCnt)
+            </th>
+            <th class="text-center" style="width: 50px;">
+                @Html.DisplayNameFor(model => model.TotalSmsCnt)
+            </th>
+            <th class="text-center" style="width: 50px;">
+                @Html.DisplayNameFor(model => model.RealSmsCnt)
+            </th>
+            <th class="text-center" style="width:50px;">
+                @Html.DisplayNameFor(model => model.FailCnt)
+            </th>
+            <th style="min-width: 300px; width: 300px">
+                @Html.DisplayNameFor(model => model.SmsContent)
+            </th>
+            <th class="text-center" style="width: 80px;">
+                @Html.DisplayNameFor(model => model.SmsStatus)
+            </th>
+            <th class="text-center" style="width: 130px;">
+                @Html.DisplayNameFor(model => model.CompleteTime)
+            </th>
+            <th class ="text-center" style="width: 80px;">操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null)
+        {
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td class ="text-center">
+                        @Html.DisplayFor(modelItem => item.PriorityName)
+                    </td>
+                    @if (item.AccId > 0)
+                    {
+                        <td>
+                            <a href="/shopinfo/index/@Html.DisplayFor(modelItem => item.AccId)" target="_blank">  @Html.DisplayFor(modelItem => item.StoreName)</a>
+</td>
+                    }
+                    else
+                    {
+                        <td>
+                            @Html.DisplayFor(modelItem => item.PhoneList)
+                        </td>
+                    }
+                    <td class="text-center">
+                        @Html.DisplayFor(modelItem => item.UserCnt)
+                    </td>
+                    <td class="text-center">
+                        @Html.DisplayFor(modelItem => item.TotalSmsCnt)
+                    </td>
+                    <td class="text-center">
+                        @Html.DisplayFor(modelItem => item.RealSmsCnt)
+                    </td>
+                    <td class="text-center">
+                        @Html.DisplayFor(modelItem => item.FailCnt)
+                    </td>
+                    <td style="white-space:initial;">
+                        @Html.DisplayFor(modelItem => item.SmsContent)
+                    </td>
+                    <td class="text-center">
+                        @Html.DisplayFor(modelItem => item.StatusName)
+                    </td>
+                    <td class="text-center">
+                        @Html.DisplayFor(modelItem => item.CompleteTime)
+                    </td>
+                    <td class="text-center">
+                        <a href="javascript:void(0)" onclick="SmsInfoDetailsList(1,@Html.DisplayFor(modelItem => item.AccId),@Html.DisplayFor(modelItem => item.Id))">详情</a>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="9"> 暂无短信数据</td>
+            </tr>
+        }
+    </tbody>
+
+</table>
+<div>
+    @if (ViewBag.Page != 1)
+    {
+        @Html.ActionLink("<<", "Index", new { iPage = 1, bgDate = ViewBag.bgDate, edDate = ViewBag.edDate })
+        @Html.Raw(" ")
+        @Html.ActionLink("< Prve", "Index", new { iPage = ViewBag.Page - 1, bgDate = ViewBag.bgDate, edDate = ViewBag.edDate })
+    }
+    else
+    {
+        @:<<
+        @Html.Raw(" ")
+        @:< Prev
+}
+    @Html.Raw(" ")
+    @if (ViewBag.Page < ViewBag.AllPage)
+    {
+        @Html.ActionLink("Next >", "Index", new { iPage = ViewBag.Page + 1 })
+        @Html.Raw(" ")
+        @Html.ActionLink(">>", "Index", new { iPage = ViewBag.AllPage })
+    }
+    else
+    {
+        @:Next>
+        @Html.Raw(" ")
+        @:>>
+}
+</div>

@@ -1,0 +1,264 @@
+﻿@{
+    ViewBag.Title = "短信信息";
+}
+
+
+@section Style{
+    @Styles.Render("~/style/form")
+}
+<div class="panel panel-transparent ">
+    <div class="tab-content tab-conten-padding0">
+        <div class="page-where" style="margin-top: 10px; ">
+            <div class="page-where-left">
+
+                <div class="whereitem">
+                    <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" id="priorityType">
+                        <option value="-99">优先级</option>
+                        <option value="0">系统</option>
+                        <option value="1">普通</option>
+                        <option value="2">群发</option>
+                        <option value="-1">审核</option>
+                    </select>
+                </div>
+                <div class="whereitem">
+                    <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" id="sendType">
+                        <option value="-99">全部状态</option>
+                        <option value="0">等待发送</option>
+                        <option value="1">已提交</option>
+                        <option value="2">正在发送</option>
+                        <option value="3">发送失败</option>
+                    </select>
+                </div>
+                <div class="whereitem">
+                    <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" id="smsType">
+                        <option value="-99">全部类型</option>
+                        <option value="0">重置密码</option>
+                        <option value="1">短信营销</option>
+                        <option value="2">充值提醒</option>
+                        <option value="3">电子账单</option>
+                        <option value="4">店铺经营</option>
+                        <option value="6">会员注册</option>
+                        <option value="7">生日祝福</option>
+                        <option value="8">日程提醒</option>
+                        <option value="9">用户注册</option>
+                        <option value="10">密码找回</option>
+                        <option value="11">订单提醒</option>
+                        <option value="12">回访营销</option>
+                        <option value="99">测试短信</option>
+                    </select>
+                </div>
+                <div class="btn-group whereitem">
+                    <button type="button" class="btn btn-default btn-select" value="7" onclick=" whereTimeButtonClick(this) ">最近7天</button>
+                    <button type="button" class="btn btn-default" value="15" onclick=" whereTimeButtonClick(this) ">最近15天</button>
+                    <button type="button" class="btn btn-default" value="30" onclick=" whereTimeButtonClick(this) ">最近30天</button>
+                    <button type="button" class="btn btn-default" value="other" onclick=" whereTimeButtonClick(this) ">其他时间</button>
+                </div>
+                <div class="btn-group page-where-othertime whereitem" style="display: none;margin-right: 10px">
+                    <button type="button" value="return" class="btn btn-default border-right0" onclick=" whereTimeButtonClick(this) ">返回</button>
+                    <div class="pull-left">
+                        <div class="input-daterange input-group">
+                            <input type="text" class="input-sm form-control" name="start" id="startTime">
+                            <span class="input-group-addon">to</span>
+                            <input type="text" class="input-sm form-control" name="end" id="endTime">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="whereitem" style="width: 100px;margin-right: 10px">
+                    <input class="form-control" id="accId" type="text" placeholder="店铺ID">
+                </div>
+                <div class="whereitem">
+                    <input type="button" value="查询" class="btn btn-default btn-inquire" onclick="GetSmsList(1)" />
+                </div>
+                <div class="clear"></div>
+                <input type="hidden" id="timePeriod" value="7" name="timePeriod" />
+            </div>
+            <div class="clear"></div>
+        </div>
+    </div>
+</div>
+
+<div class="row column-seperation">
+    <table class="table table-hover table-condensed  no-footer table-border-right fs-12" style="" id="SmsListTable">
+        <thead>
+            <tr>
+                <th class="text-center" style="width: 80px;">
+                    优先级
+                </th>
+                <th style="width:180px;">
+                    店铺名称
+                </th>
+                <th class="text-center" style="width: 60px;">
+                    号码数
+                </th>
+                <th class="text-center" style="width: 50px;">
+                    条数
+                </th>
+                <th class="text-center" style="width: 50px;">
+                    成功
+                </th>
+                <th class="text-center" style="width:50px;">
+                    失败
+                </th>
+                <th style="min-width: 300px; width: 300px">
+                    短信内容
+                </th>
+                <th class="text-center" style="width: 80px;">
+                    状态
+                </th>
+                <th class="text-center" style="width: 130px;">
+                    发送时间
+                </th>
+                <th class="text-center" style="width: 80px;">操作</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <div class="dataTables_wrapper" id="smsListPageHtml">
+        <div class="dataTables_paginate pagination">
+            <ul><li class="prev disabled"><a href="javascript:void(0)"><i class="pg-arrow_left"></i></a></li><li class="active"><a href="javascript:void(0)">1</a></li><li class="next disabled"><a href="javascript:void(0)"><i class="pg-arrow_right"></i></a></li></ul>
+        </div>
+        <div class="dataTablePagText"></div>
+    </div>
+
+</div>
+
+
+<input type="hidden" value="" id="selectSmsAccid" />
+<input type="hidden" value="" id="selectSmsId" />
+<div id="smsInfoDetailsList" style="display:none;">
+    <div>
+        <input class="form-control width200" style="float:left;" type="text" placeholder="电话号码" id="selectSmsPhone"> <input type="button" value="查询" class="btn btn-default btn-inquire" style="float:left; margin-left:20px;" onclick="SmsInfoDetailsList(1)" />
+        <div class="clear"></div>
+    </div>
+    <table class="table table-hover table-condensed  no-footer table-border-right fs-12" style="width:auto;;">
+        <thead>
+            <tr>
+                <th style="width:80px;">电话号码</th>
+                <th style="width:200px;">短信内容</th>
+                <th style="width: 85px;">发送状态</th>
+                <th style="width:120px;">发送时间</th>
+                <th style="width: 85px;">发送通道</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <div class="dataTables_wrapper ListPageHtml">
+        <div class="dataTables_paginate pagination">
+            <ul><li class="prev disabled"><a href="javascript:void(0)"><i class="pg-arrow_left"></i></a></li><li class="active"><a href="javascript:void(0)">1</a></li><li class="next disabled"><a href="javascript:void(0)"><i class="pg-arrow_right"></i></a></li></ul>
+        </div>
+        <div class="dataTablePagText"></div>
+    </div>
+
+</div>
+
+<div style="width:0px; height:0px; overflow:hidden;">
+    <div id="aeroClipDiv" style=" overflow:hidden;position:relative; width:100px; height:18px;">
+        <div id="aeroClipModel-button" style=" width:100px; height:18px; text-align:center;">复制短信内容</div>
+        <div id="aeroClipContext-Text" style=" display:none;"></div>
+    </div>
+</div>
+<script type="text/html" id="SmsListScript">
+    {{each Data}}
+    <tr>
+        <td class="text-center">
+            {{$value.PriorityName}}
+        </td>
+        {{if ($value.AccId > 0)}}
+        <td>
+            <a href="/shopinfo/index/{{$value.AccId}}" target="_blank"> {{$value.StoreName}}</a>
+        </td>
+        {{else}}
+        <td>
+            {{$value.PhoneList}}
+        </td>
+        {{/if}}
+        <td class="text-center">
+            {{$value.UserCnt}}
+        </td>
+        <td class="text-center">
+            {{$value.TotalSmsCnt}}
+        </td>
+        <td class="text-center">
+            {{$value.RealSmsCnt}}
+        </td>
+        <td class="text-center">
+            {{$value.FailCnt}}
+        </td>
+        <td class="SmsContent" onclick=" ZeroClipClick(this) " style="white-space: initial;" smstype="{{$value.SmsTypeName}}">
+            {{$value.SmsContent}}
+        </td>
+        {{if $value.IsFree==1}}
+        <td class="text-center" title="{{$value.ErrDesc}}">
+            {{$value.StatusName}}
+            <img src="/img/Shop/edi1.png" alt="免费短信" />
+        </td>
+        {{else}}
+        <td class="text-center" title="{{$value.ReviewDesc}}">
+            {{$value.StatusName}}
+        </td>
+        {{/if}}
+        <td class="text-center" title="提交时间:{{$value.SubmitTime}};定时时间:{{$value.RegularTime}};完成时间:{{$value.CompleteTime}}">
+            {{$value.CompleteTime}}
+        </td>
+        <td class="text-center">
+            <a href="javascript:void(0)" onclick="SmsInfoDetailsList(1,{{$value.AccId}},{{$value.Id}})">详情</a>
+        </td>
+    </tr>
+
+    {{/each}}
+</script>
+
+
+<script type="text/html" id="smsInfoDetailsListScript">
+    {{each detailList}}
+    <tr>
+        <td>{{$value.phoneNum}}</td>
+        <td>{{$value.smsContent}}</td>
+        <td title="{{$value.errDesc}}">{{$value.smsStatusName}}</td>
+        <td>{{$value.sendtime}}</td>
+        <td>{{$value.smsChannel}}</td>
+    </tr>
+    {{/each}}
+</script>
+
+@section Scripts{
+    @Scripts.Render("~/js/begin/form")
+    <script src="~/Scripts/plugins/artTemplate/template.js"></script>
+<script src="~/Scripts/plugins/ZeroClipboard/jquery.zclip.js"></script>
+<script src="~/Scripts/Sms/Sms.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            GetSmsList(1); 
+            $('.page-where .page-where-othertime .input-daterange').datepicker({ format: 'yyyy-mm-dd' });
+        });
+        template.helper('smsStatusIco', function (date, format) {
+             
+            return value;
+        });
+
+         
+        var clip = null;
+        clip = new ZeroClipboard.Client();
+        clip.setHandCursor(true);
+        ZeroClipboard.setMoviePath("/Scripts/plugins/ZeroClipboard/ZeroClipboard.swf");
+        //clip.addEventListener('mouseOver', my_mouse_over);
+        clip.addEventListener('complete', my_complete);
+
+        clip.glue('aeroClipModel-button',"aeroClipDiv");
+        clip.addEventListener( "load", function(client) {  
+            var val =$("#aeroClipContext-Text").html() ;
+            clip.setText(val);clip.reposition();
+        });
+
+
+        function my_mouse_over(client) {
+           
+        }
+
+        function my_complete(client, text) {
+            KDf435.close().remove();
+        }
+
+    </script>
+}

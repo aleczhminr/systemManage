@@ -1,0 +1,108 @@
+﻿
+@{
+    Layout = null;
+    ViewBag.Title = "店铺商品列表";
+}
+
+<div class="panel">
+    <div class="panel-heading">
+        <div class="panel-title">
+            <div class="form-group no-marign">
+                <div class="row">
+                    <div class="col-xs-4 col-sm-4 col-md-4">
+                        <input id="goodsGoodsName" class="form-control inline" type="text" placeholder="点此输入商品名称" onkeyup="GoodsInputOnKeyUp(event)" />
+                    </div>
+                    <div class="col-xs-8 col-sm-8 col-md-8">
+                        <div class="input-daterange input-group pull-left">
+                            <input id="goodsStartTime" class="input-sm form-control" type="text" placeholder="录入起始时间" name="start" />
+                            <span class="input-group-addon">to</span>
+                            <input id="goodsEndTime" class="input-sm form-control" type="text" placeholder="录入结束时间" name="end" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+    <div class="panel-body no-padding">
+        <div class="row column-seperation">
+            <table class="table table-hover table-condensed  no-footer" id="goodsListTable">
+                <thead>
+                    <tr>
+                        <th>商品分类 </th>
+                        <th>商品名称</th>
+                        <th>商品编码</th>
+                        <th>商品规格</th>
+                        <th>商品单价</th>
+                        <th>商品数量</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <div class="dataTables_wrapper m-l-10" id="goodsListPageHtml">
+                <div class="dataTables_paginate pagination">
+                    <ul>
+                        <li class="prev disabled">
+                            <a href="javascript:void(0)">
+                                <i class="pg-arrow_left"></i>
+                            </a>
+                        </li>
+                        <li class="active">
+                            <a href="javascript:void(0)">1</a>
+                        </li>
+                        <li class="next disabled">
+                            <a href="javascript:void(0)">
+                                <i class="pg-arrow_right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="dataTablePagText"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    var timeOut = 0;
+    $(function () {
+        GetShopGoodsList(1);
+
+        $('.input-daterange').datepicker({ orientation: "top auto" }).on({
+            'hide': function (ev) {
+                var oldValue = $(ev.target);
+                if (oldValue.val() != oldValue.attr("old")) {
+                    timeOut = setTimeout("GetShopGoodsList(1)", 500);
+                    oldValue.attr("old", oldValue.val());
+                }
+            }, 'show': function (ev) {
+                clearTimeout(timeOut);
+            }
+        });
+    })
+    template.helper('dateIsDown', function (isDown) {
+        if (isDown == 1) {
+            return '<span title="此商品已经下架" style="color:#468847;margin-right:5px;">[下架]</span>'
+        } else {
+            return "";
+        }
+    });
+</script>
+<script type="text/html" id="ShopGoodsListScript">
+    {{each listData}}
+    <tr class="odd" role="row">
+        <td class="v-align-middle">{{$value.gMaxName}} - {{$value.gMinName}}</td>
+        {{if $value.gPicUrl!=null}}
+        <td class="v-align-middle"><img src="http://img.i200.cn{{$value.gPicUrl}}!mAuto" class="m-r-10">{{#$value.isDown | dateIsDown}}{{$value.gName}}</td>
+        {{else}}
+        <td class="v-align-middle">{{#$value.isDown | dateIsDown}}{{$value.gName}}</td>
+        {{/if}}
+        <td class="v-align-middle">{{$value.gBarcode}}</td>
+        <td class="v-align-middle">{{$value.gSpecification}}</td>
+        <td class="v-align-middle">{{$value.gPrice}}</td>
+        <td class="v-align-middle">{{$value.gQuantity}}</td>
+    </tr>
+    {{/each}}
+</script>
+

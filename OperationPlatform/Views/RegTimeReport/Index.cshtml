@@ -1,0 +1,203 @@
+﻿
+@{
+    ViewBag.Title = "24小时信息分析";
+}
+@section Style{
+    @Styles.Render("~/style/form")
+}
+
+<div class="page-where regTimeReportSourceWhere m-t-10">
+    <div class="btn-group">
+        <button type="button" class="btn btn-default btn-select" value="1" onclick=" growUpwhereTimeButtonClick(this) ">昨天</button>
+        <button type="button" class="btn btn-default" value="7" onclick=" growUpwhereTimeButtonClick(this) ">最近7天</button>
+        <button type="button" class="btn btn-default" value="15" onclick=" growUpwhereTimeButtonClick(this) ">最近15天</button>
+        <button type="button" class="btn btn-default" value="30" onclick=" growUpwhereTimeButtonClick(this) ">最近30天</button>
+    </div>
+    <div class="page-where-right">
+        <div class="checkbox check-success">
+            <input type="checkbox" checked="checked" name="datatyle" value="loginnum" id="checkbox1">
+            <label for="checkbox1">登录</label>
+            <input type="checkbox" value="salenum" name="datatyle" id="checkbox2">
+            <label for="checkbox2">销售笔</label>
+            <input type="checkbox" value="regnum" name="datatyle" id="checkbox3">
+            <label for="checkbox3">注册</label>
+            <input type="checkbox" value="clientnum" name="datatyle" id="checkbox4">
+            <label for="checkbox4">客户端</label>
+        </div>
+    </div>
+</div>
+<div id="regTimeReportSummary" style="margin: 10px">
+
+</div>
+<div id="regTimeReportflashcontenttd" class="chartDiv">
+
+</div>
+@section Scripts{
+    @Scripts.Render("~/js/begin/form")
+    <script src="~/Scripts/plugins/asset/echarts-all.js"></script>
+    <script src="~/Scripts/Operation/Operation.js"></script>
+    <script src="~/Scripts/plugins/summernote/js/summernote.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.regTimeReportSourceWhere .page-where-othertime .input-daterange').datepicker();
+
+            $(".regTimeReportSourceWhere .page-where-right input:checkbox").click(function () {
+                GetRegTimeReportJson();
+            });
+            GetRegTimeReportJson();
+        });
+
+        function growUpwhereTimeButtonClick(obj) {
+            var value = obj.value;
+            if (value == "return") {
+                $(".regTimeReportSourceWhere .btn-group").show().filter(".page-where-othertime").hide();
+            } else {
+                $(obj).parent().find(".btn-select").removeClass("btn-select");
+                $(obj).addClass("btn-select");
+                if (value == "other") {
+                    $(".regTimeReportSourceWhere .btn-group").hide().filter(".page-where-othertime").show();
+                } else {
+                    GetRegTimeReportJson();
+                }
+            }
+        }
+        var myChart = echarts.init(document.getElementById('regTimeReportflashcontenttd'));
+        var option = {
+            color:
+                    ['#87cefa', '#ff7f50', '#da70d6', '#32cd32', '#6495ed',
+                     '#ff69b4', '#ba55d3', '#cd5c5c', '#ffa500', '#40e0d0',
+                     '#1e90ff', '#ff6347', '#7b68ee', '#00fa9a', '#ffd700',
+                     '#6b8e23', '#ff00ff', '#3cb371', '#b8860b', '#30e0e0'],
+            title: {
+                text: '24小时信息分析',
+                textAlign: "center",
+                x: "center"
+            },
+            tooltip: {
+                show: true,
+                trigger: 'axis'
+            },
+            legend: {
+                data: [
+                    '数量1'
+                ],
+                y: "bottom"
+            },
+            toolbox: {
+                show: true,
+                feature: {
+                    mark: { show: true },
+                    dataView: { show: true, readOnly: false },
+                    magicType: { show: true, type: ['line', 'bar'] },
+                    restore: { show: true },
+                    saveAsImage: { show: true }
+                }
+            },
+            calculable: false,
+            grid: { y: 50, y2: 70, x2: 20 },
+            xAxis: [
+                {
+                    type: 'category',
+                    boundaryGap: false,
+                    axisLine: { show: true },//坐标轴线
+                    axisTick: { show: true },//坐标轴小标记
+                    axisLabel: { show: true },//坐标轴文本标签
+                    splitArea: { show: false },//分隔区域
+                    splitLine: { show: true },//分隔线
+                    data: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23']
+                }
+            ],
+            yAxis: [
+                {
+                    type: 'value'
+                    //axisLabel: { formatter: '{value}' }
+                }
+            ],
+            series: [
+                {
+                    name: '数量1',
+                    type: 'line',
+                    symbol: 'Circle',
+                    data: [0, 0, 0, 0, 0, 0, 0]
+                }
+            ]
+        };
+        myChart.setOption(option);
+        //var option = {
+        //    color:
+        //            ['#87cefa', '#ff7f50', '#da70d6', '#32cd32', '#6495ed',
+        //             '#ff69b4', '#ba55d3', '#cd5c5c', '#ffa500', '#40e0d0',
+        //             '#1e90ff', '#ff6347', '#7b68ee', '#00fa9a', '#ffd700',
+        //             '#6b8e23', '#ff00ff', '#3cb371', '#b8860b', '#30e0e0'],
+        //    title: {
+        //        text: '24小时信息分析',
+        //        textAlign: "center",
+        //        x: "center"
+        //    },
+        //    tooltip: {
+        //        show: true,
+        //        trigger: 'axis'
+        //    },
+        //    legend: {
+        //        data: [
+        //            '数量1'
+        //        ],
+        //        y: "bottom"
+        //    },
+        //    toolbox: {
+        //        show: true,
+        //        feature: {
+        //            mark: { show: true },
+        //            dataView: { show: true, readOnly: false },
+        //            magicType: { show: true, type: ['line', 'bar'] },
+        //            restore: { show: true },
+        //            saveAsImage: { show: true }
+        //        }
+        //    },
+        //    dataZoom: {
+        //        show: true,
+        //        realtime: true,
+        //        //orient: 'vertical',   // 'horizontal'
+        //        //x: 0,
+        //        y: 30,
+        //        //width: 400,
+        //        height: 20,
+        //        start: 0,
+        //        end: 100
+        //    },
+        //    calculable: false,
+        //    grid: { y: 60, y2: 70, x2: 20 },
+        //    xAxis: [
+        //        {
+        //            type: 'category',
+        //            boundaryGap: false,
+        //            axisLine: { show: true },//坐标轴线
+        //            axisTick: { show: true },//坐标轴小标记
+        //            axisLabel: { show: true },//坐标轴文本标签
+        //            splitArea: { show: false },//分隔区域
+        //            splitLine: { show: true },//分隔线
+        //            data: ['0', '0', '0', '0', '0', '0', '0']
+        //        }
+        //    ],
+        //    yAxis: [
+        //        {
+        //            type: 'value',
+        //            scale: true
+        //            //axisLabel: { formatter: '{value}' }
+        //        }
+        //    ],
+        //    series: [
+        //        {
+        //            name: '数量1',
+        //            type: 'line',
+        //            symbol: 'Circle',
+        //            data: [0, 0, 0, 0, 0, 0, 0]
+        //        }
+        //    ]
+        //};
+
+
+        // 为echarts对象加载数据
+        //myChart.setOption(option);
+    </script>
+}

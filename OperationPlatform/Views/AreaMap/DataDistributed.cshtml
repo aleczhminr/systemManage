@@ -1,0 +1,647 @@
+﻿@{
+    ViewBag.Title = "数据分布";
+}
+@section Style{
+    @Styles.Render("~/style/form")
+    <link href="~/css/AreaMap/AreaMap.css" rel="stylesheet" />
+    <link href="~/css/plugins/jquery-datatable/dataTables.fixedColumns.min.css" rel="stylesheet" />
+
+}
+<style>
+    table.dataTable thead .sorting_asc,
+    table.dataTable thead .sorting_desc,
+    table.dataTable thead .sorting {
+        background-position: center;
+    }
+</style>
+<div class="panel">
+    <div class="panel-heading">
+        <div class="panel-title">
+            <div class="page-where dataDstributedWhere m-t-10">
+                <div class="pull-left m-r-10 whereitem" style="width: 200px">
+                    <div class="input-group">
+                        <span class="input-group-addon">分布依据：</span>
+                        <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" id="keyValue" onchange="QueryArea('none','')">
+                            <option value="regCnt">店铺注册数</option>
+                            <option value="MemberCnt">店铺会员数</option>
+                            <option value="saleCnt">销售笔数</option>
+                            <option value="payCnt">支出笔数</option>
+                            <option value="smsCnt">短信条数</option>
+                            <option value="orderSum">订单金额</option>
+                            <option value="UserActiveCnt">活跃店铺数</option>
+                            <option value="UserSleepCnt">休眠店铺数</option>
+                            <option value="UserLostCnt">流失店铺数</option>
+                            <option value="UserLoginCnt">今日登录数</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="pull-left m-r-10 whereitem">
+                    <div class="input-group" id="showDateTip">
+                        <span class="input-group-addon" style="width:90px">数据日期：</span>
+                        <div class="input-daterange input-group date DataRange">
+                            <input type="text" id="ShowDate" class="form-control" style="width:120px" value="@ViewBag.StartTime" />
+                            <span class="input-group-addon towTimeInput"> to </span>
+                            <input type="text" id="endDate" class="form-control towTimeInput" style="width:120px" />
+                        </div>
+                    </div>
+                </div>
+                <div class="pull-left m-r-10 checkbox check-success whereitem">
+                    <input type="checkbox" value="1" id="rangeType" onchange="SetRangeType()" />
+                    <label for="rangeType">按日期范围统计</label>
+                </div>
+                <div class="clear"></div>
+            </div>
+        </div>
+    </div>
+    <div class="panel-body">
+        <div id="mapdiv" class="chartDiv no-border"></div>
+    </div>
+</div>
+
+<div id="tableZone" class="panel" style="display: none;">
+    <div class="panel-heading">
+        <div class="panel-controls">
+            <input id="search-table" type="text" class="form-control pull-right" placeholder="搜索">
+        </div>
+    </div>
+    <div class="panel-body">
+        <div class="row column-seperation tableCheckpoint">
+            <!-- Table Zone -->
+            <table id="tbAreaList" align="center" class="table table-striped table-condensed table-hover sieve">
+                <thead>
+                    <tr>
+                        <th>区域</th>
+                        <th>注册店铺</th>
+                        <th>店铺会员</th>
+                        <th>销售笔数</th>
+                        <th>支出笔数</th>
+                        <th>短信条数</th>
+                        <th>订单金额</th>
+                        <th>活跃店铺</th>
+                        @*<th>活跃率</th>*@
+                        <th>今日登录</th>
+                    </tr>
+                </thead>
+                <tbody id="list"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="tableZoneProv" class="panel" style="display: none;">
+    <div class="panel-heading">
+        <div class="panel-controls">
+            <input id="search-table-prov" type="text" class="form-control pull-right" placeholder="搜索">
+        </div>
+    </div>
+    <div class="panel-body">
+        <div class="row column-seperation tableCheckpoint">
+            <!-- Table Zone -->
+            <table id="tbAreaListProv" align="center" class="table table-striped table-condensed table-hover sieve">
+                <thead>
+                    <tr>
+                        <th>区域</th>
+                        <th>注册店铺</th>
+                        <th>店铺会员</th>
+                        <th>销售笔数</th>
+                        <th>支出笔数</th>
+                        <th>短信条数</th>
+                        <th>订单金额</th>
+                        <th>活跃店铺</th>
+                        <th>今日登录</th>
+                    </tr>
+                </thead>
+                <tbody id="list-prov"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+<input type="hidden" id="city" value="" />
+
+<div id="AjaxDataJson" style="display:none;"></div>
+<script id="areaListTpl" type="text/html">
+    {{each areaDataList}}
+    {{if $value.prov_name=="prov"}}
+    <tr>
+        <td>
+            <a href="javascript:void(0)" onclick="showDetailBox('{{$value.areaName}}');">{{$value.areaName}}</a>
+        </td>
+        <td>{{$value.regCnt}}</td>
+        <td>{{$value.MemberCnt}}</td>
+        <td>{{$value.saleCnt}}</td>
+        <td>{{$value.payCnt}}</td>
+        <td>{{$value.smsCnt}}</td>
+        <td>￥{{$value.orderSum}}</td>
+        <td>{{$value.UserActiveCnt}}</td>
+        @*<td>{{$value.UserSleepCnt}}</td>
+            <td>{{$value.UserLostCnt}}</td>*@
+        <td>{{$value.UserLoginCnt}}</td>
+    </tr>
+    {{/if}}
+    {{/each}}
+</script>
+<script id="AreaTableTpl" type="text/html">
+    {{each listData}}
+    <tr>
+        <td>{{$value.accID}}</td>
+        <td><a href="/shopinfo/index/{{$value.accID}}" target="_blank">{{$value.accName}}</a></td>
+        <td>{{$value.regTime}}</td>
+        <td>{{$value.loginTimes}}</td>
+        <td>{{$value.lastLoginTime}}</td>
+    </tr>
+    {{/each}}
+</script>
+<input type="hidden" id="AreaName" value="" />
+<input type="hidden" id="bgDate" value="" />
+<input type="hidden" id="edDate" value=""/>
+<input type="hidden" id="disOrder" name="name" value=" " />
+
+<div id="showMoreDataTable" style=" display:none;">
+    <table class="table table-striped table-hover " style="height:660px">
+        <thead>
+            <tr>
+                <th>店铺ID</th>
+                <th>店铺名称</th>
+                <th>注册时间</th>
+                <th>登录次数</th>
+                <th>最后登录时间</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ><td class="DataNull" colspan="5">正在加载..</td></tr>
+        </tbody>
+    </table>
+    <div class="dataTables_wrapper AccountListPageHtmlId" id="ListPageHtml">
+        <div class="dataTables_paginate pagination">
+            <ul><li class="prev disabled"><a href="javascript:void(0)"><i class="pg-arrow_left"></i></a></li><li class="active"><a href="javascript:void(0)">1</a></li><li class="next disabled"><a href="javascript:void(0)"><i class="pg-arrow_right"></i></a></li></ul>
+        </div>
+        <div class="dataTablePagText"></div>
+    </div>
+</div>
+
+
+
+@section Scripts{
+    @Scripts.Render("~/js/begin/form")
+    <script src="~/Scripts/plugins/asset/echarts-all.js"></script>
+    <script src="~/Scripts/plugins/artTemplate/template.js"></script>
+    <script src="~/Scripts/plugins/jquery-datatable/dataTables.tableTools.js"></script>
+    <script src="~/Scripts/plugins/jquery-datatable/jquery-datatable-bootstrap.js"></script>
+    <script type="text/javascript">
+
+        var timeOut = 0;
+        $(function() {
+            $("#tbAreaList").find("i").css('display', 'none');
+            QueryArea("none", '');
+
+            $('.dataDstributedWhere .input-daterange.date').datepicker().on({
+                'hide': function(ev) {
+                    var oldValue = $(ev.target);
+                    if (oldValue.val() != oldValue.attr("old")) {
+                        timeOut = setTimeout(QueryArea('none', ''), 500);
+                        oldValue.attr("old", oldValue.val());
+                    }
+                },
+                'show': function(ev) {
+                    clearTimeout(timeOut);
+                }
+            });
+        });
+
+
+        function changeOrd(obj) {
+            var vName = jQuery(obj).id;
+            $("#disOrder").val(vName);
+            $("#tbAreaList").find("i").css('display', 'none');
+            jQuery(obj).find("i").css('display', '');
+            //<i class="fa fa-caret-down"></i>
+            QueryArea("none", '');
+        }
+
+
+        function SetRangeType() {
+            if ($("#rangeType").prop("checked")) {
+                $("#showDateTip .input-daterange").removeClass("DataRange");
+            } else {
+                $("#showDateTip .input-daterange").addClass("DataRange");
+            }
+        }
+
+        function QueryArea(areaName, prov) {
+            var QueryData = {};
+            QueryData["bgdate"] = $("#ShowDate").val();
+            if ($("#endDate").val().length > 0) {
+                QueryData["eddate"] = $("#endDate").val();
+            }
+            QueryData["key"] = $("#keyValue").val();
+            QueryData["areaname"] = areaName;
+
+            if ($("#rangeType").prop("checked")) {
+                QueryData["sClass"] = "range";
+                if (QueryData["eddate"] == "") {
+                    return false;
+                }
+            } else {
+                QueryData["sClass"] = "single";
+            }
+
+            $("#helpTip").show();
+
+            switch ($("#keyValue").val().toString()) {
+            case 'regCnt':
+                label = '店铺注册数';
+                break;
+            case 'MemberCnt':
+                label = '店铺会员数';
+                break;
+            case 'saleCnt':
+                label = '销售笔数';
+                break;
+            case 'payCnt':
+                label = '支出笔数';
+                break;
+            case 'smsCnt':
+                label = '短信条数';
+                break;
+            case 'orderSum':
+                label = '订单金额';
+                break;
+            case 'UserActiveCnt':
+                label = '活跃店铺数';
+                break;
+            case 'UserSleepCnt':
+                label = '休眠店铺数';
+                break;
+            case 'UserLostCnt':
+                label = '流失店铺数';
+                break;
+            case 'UserLoginCnt':
+                label = '今日登录数';
+                break;
+            default:
+                label = '未知依据';
+                break;
+            }
+
+            var sUrl = "/AreaMap/DataDistributedChartJson";
+
+            $.doAjax(sUrl, QueryData, function(msg) {
+                $("#helpTip").hide();
+
+                if (msg == "none") {
+                    for (var i = 0; i < option.series[0].data.length; i++) {
+                        option.series[0].data[i].value = 0;
+                    }
+                    // console.log(msg);
+                    myChart.clear().setOption(option);
+                }
+
+
+                if (msg != "error" && msg != "none") {
+                    $("#tableZone").show();
+                    $("#AjaxDataJson").html(msg);
+                    var json = jQuery.parseJSON(msg);
+                    if (prov == '') {
+                        $.each(json.areaDataList, function(i, n) {
+
+                            for (var i = 0; i < option.series[0].data.length; i++) {
+                                if (option.series[0].data[i].name == n.areaName) {
+                                    option.series[0].data[i].value = n.keyAreaValue;
+                                }
+                            }
+
+                        });
+
+                        option.tooltip.formatter = function(a) {
+                            res = a[1];
+                            $.each(json.areaDataList, function(i, n) {
+
+                                if (n.areaName == a[1].toString()) {
+                                    res += '</br>店铺注册数:' + n.regCnt;
+                                    res += '</br>店铺会员数:' + n.MemberCnt;
+                                    res += '</br>销售笔数:' + n.saleCnt;
+                                    res += '</br>支出笔数:' + n.payCnt;
+                                    res += '</br>短信条数:' + n.smsCnt;
+                                    res += '</br>订单金额:' + n.orderSum;
+                                    res += '</br>活跃店铺数:' + n.UserActiveCnt;
+                                    res += '</br>休眠店铺数:' + n.UserSleepCnt;
+                                    res += '</br>流失店铺数:' + n.UserLostCnt;
+                                    res += '</br>今日登录数:' + n.UserLoginCnt;
+                                }
+
+                            });
+                            return res;
+                        }
+
+                        //var label = '';
+                        //alert(json.areaMaxValue);
+                        option.dataRange.max = json.areaMaxValue;
+                        option.dataRange.min = json.areaMinValue;
+                        
+            //            option.dataRange.splitList = [
+            //{ start: 1500 },
+            //{ start: 900, end: 1500 },
+            //{ start: 310, end: 1000 },
+            //{ start: 200, end: 300 },
+            //{ start: 10, end: 200, label: '10 到 200（自定义label）' },
+            //{ start: 5, end: 5, label: '5（自定义特殊颜色）', color: 'black' },
+            //{ end: 10 }
+            //            ];
+
+                        myChart.clear().setOption(option);
+
+                        areaListTemplate(json,"china");
+
+
+
+                    } else {
+                        $.each(json.areaDataList, function(i, n) {
+
+                            if (n.prov_name == prov) {
+                                n.prov_name = "prov";
+                            } else {
+                                if (n.prov_name == "prov") {
+                                    n.prov_name = "";
+                                }
+                            }
+
+                        });
+
+                        //option.dataRange.max = json.areaMaxValue;
+                        areaListTemplate(json, mt);
+
+                    }
+
+                } else {
+                    $("#tableZone").hide();
+                    $("#tableZoneProv").hide();
+                }
+            }, true);
+        }
+
+        function MpaDataSelect(selectKey) {
+            var len = mapType.length;
+            var mt = selectKey;
+            var json = jQuery.parseJSON($("#AjaxDataJson").html());
+            if (mt != 'china') {
+                // 全国选择时指定到选中的省份
+                //province = i.toString();
+                //docunment.getElementById("city").value = i.toString();
+                while (len--) {
+                    if (mapType[len] == mt) {
+                        curIndx = len;
+                    }
+                }
+
+                $.each(json.areaDataList, function(i, n) {
+
+                    if (n.prov_name == selectKey) {
+                        n.prov_name = "prov";
+                    } else {
+                        if (n.prov_name == "prov") {
+                            n.prov_name = "";
+                        }
+                    }
+
+                });
+                //option.tooltip.formatter = '滚轮切换省份或点击返回全国<br/>{b},{a},{c}';
+            } else {
+                //QueryArea('none', '');
+                curIndx = 0;
+                mt = 'china';
+                //option.tooltip.formatter = '滚轮切换或点击进入该省<br/>{b},{a}';
+            }
+
+
+            //option.dataRange.max = json.areaMaxValue;
+            areaListTemplate(json,mt);
+            //initTableWithSearch();
+
+
+            option.dataRange.max = json.areaMaxValue;
+            option.series[0].mapType = mt;
+            option.title.subtext = mt + ' （滚轮或点击切换）';
+            myChart.setOption(option, true);
+        }
+
+
+        function areaListTemplate(json, selectKey) {
+            if (selectKey == "china") {
+                $("#tableZone").show();
+                $("#tableZoneProv").hide();
+                $("#tableZone .tableCheckpoint").html("<table id='tbAreaList' align='center' class='table table-striped table-condensed table-hover sieve'><thead><tr><th>区域</th><th>注册店铺</th><th>店铺会员</th><th>销售笔数</th><th>支出笔数</th><th>短信条数</th><th>订单金额</th><th>活跃店铺</th><th>今日登录</th></tr></thead><tbody id='list'></tbody></table>");
+                $("#list").html(template('areaListTpl', json));
+                initTableWithSearch("#search-table");
+            } else {
+                $("#tableZoneProv").show();
+                $("#tableZone").hide();
+                $("#tableZoneProv .tableCheckpoint").html("<table id='tbAreaListProv' align='center' class='table table-striped table-condensed table-hover sieve'><thead><tr><th>区域</th><th>注册店铺</th><th>店铺会员</th><th>销售笔数</th><th>支出笔数</th><th>短信条数</th><th>订单金额</th><th>活跃店铺</th><th>今日登录</th></tr></thead><tbody id='list-prov'></tbody></table>");
+                $("#list-prov").html(template('areaListTpl', json));
+                initTableWithSearch("#search-table-prov");
+            }
+        }
+
+
+        function showDetailBox(areaName) {
+
+
+            if (areaName.indexOf("市") > -1 || areaName == "澳门" || areaName == "香港") {
+                //var bgDate;
+                //var edDate;
+                //if ($("#rangeType").attr("checked") == undefined) {
+                //    bgDate = "2011-1-1";
+                //    edDate = $("#ShowDate").val();
+                //} else {
+                //    bgDate = $("#ShowDate").val();
+                //    edDate = $("#endDate").val();
+                //}
+
+                //$("#AreaName").val(areaName);
+                //$("#bgDate").val(bgDate);
+                //$("#edDate").val(edDate);
+
+
+                //$("#showMoreDataTable table tbody").html('<tr ><td class="DataNull" colspan="5">正在加载..</td></tr>');
+                //$("#ListPageHtml").html('<div class="dataTables_paginate pagination"><ul><li class="prev disabled"><a href="javascript:void(0)"><i class="pg-arrow_left"></i></a></li><li class="active"><a href="javascript:void(0)">1</a></li><li class="next disabled"><a href="javascript:void(0)"><i class="pg-arrow_right"></i></a></li></ul></div><div class="dataTablePagText"></div>');
+
+
+                //dialog({
+                //    title: areaName + "地区店铺详情",
+                //    content: document.getElementById('showMoreDataTable'),
+                //    id:"areaNameTableShowDialog"
+                //}).showModal();
+
+
+                //showDetailBoxJson(1);
+                GetDetailPage(areaName);
+            } else {
+                MpaDataSelect(areaName);
+            }
+        }
+
+        function showDetailBoxJson(page) {
+            var postJson = {};
+            postJson["page"] = page;
+            postJson["areaname"] = $("#AreaName").val();
+            postJson["bgdate"] = $("#bgDate").val();
+            postJson["eddate"] = $("#edDate").val();
+            var url = "/AreaMap/DataDistributedList";
+            $.doAjax(url, postJson, function(msg) {
+                if (msg != "" && msg != "none") {
+                    var json = $.parseJSON(msg);
+                    $("#showMoreDataTable table tbody").html(template("AreaTableTpl", json));
+                    if (page == 1) {
+                        $("#ListPageHtml").attr("rowcount", json.rowCount).attr("maxpage", json.maxPage);
+                        $("#ListPageHtml .dataTablePagText").html("共" + json.rowCount + "条");
+                    }
+                    var pageHtml = $.listPageHtml(page, $("#ListPageHtml").attr("maxpage"), "GetShopList", 5);
+                    $("#ListPageHtml .dataTables_paginate").html(pageHtml);
+                }
+            }, true);
+        }
+
+        function GetDetailPage(area) {
+
+            //alert(cnt);
+            window.open("/IndexDetailInfo/Index?type=Location&index=0&pageIndex=1&cnt=0&location=" + area);
+        }
+
+
+    </script>
+
+    <script type="text/javascript">
+
+        //var province = '';
+        //var map;
+        var myChart = echarts.init(document.getElementById('mapdiv'));
+
+        //var ecConfig = require('echarts/config');
+        //var zrEvent = require('zrender/tool/event');
+        var curIndx = 0;
+        var mapType = [
+            'china',
+            // 23个省
+            '广东', '青海', '四川', '海南', '陕西',
+            '甘肃', '云南', '湖南', '湖北', '黑龙江',
+            '贵州', '山东', '江西', '河南', '河北',
+            '山西', '安徽', '福建', '浙江', '江苏',
+            '吉林', '辽宁', '台湾',
+            // 5个自治区
+            '新疆', '广西', '宁夏', '内蒙古', '西藏',
+            // 4个直辖市
+            '北京', '天津', '上海', '重庆',
+            // 2个特别行政区
+            '香港', '澳门'
+        ];
+
+        myChart.on(echarts.config.EVENT.MAP_SELECTED, function(param) {
+            var len = mapType.length;
+            var mt = mapType[curIndx % len];
+
+            if (mt == 'china') {
+                // 全国选择时指定到选中的省份
+                var selected = param.selected;
+
+                for (var i in selected) {
+                    if (selected[i]) {
+                        mt = i;
+                        break;
+                    }
+                }
+                //option.tooltip.formatter = '滚轮切换省份或点击返回全国<br/>{b},{a},{c}';
+            } else {
+                mt = 'china';
+                //option.tooltip.formatter = '滚轮切换或点击进入该省<br/>{b},{a}';
+            }
+            MpaDataSelect(mt);
+        });
+
+        var data_extend = [
+            //{ name: '南京市', value: 500 }
+        ]
+
+        //var label = '';
+
+        var option = {
+            title: {
+                text: '全国34个省市自治区',
+                subtext: 'china （点击切换）'
+            },
+            tooltip: {
+                trigger: 'item',
+                formatter: function(a) {
+                    //alert(label);
+                    res = a[1] + '</br>' + label + ':' + a[2];
+                    for (var i = 0; i < data_extend.length; i++) {
+                        if (a[1] == data_extend[i].name) {
+                            res += '</br>扩展属性：' + data_extend[i].value;
+                        }
+                    }
+                    return res;
+                }
+            },
+            legend: {
+                show: false,
+                orient: 'vertical',
+                x: 'right',
+                data: ['分布']
+            },
+            dataRange: {
+                min: 0,
+                max: 3000,
+                
+                //color: ['green', '#EEEEEE'],
+                //text: ['高', '低'], // 文本，默认为数值文本
+                calculable: true
+            },
+            series: [
+                {
+                    name: '分布',
+                    type: 'map',
+                    mapType: 'china',
+                    selectedMode: 'single',
+                    itemStyle: {
+                        normal: { label: { show: true } },
+                        emphasis: { label: { show: true } }
+                    },
+                    data: [
+                        { name: '重庆市', value: 0 }, { name: '北京市', value: 0 }, { name: '天津市', value: 0 }, { name: '上海市', value: 0 }, { name: '香港', value: 0 }, { name: '澳门', value: 0 }, { name: '巴音郭楞蒙古自治州', value: 0 }, { name: '和田地区', value: 0 }, { name: '哈密地区', value: 0 }, { name: '阿克苏地区', value: 0 }, { name: '阿勒泰地区', value: 0 }, { name: '喀什地区', value: 0 }, { name: '塔城地区', value: 0 }, { name: '昌吉回族自治州', value: 0 }, { name: '克孜勒苏柯尔克孜自治州', value: 0 }, { name: '吐鲁番地区', value: 0 }, { name: '伊犁哈萨克自治州', value: 0 }, { name: '博尔塔拉蒙古自治州', value: 0 }, { name: '乌鲁木齐市', value: 0 }, { name: '克拉玛依市', value: 0 }, { name: '阿拉尔市', value: 0 }, { name: '图木舒克市', value: 0 }, { name: '五家渠市', value: 0 }, { name: '石河子市', value: 0 }, { name: '那曲地区', value: 0 }, { name: '阿里地区', value: 0 }, { name: '日喀则地区', value: 0 }, { name: '林芝地区', value: 0 }, { name: '昌都地区', value: 0 }, { name: '山南地区', value: 0 }, { name: '拉萨市', value: 0 }, { name: '呼伦贝尔市', value: 0 }, { name: '阿拉善盟', value: 0 }, { name: '锡林郭勒盟', value: 0 }, { name: '鄂尔多斯市', value: 0 }, { name: '赤峰市', value: 0 }, { name: '巴彦淖尔市', value: 0 }, { name: '通辽市', value: 0 }, { name: '乌兰察布市', value: 0 }, { name: '兴安盟', value: 0 }, { name: '包头市', value: 0 }, { name: '呼和浩特市', value: 0 }, { name: '乌海市', value: 0 }, { name: '海西蒙古族藏族自治州', value: 0 }, { name: '玉树藏族自治州', value: 0 }, { name: '果洛藏族自治州', value: 0 }, { name: '海南藏族自治州', value: 0 }, { name: '海北藏族自治州', value: 0 }, { name: '黄南藏族自治州', value: 0 }, { name: '海东地区', value: 0 }, { name: '西宁市', value: 0 }, { name: '甘孜藏族自治州', value: 0 }, { name: '阿坝藏族羌族自治州', value: 0 }, { name: '凉山彝族自治州', value: 0 }, { name: '绵阳市', value: 0 }, { name: '达州市', value: 0 }, { name: '广元市', value: 0 }, { name: '雅安市', value: 0 }, { name: '宜宾市', value: 0 }, { name: '乐山市', value: 0 }, { name: '南充市', value: 0 }, { name: '巴中市', value: 0 }, { name: '泸州市', value: 0 }, { name: '成都市', value: 0 }, { name: '资阳市', value: 0 }, { name: '攀枝花市', value: 0 }, { name: '眉山市', value: 0 }, { name: '广安市', value: 0 }, { name: '德阳市', value: 0 }, { name: '内江市', value: 0 }, { name: '遂宁市', value: 0 }, { name: '自贡市', value: 0 }, { name: '黑河市', value: 0 }, { name: '大兴安岭地区', value: 0 }, { name: '哈尔滨市', value: 0 }, { name: '齐齐哈尔市', value: 0 }, { name: '牡丹江市', value: 0 }, { name: '绥化市', value: 0 }, { name: '伊春市', value: 0 }, { name: '佳木斯市', value: 0 }, { name: '鸡西市', value: 0 }, { name: '双鸭山市', value: 0 }, { name: '大庆市', value: 0 }, { name: '鹤岗市', value: 0 }, { name: '七台河市', value: 0 }, { name: '酒泉市', value: 0 }, { name: '张掖市', value: 0 }, { name: '甘南藏族自治州', value: 0 }, { name: '武威市', value: 0 }, { name: '陇南市', value: 0 }, { name: '庆阳市', value: 0 }, { name: '白银市', value: 0 }, { name: '定西市', value: 0 }, { name: '天水市', value: 0 }, { name: '兰州市', value: 0 }, { name: '平凉市', value: 0 }, { name: '临夏回族自治州', value: 0 }, { name: '金昌市', value: 0 }, { name: '嘉峪关市', value: 0 }, { name: '普洱市', value: 0 }, { name: '红河哈尼族彝族自治州', value: 0 }, { name: '文山壮族苗族自治州', value: 0 }, { name: '曲靖市', value: 0 }, { name: '楚雄彝族自治州', value: 0 }, { name: '大理白族自治州', value: 0 }, { name: '临沧市', value: 0 }, { name: '迪庆藏族自治州', value: 0 }, { name: '昭通市', value: 0 }, { name: '昆明市', value: 0 }, { name: '丽江市', value: 0 }, { name: '西双版纳傣族自治州', value: 0 }, { name: '保山市', value: 0 }, { name: '玉溪市', value: 0 }, { name: '怒江傈僳族自治州', value: 0 }, { name: '德宏傣族景颇族自治州', value: 0 }, { name: '百色市', value: 0 }, { name: '河池市', value: 0 }, { name: '桂林市', value: 0 }, { name: '南宁市', value: 0 }, { name: '柳州市', value: 0 }, { name: '崇左市', value: 0 }, { name: '来宾市', value: 0 }, { name: '玉林市', value: 0 }, { name: '梧州市', value: 0 }, { name: '贺州市', value: 0 }, { name: '钦州市', value: 0 }, { name: '贵港市', value: 0 }, { name: '防城港市', value: 0 }, { name: '北海市', value: 0 }, { name: '怀化市', value: 0 }, { name: '永州市', value: 0 }, { name: '邵阳市', value: 0 }, { name: '郴州市', value: 0 }, { name: '常德市', value: 0 }, { name: '湘西土家族苗族自治州', value: 0 }, { name: '衡阳市', value: 0 }, { name: '岳阳市', value: 0 }, { name: '益阳市', value: 0 }, { name: '长沙市', value: 0 }, { name: '株洲市', value: 0 }, { name: '张家界市', value: 0 }, { name: '娄底市', value: 0 }, { name: '湘潭市', value: 0 }, { name: '榆林市', value: 0 }, { name: '延安市', value: 0 }, { name: '汉中市', value: 0 }, { name: '安康市', value: 0 }, { name: '商洛市', value: 0 }, { name: '宝鸡市', value: 0 }, { name: '渭南市', value: 0 }, { name: '咸阳市', value: 0 }, { name: '西安市', value: 0 }, { name: '铜川市', value: 0 }, { name: '清远市', value: 0 }, { name: '韶关市', value: 0 }, { name: '湛江市', value: 0 }, { name: '梅州市', value: 0 }, { name: '河源市', value: 0 }, { name: '肇庆市', value: 0 }, { name: '惠州市', value: 0 }, { name: '茂名市', value: 0 }, { name: '江门市', value: 0 }, { name: '阳江市', value: 0 }, { name: '云浮市', value: 0 }, { name: '广州市', value: 0 }, { name: '汕尾市', value: 0 }, { name: '揭阳市', value: 0 }, { name: '珠海市', value: 0 }, { name: '佛山市', value: 0 }, { name: '潮州市', value: 0 }, { name: '汕头市', value: 0 }, { name: '深圳市', value: 0 }, { name: '东莞市', value: 0 }, { name: '中山市', value: 0 }, { name: '延边朝鲜族自治州', value: 0 }, { name: '吉林市', value: 0 }, { name: '白城市', value: 0 }, { name: '松原市', value: 0 }, { name: '长春市', value: 0 }, { name: '白山市', value: 0 }, { name: '通化市', value: 0 }, { name: '四平市', value: 0 }, { name: '辽源市', value: 0 }, { name: '承德市', value: 0 }, { name: '张家口市', value: 0 }, { name: '保定市', value: 0 }, { name: '唐山市', value: 0 }, { name: '沧州市', value: 0 }, { name: '石家庄市', value: 0 }, { name: '邢台市', value: 0 }, { name: '邯郸市', value: 0 }, { name: '秦皇岛市', value: 0 }, { name: '衡水市', value: 0 }, { name: '廊坊市', value: 0 }, { name: '恩施土家族苗族自治州', value: 0 }, { name: '十堰市', value: 0 }, { name: '宜昌市', value: 0 }, { name: '襄樊市', value: 0 }, { name: '黄冈市', value: 0 }, { name: '荆州市', value: 0 }, { name: '荆门市', value: 0 }, { name: '咸宁市', value: 0 }, { name: '随州市', value: 0 }, { name: '孝感市', value: 0 }, { name: '武汉市', value: 0 }, { name: '黄石市', value: 0 }, { name: '神农架林区', value: 0 }, { name: '天门市', value: 0 }, { name: '仙桃市', value: 0 }, { name: '潜江市', value: 0 }, { name: '鄂州市', value: 0 }, { name: '遵义市', value: 0 }, { name: '黔东南苗族侗族自治州', value: 0 }, { name: '毕节地区', value: 0 }, { name: '黔南布依族苗族自治州', value: 0 }, { name: '铜仁地区', value: 0 }, { name: '黔西南布依族苗族自治州', value: 0 }, { name: '六盘水市', value: 0 }, { name: '安顺市', value: 0 }, { name: '贵阳市', value: 0 }, { name: '烟台市', value: 0 }, { name: '临沂市', value: 0 }, { name: '潍坊市', value: 0 }, { name: '青岛市', value: 0 }, { name: '菏泽市', value: 0 }, { name: '济宁市', value: 0 }, { name: '德州市', value: 0 }, { name: '滨州市', value: 0 }, { name: '聊城市', value: 0 }, { name: '东营市', value: 0 }, { name: '济南市', value: 0 }, { name: '泰安市', value: 0 }, { name: '威海市', value: 0 }, { name: '日照市', value: 0 }, { name: '淄博市', value: 0 }, { name: '枣庄市', value: 0 }, { name: '莱芜市', value: 0 }, { name: '赣州市', value: 0 }, { name: '吉安市', value: 0 }, { name: '上饶市', value: 0 }, { name: '九江市', value: 0 }, { name: '抚州市', value: 0 }, { name: '宜春市', value: 0 }, { name: '南昌市', value: 0 }, { name: '景德镇市', value: 0 }, { name: '萍乡市', value: 0 }, { name: '鹰潭市', value: 0 }, { name: '新余市', value: 0 }, { name: '南阳市', value: 0 }, { name: '信阳市', value: 0 }, { name: '洛阳市', value: 0 }, { name: '驻马店市', value: 0 }, { name: '周口市', value: 0 }, { name: '商丘市', value: 0 }, { name: '三门峡市', value: 0 }, { name: '新乡市', value: 0 }, { name: '平顶山市', value: 0 }, { name: '郑州市', value: 0 }, { name: '安阳市', value: 0 }, { name: '开封市', value: 0 }, { name: '焦作市', value: 0 }, { name: '许昌市', value: 0 }, { name: '濮阳市', value: 0 }, { name: '漯河市', value: 0 }, { name: '鹤壁市', value: 0 }, { name: '大连市', value: 0 }, { name: '朝阳市', value: 0 }, { name: '丹东市', value: 0 }, { name: '铁岭市', value: 0 }, { name: '沈阳市', value: 0 }, { name: '抚顺市', value: 0 }, { name: '葫芦岛市', value: 0 }, { name: '阜新市', value: 0 }, { name: '锦州市', value: 0 }, { name: '鞍山市', value: 0 }, { name: '本溪市', value: 0 }, { name: '营口市', value: 0 }, { name: '辽阳市', value: 0 }, { name: '盘锦市', value: 0 }, { name: '忻州市', value: 0 }, { name: '吕梁市', value: 0 }, { name: '临汾市', value: 0 }, { name: '晋中市', value: 0 }, { name: '运城市', value: 0 }, { name: '大同市', value: 0 }, { name: '长治市', value: 0 }, { name: '朔州市', value: 0 }, { name: '晋城市', value: 0 }, { name: '太原市', value: 0 }, { name: '阳泉市', value: 0 }, { name: '六安市', value: 0 }, { name: '安庆市', value: 0 }, { name: '滁州市', value: 0 }, { name: '宣城市', value: 0 }, { name: '阜阳市', value: 0 }, { name: '宿州市', value: 0 }, { name: '黄山市', value: 0 }, { name: '巢湖市', value: 0 }, { name: '亳州市', value: 0 }, { name: '池州市', value: 0 }, { name: '合肥市', value: 0 }, { name: '蚌埠市', value: 0 }, { name: '芜湖市', value: 0 }, { name: '淮北市', value: 0 }, { name: '淮南市', value: 0 }, { name: '马鞍山市', value: 0 }, { name: '铜陵市', value: 0 }, { name: '南平市', value: 0 }, { name: '三明市', value: 0 }, { name: '龙岩市', value: 0 }, { name: '宁德市', value: 0 }, { name: '福州市', value: 0 }, { name: '漳州市', value: 0 }, { name: '泉州市', value: 0 }, { name: '莆田市', value: 0 }, { name: '厦门市', value: 0 }, { name: '丽水市', value: 0 }, { name: '杭州市', value: 0 }, { name: '温州市', value: 0 }, { name: '宁波市', value: 0 }, { name: '舟山市', value: 0 }, { name: '台州市', value: 0 }, { name: '金华市', value: 0 }, { name: '衢州市', value: 0 }, { name: '绍兴市', value: 0 }, { name: '嘉兴市', value: 0 }, { name: '湖州市', value: 0 }, { name: '盐城市', value: 0 }, { name: '徐州市', value: 0 }, { name: '南通市', value: 0 }, { name: '淮安市', value: 0 }, { name: '苏州市', value: 0 }, { name: '宿迁市', value: 0 }, { name: '连云港市', value: 0 }, { name: '扬州市', value: 0 }, { name: '南京市', value: 0 }, { name: '泰州市', value: 0 }, { name: '无锡市', value: 0 }, { name: '常州市', value: 0 }, { name: '镇江市', value: 0 }, { name: '吴忠市', value: 0 }, { name: '中卫市', value: 0 }, { name: '固原市', value: 0 }, { name: '银川市', value: 0 }, { name: '石嘴山市', value: 0 }, { name: '儋州市', value: 0 }, { name: '文昌市', value: 0 }, { name: '乐东黎族自治县', value: 0 }, { name: '三亚市', value: 0 }, { name: '琼中黎族苗族自治县', value: 0 }, { name: '东方市', value: 0 }, { name: '海口市', value: 0 }, { name: '万宁市', value: 0 }, { name: '澄迈县', value: 0 }, { name: '白沙黎族自治县', value: 0 }, { name: '琼海市', value: 0 }, { name: '昌江黎族自治县', value: 0 }, { name: '临高县', value: 0 }, { name: '陵水黎族自治县', value: 0 }, { name: '屯昌县', value: 0 }, { name: '定安县', value: 0 }, { name: '保亭黎族苗族自治县', value: 0 }, { name: '五指山市', value: 0 }, { name: '北京', value: 0 }, { name: '上海', value: 0 }, { name: '天津', value: 0 }, { name: '重庆', value: 0 }, { name: '黑龙江', value: 0 }, { name: '吉林', value: 0 }, { name: '辽宁', value: 0 }, { name: '山东', value: 0 }, { name: '山西', value: 0 }, { name: '陕西', value: 0 }, { name: '河北', value: 0 }, { name: '河南', value: 0 }, { name: '湖北', value: 0 }, { name: '湖南', value: 0 }, { name: '海南', value: 0 }, { name: '江苏', value: 0 }, { name: '江西', value: 0 }, { name: '广东', value: 0 }, { name: '广西', value: 0 }, { name: '云南', value: 0 }, { name: '贵州', value: 0 }, { name: '四川', value: 0 }, { name: '内蒙古', value: 0 }, { name: '宁夏', value: 0 }, { name: '甘肃', value: 0 }, { name: '青海', value: 0 }, { name: '西藏', value: 0 }, { name: '新疆', value: 0 }, { name: '安徽', value: 0 }, { name: '浙江', value: 0 }, { name: '福建', value: 0 }, { name: '台湾', value: 0 }, { name: '香港', value: 0 }, { name: '澳门', value: 0 }, { name: '其他', value: 0 }
+                    ]
+                }
+            ]
+        };
+
+        myChart.clear().setOption(option);
+    </script>
+
+
+    <script>
+        // 表格自动搜索排序
+
+        function initTableWithSearch(obj) {
+
+            var table = $(".sieve"),
+                settings = {
+                    "sDom": "<'table-responsive't><'row'<p i>>",
+                    "sPaginationType": "bootstrap",
+                    "destroy": true,
+                    "scrollCollapse": true,
+                    "oLanguage": {
+                        "sLengthMenu": "_MENU_ ",
+                        "sInfo": ""
+                    },
+                    "iDisplayLength": 10
+                };
+
+            table.dataTable(settings);
+            // search box for table
+            $(obj).keyup(function() {
+                table.fnFilter($(this).val());
+            });
+        }
+
+    </script>
+}

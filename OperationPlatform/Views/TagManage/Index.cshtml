@@ -1,0 +1,345 @@
+﻿
+@{
+    ViewBag.Title = "标签管理";
+}
+
+@section Style{
+    @Styles.Render("~/style/form")
+}
+
+<div class="panel">
+    <div class="panel-heading page-where tagWhere">
+        <div class="panel-title">
+
+            <div class="cs-wrapper pull-left m-r-10">
+
+                <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" name="tagType" id="tagType">
+                    <option value="-99">标签类别</option>
+                    <option value="0">无标签类型</option>
+                    <option value="1">所在行业</option>
+                    <option value="2">竞品软件</option>
+                    <option value="3">开店时间</option>
+                    <option value="4">线上营销</option>
+                    <option value="5">了解产品途径</option>
+                    <option value="6">系统标签</option>
+                    <option value="7">有网店</option>
+                    <option value="8">用户身份</option>
+                    <option value="9">对产品态度</option>
+                    <option value="10">回访</option>
+                    <option value="11">经商经验</option>
+                    <option value="12">店铺数量</option>
+                    <option value="13">电脑熟悉水平</option>
+                    <option value="14">选择原因</option>
+                    <option value="15">用户来源</option>
+                    <option value="19">用户帮助</option>
+                    <option value="18">用户行为</option>
+                    <option value="17">用户价值</option>
+                    <option value="16">用户状态</option>
+                    <option value="-1">废弃标签</option>
+                </select>
+
+            </div>
+
+            <div style="float: left; margin-right: 10px; width: 80px">
+                <input class="form-control" type="text" placeholder="添加人" name="insertName" id="insertName">
+
+            </div>
+
+            <div style="float: left; margin-right: 10px; width: 120px">
+                <input class="form-control" type="text" placeholder="标签名称" name="tagName" id="tagName">
+            </div>
+            <button type="button" value="select" class="btn btn-default btn-inquire" onclick="GetTagList(1)">查询</button>
+            <button type="button" value="select" class="btn btn-default btn-inquire" onclick=" AddNewTag() ">添加标签</button>
+            @*<button type="button" value="select" class="btn btn-default btn-inquire" onclick="TagTransfer()">导入标签</button>*@
+            <div class="clearfix"></div>
+        </div>
+        <input type="hidden" value="" id="pageIndexSave" />
+    </div>
+
+    <div class="panel-body no-padding">
+        <div class="table-responsive">
+            <table class="table table-hover table-detailed dataTable" id="ListTable">
+                <thead>
+                    <tr>
+                        <th class="text-center">标签名称 </th>
+                        <th class="text-center">标签类型</th>
+                        <th class="text-center">添加人</th>
+                        <th class="text-center">添加时间</th>
+                        <th class="text-center">标签状态</th>
+                        <th class="text-center">店铺数量</th>
+                        <th class="text-center">操作</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <div class="dataTables_wrapper m-t-10" id="ListPageHtml">
+                <div class="dataTables_paginate pagination no-padding">
+                    <ul>
+                        <li class="prev disabled">
+                            <a href="javascript:void(0)">
+                                <i class="pg-arrow_left"></i>
+                            </a>
+                        </li>
+                        <li class="active">
+                            <a href="javascript:void(0)">1</a>
+                        </li>
+                        <li class="next disabled">
+                            <a href="javascript:void(0)">
+                                <i class="pg-arrow_right">
+                                </i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="dataTablePagText p-l-20"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div style="display: none;">
+    <div id="singleShowDiv" style="width: 300px;">
+        <table class="table table-bordered removeBottom">
+            <tr>
+                <th style="line-height: 26px; text-align: right;">标签名称</th>
+                <td><input id="tagNameForModify" class="span1 removeBottom" style="width: 180px;" type="text"/></td>
+            </tr>
+            <tr>
+                <th style="line-height: 26px; text-align: right;">标签类型</th>
+                <td>
+                    <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" name="tagTypeForModify" id="tagTypeForModify">
+                        <option value="-99">标签类别</option>
+                        <option value="0">无标签</option>
+                        <option value="1">所在行业</option>
+                        <option value="2">竞品软件</option>
+                        <option value="3">开店时间</option>
+                        <option value="4">线上营销</option>
+                        <option value="5">了解产品途径</option>
+                        <option value="6">系统标签</option>
+                        <option value="7">有网店</option>
+                        <option value="8">用户身份</option>
+                        <option value="9">对产品态度</option>
+                        <option value="10">回访</option>
+                        <option value="11">经商经验</option>
+                        <option value="12">店铺数量</option>
+                        <option value="13">电脑熟悉水平</option>
+                        <option value="14">选择原因</option>
+                        <option value="15">用户来源</option>
+                        <option value="19">用户帮助</option>
+                        <option value="18">用户行为</option>
+                        <option value="17">用户价值</option>
+                        <option value="16">用户状态</option>
+                        <option value="-1">废弃标签</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th style="line-height: 26px; text-align: right;">标签状态</th>
+                <td>
+                    <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" name="tagStatusForModify" id="tagStatusForModify">
+
+                        <option value="0">无效</option>
+                        <option value="1">有效</option>
+
+                    </select>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div style=" display:none;">
+    <div id="newTagShowDiv" style="width:300px;">
+        <table class="table table-bordered removeBottom">
+            <tr>
+                <th style="line-height: 26px; text-align:right;">标签名称</th>
+                <td><input id="tagNameForAdd" class="span1 removeBottom" style=" width:180px;" type="text" /></td>
+            </tr>
+            
+        </table>
+    </div>
+</div>
+
+<script type="text/html" id="ListTableScript">
+    {{each list}}
+
+    <tr class="odd" role="row">
+        <td class="v-align-middle text-center">
+            {{$value.t_Name}}
+        </td>
+
+        <td class="v-align-middle text-center">{{$value.tagType}}</td>
+        <td class="v-align-middle text-center">{{$value.insertName}}</td>
+
+        <td class="v-align-middle text-center">{{$value.insertTime}}</td>
+        {{if $value.tagStatus==1}}
+        <td class="v-align-middle text-center" style="color: green">有效标签</td>
+        {{else}}
+        @*<td class="v-align-middle text-center" style="color: red">无效标签</td>*@
+        {{/if}}
+
+        <td class="v-align-middle text-center">{{$value.AccidCount}}</td>
+        <td class="v-align-middle text-center">
+
+            <button class="btn btn-success btn-sm m-l-10" data-toggle="modal" data-target="#modalSlideUp" name="" onclick="GetSingleInfo('{{$value.id}}')">
+                修改标签
+            </button>
+
+
+        </td>
+    </tr>
+    {{/each}}
+</script>
+
+<script src="~/Scripts/plugins/artTemplate/template.js"></script>
+
+@section Scripts{
+    @Scripts.Render("~/js/begin/form")
+    <script type="text/javascript">
+        $(function() {
+            GetTagList(1);
+        });
+
+        function GetTagList(pageIndex) {
+            $("#pageIndexSave").val(pageIndex);
+
+            var postJson = {};
+
+            postJson["pageIndex"] = pageIndex;
+
+            var tagType = $("#tagType").val();
+            var insertName = $("#insertName").val();
+            var tagName = $("#tagName").val();
+
+            postJson["tagType"] = tagType;
+            postJson["insertName"] = insertName;
+            postJson["tagName"] = tagName;
+
+            var url = "/TagManage/GetTagInfo";
+
+            $.doAjax(url, postJson, function(msg) {
+                if (msg != "") {
+                    var json = jQuery.parseJSON(msg);
+                    $("#ListTable tbody").html(template("ListTableScript", { "list": jQuery.parseJSON(json.list) }));
+
+                    if (pageIndex == 1) {
+                        $("#ListPageHtml").attr("rowcount", parseInt(json.RowCount)).attr("maxpage", parseInt(json.PageCount));
+                        $("#ListPageHtml .dataTablePagText").html("共" + parseInt(json.RowCount) + "条");
+                    }
+                    var pageHtml = $.listPageHtml(pageIndex, $("#ListPageHtml").attr("maxpage"), "GetTagList", 5);
+                    $("#ListPageHtml .dataTables_paginate").html(pageHtml);
+                }
+            }, true);
+        }
+
+        function AddNewTag() {
+            dialog({
+                id: "addNewTagDivdialog",
+                title: "新增标签",
+                lock: true,
+                background: '#fff', // 背景色
+                opacity: 0.5, // 透明度
+                content: document.getElementById("newTagShowDiv"),
+                ok: function() {
+                    var ur = "/TagManage/AddNewTag";
+                    var name = $("#tagNameForAdd").val();
+
+                    var postJson = {};
+
+                    postJson["tagName"] = name;
+
+                    $.doAjax(ur, postJson, function(msg) {
+                        if (msg == "1") {
+                            dialog({
+                                content: '标签新增成功',
+                                quickClose: true // 点击空白处快速关闭
+                            }).show();
+                            GetTagList(1);
+                        } else {
+                            alert("标签新增失败！");
+                        }
+                    }, true);
+
+                }
+            }).showModal();
+        }
+
+        function TagTransfer() {
+            var url = "/TagManage/ImportTag";
+
+            $.doAjax(url, null, function (msg) {
+                if (msg != "") {
+                    alert(msg);
+
+                } else
+                    alert("导入成功");
+            }, true);
+        }
+
+        function GetSingleInfo(id) {
+            var url = "/TagManage/GetSingleModel";
+
+            var postJson = {};
+
+            var formerName = "";
+            var formerType = 0;
+            var formerStatus = 0;
+
+            postJson["id"] = id;
+            $.doAjax(url, postJson, function(msg) {
+                if (msg != "") {
+                    var json = jQuery.parseJSON(msg);
+
+                    $("#tagNameForModify").val(json.t_Name);
+                    $("#tagTypeForModify").val(json.tagTypeid);
+                    $("#tagStatusForModify").val(json.tagStatus);
+
+                    formerName = $("#tagNameForModify").val();
+                    formerType = $("#tagTypeForModify").val();
+                    formerStatus = $("#tagStatusForModify").val();
+
+                }
+            }, true);
+
+            dialog({
+                id: "singleShowDivdialog",
+                title: "修改标签信息",
+                lock: true,
+                background: '#fff', // 背景色
+                opacity: 0.5, // 透明度
+                content: document.getElementById("singleShowDiv"),
+                ok: function() {
+                    var ur = "/TagManage/ModifyModel";
+                    var name = $("#tagNameForModify").val();
+                    var type = $("#tagTypeForModify").val();
+                    var status = $("#tagStatusForModify").val();
+
+                    if (name != formerName || type != formerType || status != formerStatus) {
+                        var postJson = {};
+                        postJson["id"] = id;
+                        postJson["tagName"] = name;
+                        postJson["tagTypeId"] = type;
+                        postJson["tagTypeName"] = $("#tagTypeForModify option:selected").text();
+                        postJson["tagStatus"] = $("#tagStatusForModify").val();
+
+                        $.doAjax(ur, postJson, function(msg) {
+                            if (msg == "1") {
+                                dialog({
+                                    content: '标签修改成功',
+                                    quickClose: true // 点击空白处快速关闭
+                                }).show();
+                                GetTagList($("#pageIndexSave").val());
+                            } else {
+                                alert("标签修改失败！");
+                            }
+                        }, true);
+                    }
+                }
+            }).showModal();
+        }
+
+        function DeleteTag(id) {
+
+        }
+    </script>
+}

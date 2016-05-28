@@ -1,0 +1,1361 @@
+﻿@model Model.T_AccountBasic
+@{
+    Layout = null;
+    ViewBag.Title = "店铺信息";
+}
+
+<style type="text/css">
+    .icon-multiple {
+        background-color: #959595;
+    }
+
+    .icon-font {
+        display: inline-block;
+        color: #fff;
+        font-style: normal;
+        font-size: 12px;
+        line-height: 16px;
+        text-align: center;
+        border-radius: 1px;
+        margin-right: 3px;
+        padding: 0px 1px 0px 2px;
+        background-color: #f63;
+        margin-top: 2px;
+    }
+
+    .icon-font-g {
+        display: inline-block;
+        color: #fff;
+        font-style: normal;
+        font-size: 12px;
+        line-height: 16px;
+        text-align: center;
+        border-radius: 1px;
+        margin-right: 3px;
+        padding: 0px 1px 0px 2px;
+        background-color: green;
+        margin-top: 2px;
+    }
+</style>
+
+
+<link rel="stylesheet" href="~/Scripts/plugins/bootstrap-tag/bootstrap-tagsinput.css">
+<div class="panel no-border">
+    <div class="panel-heading bg-white">
+        <div class="panel-title">
+            @if (Model.LoginTimeLast.ToShortDateString() == DateTime.Now.ToShortDateString())
+            {
+                <h5 class="no-margin inline text-key">@Html.DisplayFor(model => model.CompanyName)</h5>
+            }
+            else
+            {
+                <h5 class="no-margin inline">@Html.DisplayFor(model => model.CompanyName)</h5>
+            }
+
+            <span class="form-group">
+                <span class="help"> [@Html.DisplayFor(model => model.ID)] </span>
+            </span>
+            @if (Model.aotjbName == "免费版")
+            {
+                <span class="m-l-20">@Html.DisplayFor(model => model.aotjbName)</span>
+            }
+            else
+            {
+                <span class="m-l-20 text-danger">@Html.DisplayFor(model => model.aotjbName)</span>
+            }
+
+            <span class="fs-12 hint-text m-l-20">活跃状态:</span>
+            <span class="text-success fs-16 bold m-l-5 m-r-5">@Html.DisplayFor(model => model.activeName)</span>
+            <span class="fs-12 hint-text m-l-20" id="behaveIndex"></span>
+        </div>
+        <div class="panel-controls pull-right">
+            <button class="btn btn-complete btn-cons" onclick="AddVisitInfoButtonClick()">增加回访</button>
+        </div>
+        <div class="panel-controls pull-right ">
+            <button class="btn btn-success btn-cons" onclick="SendSms()">发送短信</button>
+        </div>
+
+        <div class="panel-controls pull-right">
+            <h5 id="userReturn" class="m-b-15 m-r-20">
+                <span class="fs-12 hint-text">距上一次回访间隔</span><span class="period m-l-5 bold text-success"></span>天<span class="source m-l-5"></span>
+            </h5>
+        </div>
+
+        @*<div class="clearfix"></div>*@
+    </div>
+    <div class="panel-body no-padding">
+        <div class="row defaultFill padding-20 b-b b-t b-grey">
+            <div class="col-xs-12 col-sm-6 col-md-3">
+                <h5 class="m-t-0">
+                    登录次数：<span class="text-success bold" style="cursor:help" id="logDetail">@Html.DisplayFor(model => model.LoginTimeWeb)</span>
+                    <span id="loginTimeDiv" class="small-text"></span>
+                </h5>
+
+                <h6 class="m-b-0">最后登录：(@Html.DisplayFor(model => model.LoginTimeLast))<span id="lastClient"></span></h6>
+            </div>
+            @*<div class="col-xs-12 col-sm-6 col-md-4">
+                    <h6 class="hint-text m-t-0">店铺版本</h6>
+                    <h5 class="m-b-0">@Html.DisplayFor(model => model.aotjbName)</h5>
+                </div>*@
+            <div id="regTimeDiv" class="col-xs-12 col-sm-6 col-md-3">
+                <h6 class="hint-text m-t-0">注册时间</h6>
+                <h5 class="m-b-0"></h5>
+            </div>
+            <div id="endTimeDiv" class="col-xs-12 col-sm-6 col-md-3">
+                <h6 class="hint-text m-t-0">到期时间</h6>
+                <h5 class="m-b-0"></h5>
+            </div>
+            <div id="orderNum" class="col-xs-12 col-sm-6 col-md-3">
+                <h6 class="hint-text m-t-0">订单</h6>
+                <h5 class="m-b-0"></h5>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-3 col-sm-3 col-md-3 padding-20 shop-profiles b-r b-grey">
+                <div class="row">
+                    <p class="pull-left">店主名称</p>
+                    <p class="pull-right bold">@Html.DisplayFor(model => model.UserRealName)</p>
+                </div>
+                <div class="row">
+                    <p class="pull-left">登录账号</p>
+                    @if (!string.IsNullOrEmpty(Model.PhoneNumber))
+                    {
+                        <p class="pull-right bold">@Html.DisplayFor(model => model.PhoneNumber)</p>
+                    }
+                    else
+                    {
+                        <p class="pull-right bold">@Html.DisplayFor(model => model.UserEmail)</p>
+                    }
+
+                </div>
+                @if (Model.ServiceManager == "邮件自助注册" && !string.IsNullOrEmpty(Model.PhoneNumber))
+                {
+                    <div class="row">
+                        <p class="pull-left">邮箱地址</p>
+                        <p class="pull-right bold">@Html.DisplayFor(model => model.UserEmail)</p>
+                    </div>
+                }
+                <!-- <div class="row">
+                    <p class="pull-left">电子邮件</p>
+                    <p class="pull-right bold">@Html.DisplayFor(model => model.UserEmail)</p>
+                </div> -->
+                <div class="row">
+                    <p class="pull-left">店铺简称</p>
+                    <p class="pull-right bold">@Html.DisplayFor(model => model.shotName)</p>
+                </div>
+
+                <div class="row">
+                    <p class="pull-left">客户经理</p>
+                    <p class="pull-right bold">@Html.DisplayFor(model => model.ServiceManager)</p>
+                </div>
+                <div class="row">
+                    <p class="pull-left">代理商</p>
+                    @if (!string.IsNullOrEmpty(Model.AgentName))
+                    {
+                        <p class="pull-right bold">@Html.DisplayFor(model => model.AgentName)</p>
+                    }
+                    else
+                    {
+                        <p class="pull-right bold">无信息</p>
+                    }
+
+                </div>
+                @*<div class="row no-border">
+                        <div class="col-xs-6 col-sm-6 col-md-6 no-padding p-r-20">
+                            <div class="row">
+                                <p class="pull-left">注册时间</p>
+                                <p class="pull-right bold">@Html.DisplayFor(model => model.RegTime)</p>
+                            </div>
+                        </div>
+                        <div class="col-xs-6 col-sm-6 col-md-6 no-padding">
+                            <div class="row">
+                                <p class="pull-left">到期时间</p>
+                                @if (Model.endtime == DateTime.MinValue)
+                                {
+                                    <p class="pull-right bold">无限时</p>
+                                }
+                                else
+                                {
+                                    <p class="pull-right bold">@Html.DisplayFor(model => model.endtime)</p>
+                                }
+
+                            </div>
+                        </div>
+                    </div>*@
+                @*<div class="row no-border">
+
+                        <div class="col-xs-6 col-sm-6 col-md-6 no-padding p-r-20">
+                            <div class="row">
+                                <p class="pull-left">客户经理</p>
+                                <p class="pull-right bold">@Html.DisplayFor(model => model.ServiceManager)</p>
+                            </div>
+                        </div>
+                        <div class="col-xs-6 col-sm-6 col-md-6 no-padding">
+                            <div class="row">
+                                <p class="pull-left">代理商</p>
+                                <p class="pull-right bold">@Html.DisplayFor(model => model.AgentName)</p>
+                            </div>
+                        </div>
+                    </div>*@
+            </div>
+            <div id="AccountInfo" class="col-xs-3 col-sm-3 col-md-3 padding-20 shop-profiles">
+                @*<div class="row">
+                        <p class="pull-left">活跃等级</p>
+                        <p class="pull-right bold">@Html.DisplayFor(model => model.activeName)</p>
+                    </div>*@
+                @*<div class="row">
+                        <p class="pull-left">总积分</p>
+                        <p class="pull-right text-danger bold">@Html.DisplayFor(model => model.integral)</p>
+                    </div>
+                    <div class="row">
+                        <p class="pull-left">短信</p>
+                        <p class="pull-right bold">剩余：<span class="text-key m-r-5">@Html.DisplayFor(model => model.smsSurplusNum)</span>条，已发送<span id="smsSendAllNum" class="m-l-5">@Html.DisplayFor(model => model.smsNum)</span> 条</p>
+                    </div>*@
+                <div class="clearfix"></div>
+            </div>
+            <div class="col-xs-6 col-sm-6 col-md-6 padding-20 b-l b-grey">
+                <div class="row" id="AccountAddress">
+                    <p>
+                        商铺地址:
+                        @if (Model.CompanyAddress != "" && Model.CompanyAddress != null)
+                        {
+                            <span class="bold m-l-5">@Html.DisplayFor(model => model.CompanyAddress)</span>
+                        }
+                        else
+                        {
+                            <span class="bold m-l-5">未填写地址</span>
+                        }
+                        （<span class="bold m-l-5">推断地址:</span><span class="aboutAddrees bold m-l-5"></span>）
+                    </p>
+                    @*<p class="bold">@Html.DisplayFor(model => model.CompanyAddress)</p>*@
+                    @*<p>推断地址:<span class="aboutAddrees bold m-l-5"></span></p>*@
+                </div>
+                <div class="row m-t-0" id="sysHuiFangHelp">
+                    <p>用户后台信息:<span class="m-l-5 bold txtContent"></span></p>
+                </div>
+                <div class="row">
+                    <hr>
+                    <p class="pull-left inline m-r-5">
+                        用户标签：
+                        <div class="" id="shopTagAddP">
+                            <a href="javascript:void(0)" class="tagAdd btn btn-primary no-padding p-l-5 p-r-5" onclick=" ShopAddTagInoutShow() "><i class="pg-plus"></i></a>
+                            <div class="tagAddInput col-xs-6 col-sm-6 col-md-6 no-padding m-t-10" style="display: none;">
+                                <span class="input-group">
+                                    <input id="SysShopTagNewInput" type="text" class="form-control" placeholder="输入关键字进行搜索" onkeyup="">
+                                    @*<span class="input-group-addon cur-p" onclick=" AddShopNewTag() ">
+                                            <i class="fa fa-plus-square hover-highlight"></i>
+                                        </span>*@
+                                    <span class="input-group-addon cur-p" onclick=" ShopAddTagInoutHide() ">
+                                        <i class="fa fa-close hover-highlight" title="关闭"></i>
+                                    </span>
+                                </span>
+                                <ul class="SysTagListDiv list-unstyled p-t-10 p-l-5 p-r-5 b-l b-r b-b b-grey no-margin"></ul>
+                            </div>
+                        </div>
+                    </p>
+
+                    <div id="ShopTagList" class="bootstrap-tagsinput no-border pull-left" style="width: auto;"></div>
+
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+
+        <div id="SysShopInfoItemInfoDiv" class="SysShopInfoItem row shopsys" style="display: none;">
+
+            <table class="sysAccounttable m-b-20 m-l-20 m-r-20" border="0" cellpadding="0" cellspacing="0" id="shopinfotable">
+                <tr>
+                    <td class="sitd sinullcont" colspan="10" style="font-weight: bold;">后台信息记录：</td>
+                </tr>
+                <tr>
+                    <td class="sitd sititle">QQ：</td>
+                    <td class="sitd sicontent" id="sys_qq" onclick=" ColumnTdClick(this, 'QQ') "></td>
+                    <td class="sitd sititle">微信：</td>
+                    <td class="sitd sicontent" id="sys_weixin" onclick=" ColumnTdClick(this, 'WeiXin') "></td>
+                    <td class="sitd sititle">电话：</td>
+                    <td class="sitd sicontent" id="sys_tel" onclick=" ColumnTdClick(this, 'Tel') "></td>
+                    <td class="sitd sititle">店铺大小：</td>
+                    <td class="sitd sicontent" id="sys_shopsize" onclick=" ColumnTdClick(this, 'ShopSize') ">&nbsp;</td>
+                    <td class="sitd sititle">经营内容：</td>
+                    <td class="sitd sicontent" id="sys_operate" onclick=" ColumnTdClick(this, 'Operate') ">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td class="sitd sititle">地址：</td>
+                    <td class="sitd sicontent" id="sys_address" onclick=" ColumnTdClick(this, 'Address') ">&nbsp;</td>
+                    <td class="sitd sititle">行业：</td>
+                    <td class="sitd sicontent" id="sys_industry" onclick=" ColumnTdClick(this, 'Industry') ">&nbsp;</td>
+                    <td class="sitd sititle">真实姓名：</td>
+                    <td class="sitd sicontent" id="sys_name" onclick=" ColumnTdClick(this, 'Name') ">&nbsp;</td>
+                    <td class="sitd sititle">身份证：</td>
+                    <td class="sitd sicontent" id="sys_indentity" onclick=" ColumnTdClick(this, 'IdentityNumber') ">&nbsp;</td>
+                    <td class="sitd sititle">开店时长：</td>
+                    <td class="sitd sicontent" id="sys_duration" onclick=" ColumnTdClick(this, 'Duration') ">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td class="sitd sititle">用过软件：</td>
+                    <td class="sitd sicontent" colspan="3" id="sys_software" onclick=" ColumnTdClick(this, 'OtherSoftware') ">&nbsp;</td>
+                    <td class="sitd sititle" colspan="6">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td class="sitd sititle">备注：</td>
+                    <td class="sitd sicontent" colspan="9" id="sys_remark" onclick=" ColumnTdClick(this, 'Remark') ">&nbsp;</td>
+                </tr>
+            </table>
+        </div>
+
+        <hr>
+        <div class="row">
+            <div class="ButtonList m-l-15">
+                <button class="btn btn-primary fs-12" onclick=" AppListShow() ">App开通管理</button>
+                <button class="btn btn-complete fs-12 m-l-5" onclick=" GetSubranchList() ">分店信息</button>
+                <button class="btn btn-complete fs-12 m-l-5" onclick=" GetAccountUserList() ">店员信息</button>
+                @*<button class="btn btn-success fs-12 m-l-5" onclick=" SysInfoListButtonClick() ">补充客户资料</button>*@
+                <button class="btn btn-danger fs-12 m-l-5" onclick=" PortraitInfo() ">用户扩展信息</button>
+                
+            </div>
+        </div>
+        <div class="row VisitInfo">
+            <div class="col-md-12 col-sm-12 col-xs-12 m-l-20">
+                <div class="AddVisitInfoDiv shopsys newVisitInfo" style="display: none;" id="newVisitInfo">
+                    <table width="98%" class="sysAccounttable" border="0" cellpadding="0" cellspacing="0">
+                        <tbody>
+                            <tr>
+                                <td class=" sititle">一级概要：</td>
+                                <td>
+                                    <select id="visitReasonOneSelect" onchange=" GetVisitReason(this) ">
+                                        <option value="0">----------</option>
+                                    </select>
+                                </td>
+                                <td class=" sititle">二级概要</td>
+                                <td>
+                                    <select id="visitReasonTwoSelect" onchange=" GetVisitReason(this) ">
+                                        <option value="0">----------</option>
+                                    </select>
+                                </td>
+                                <td class=" sititle">三级概要</td>
+                                <td>
+                                    <select id="visitReasonThreeSelect">
+                                        <option value="0">----------</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class=" sititle">咨询途径：</td>
+                                <td>
+                                    <span style="display: inline-block;">
+                                        <select id="VisitMannerSelect" onchange=" VisitMannerClick(this) "></select>
+                                    </span>
+                                    <span style="margin-left: 10px; display: inline-block;">
+                                        <input type="text" placeholder="请输入用户电话" class="form-control width200" id="visitContact">
+                                    </span>
+                                </td>
+                                <td colspan="2">
+                                    <div class="radio radio-warning">
+                                        <input type="radio" checked="checked" value="2" name="recordType" id="recordType1">
+                                        <label for="recordType1">用户来电</label>
+                                        <input type="radio" value="1" name="recordType" id="recordType2">
+                                        <label for="recordType2">客服回访</label>
+                                    </div>
+                                </td>
+                                <td colspan="2">
+                                    <div class="radio radio-warning">
+                                        <input type="radio" value="4" name="HandleStat" id="HandleStat1">
+                                        <label for="HandleStat1">需继续回访</label>
+                                        <input type="radio" value="2" name="HandleStat" id="HandleStat2">
+                                        <label for="HandleStat2">回访失败</label>
+                                        @*<input type="radio" value="3" name="HandleStat" id="HandleStat3">
+                                            <label for="HandleStat3">已提交</label>*@
+                                        <input type="radio" class="hidden" value="1" checked="checked" name="HandleStat" id="HandleStat4">
+                                        <label class="hidden" for="HandleStat4">关闭事件</label>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr style="display: none;">
+                                <td class=" sititle">问题：</td>
+                                <td class="" id="TaskDailyTitle" colspan="5"></td>
+                            </tr>
+                            @*<tr style="display: none;">
+                                    <td>询问问题：</td>
+                                    <td colspan="5" class="TagQuestionsTd" style="padding: 0px"></td>
+                                </tr>*@
+                            <tr>
+                                <td class=" sititle">回访内容：</td>
+                                <td colspan="5" style="line-height: initial;">
+                                    <div id="VisitContent" style="width: 80%; height: 200px;"></div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="sititle">&nbsp;</td>
+                                <td colspan="5">
+                                    <button class="btn btn-primary  btn-cons" onclick=" ShopInfoSavingHuiFang() ">保存回访信息</button>
+                                    <div class="checkbox check-info m-l-10" style="display: inline">
+                                        <input type="checkbox" value="feedBack" id="feedBack" onchange="">
+                                        <label for="feedBack" title="将此回访导入反馈">导入反馈</label>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="AddVisitInfoDiv shopsys goOnVisitInfo" style="display: none;">
+                    <table class="sysAccounttable table" border="0" cellpadding="0" cellspacing="0">
+                        <tbody>
+
+                            @*<tr style="display: none;">
+                                    <td>询问问题：</td>
+                                    <td colspan="5" class="TagQuestionsTd" style="padding: 0px"></td>
+                                </tr>*@
+                            <tr>
+                                <td class=" sititle">回访内容：</td>
+                                <td colspan="5" style="line-height: initial;">
+                                    <div id="needVisitContent" style="width: 80%; height: 200px;"></div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="sititle">&nbsp;</td>
+                                <td colspan="5"><button class="btn btn-primary  btn-cons" onclick=" SaveVisitReply() ">保存回访信息</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <input type="hidden" value="0" id="needVisitId" />
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ***** 用户拓展信息 ***** -->
+    <div class="hidden m-t-20 m-b-20 p-l-20 p-r-20" id="userPortrait">
+        <div class="SysShopInfoItem row shopsys">
+            <table class="table dataTable sysAccounttable m-b-20" border="0" cellpadding="0" cellspacing="0" id="exInfoTable">
+                <tr>
+                    <td class="sitd sinullcont" colspan="8" style="font-weight: bold;">用户扩展信息：</td>
+                </tr>
+                <tr>
+                    <td class="sitd sititle">真实姓名：</td>
+                    <td class="sitd sicontent" id="" onclick="">
+                        <input type="text" id="realName" name="realName" class="form-control" value="" />
+                    </td>
+
+                    <td class="sitd sititle">年龄段：</td>
+                    <td class="sitd sicontent">
+                        <select class="cs-select cs-skin-slide" id="ageGrade">
+                            <option value='0' rel=''>---</option>
+                            <option value='1' rel=''>20-30</option>
+                            <option value='2' rel=''>30-40</option>
+                            <option value='3' rel=''>40-50</option>
+                        </select>
+                    </td>
+                    <td class="sitd sititle">性别：</td>
+                    <td class="sitd sicontent">
+                        <select class="cs-select cs-skin-slide" id="gender">
+                            <option value='0' rel=''>---</option>
+                            <option value='1' rel=''>男</option>
+                            <option value='2' rel=''>女</option>
+                        </select>
+                    </td>
+                    <td class="sitd sititle">分店数量：</td>
+                    <td class="sitd sicontent" id="" onclick="">
+                        <select class="cs-select cs-skin-slide" id="branchNum">
+                            <option value='0' rel=''>---</option>
+                            <option value='1' rel=''>1-2</option>
+                            <option value='2' rel=''>3-6</option>
+                            <option value='3' rel=''>6<</option>
+                        </select>
+                    </td>
+
+                </tr>
+                <tr class="hidden">
+                    <td class="sitd sititle hidden">发票抬头：</td>
+                    <td class="sitd sicontent hidden" id="" onclick="">
+                        <input type="text" id="invoiceTitle" name="invoiceTitle" class="form-control" value="" />
+                    </td>
+                    @*<td class="sitd sititle">分店数量：</td>
+                        <td class="sitd sicontent" id="" onclick="">
+                            <select class="cs-select cs-skin-slide" id="branchNum">
+                                <option value='0' rel=''>---</option>
+                                <option value='1' rel=''>1-2</option>
+                                <option value='2' rel=''>3-6</option>
+                                <option value='3' rel=''>6<</option>
+                            </select>
+                        </td>*@
+                    <td class="sitd sititle hidden">经商年限：</td>
+                    <td class="sitd sicontent hidden" id="businessExp_Tag" onclick="">&nbsp;</td>
+                    <td class="sitd sititle  hidden">店铺地址：</td>
+                    <td class="sitd sicontent hidden" colspan="3" id="" onclick="">
+                        <input type="text" id="shopAddress" name="shopAddress" class="form-control" value="" />
+                    </td>
+                </tr>
+                @*<tr>
+                        <td class="sitd sinullcont" colspan="8" style="font-weight: bold;">用户扩展信息：</td>
+                    </tr>*@
+                <tr>
+                    <td class="sitd sititle">行业（大分类）：</td>
+                    <td class="sitd sicontent">
+                        <div class="select-puppet" id="industryMain">
+                            <select class="cs-select cs-skin-slide" onchange=" SecondaryList(1) " id="type_1">
+                                <option value='0' rel=''>---</option>
+                            </select>
+                        </div>
+                    </td>
+                    <td class="sitd sititle">行业（小分类）：</td>
+                    <td class="sitd sicontent">
+                        <div class="select-puppet" id="industrySecondary">
+                            <select class="cs-select cs-skin-slide" onchange="" id="type_2">
+                                <option value='0' rel=''>---</option>
+                            </select>
+                        </div>
+                    </td>
+                    <td class="sitd sititle">用户来源：</td>
+                    <td class="sitd sicontent" id="userSource_Tag" onclick=""></td>
+                    <td class="sitd sititle">希望解决问题：</td>
+                    <td class="sitd sicontent" id="mainQuestion_Tag" onclick="">&nbsp;</td>
+                </tr>
+                <tr>
+
+                    <td class="sitd sititle">选择我们的理由：</td>
+                    <td class="sitd sicontent" id="choiceReason_Tag" onclick="">&nbsp;</td>
+                    <td class="sitd sititle">潜在需求：</td>
+                    <td class="sitd sicontent" id="needType_Tag" onclick="">&nbsp;</td>
+                    <td class="sitd sititle">对我们的态度：</td>
+                    <td>
+                        <div class="select-puppet" id="attitude">
+                            <select class="cs-select cs-skin-slide" onchange="" id="type_7">
+                                <option value='0' rel=''>---</option>
+                            </select>
+                        </div>
+                    </td>
+                    <td class="sitd sititle">使用过竞品：</td>
+                    @*<td class="sitd sicontent" colspan="1" id="compete">
+                         <div class="bootstrap-tagsinput"></div> 
+                        <input id="tagInput" type="text" value="" class="form-control tagsinput custom-tag-input" data-role="tagsinput"/>
+                    </td>*@
+                    <td class="sitd sititle">
+                        <div class="input-group full-width">
+                            <input type="text" name="remarkContent" class="form-control full-width" id="compete" value="" />
+                        </div>
+                    </td>
+                </tr>
+                @*<tr>
+                    <td class="sitd sititle">是否解决问题：</td>
+                    <td class="sitd sicontent">
+                        <div class="select-puppet" id="isSolved">
+                            <select class="cs-select cs-skin-slide" onchange="" id="type_10">
+                                <option value='0' rel=''>---</option>
+                            </select>
+                        </div>
+                    </td>
+                </tr>*@
+                <tr class="hidden">
+                    <td class="sitd sititle">邮箱：</td>
+                    <td class="sitd sicontent" id="" onclick="">
+                        <input type="text" id="email" name="email" class="form-control" value="" />
+                    </td>
+                    <td class="sitd sititle hidden">微信：</td>
+                    <td class="sitd sicontent hidden" id="" onclick="">
+                        <input type="text" id="weixin" name="weixin" class="form-control" value="" />
+                    </td>
+                    <td class="sitd sititle hidden">身份证号：</td>
+                    <td class="sitd sicontent hidden" id="" onclick="">
+                        <input type="text" id="idCardNo" name="idCardNo" class="form-control" value="" />
+                    </td>
+
+                    @*<td class="sitd sititle" colspan="6">&nbsp;</td>*@
+                </tr>
+                <tr>
+                    <td class="sitd sititle hidden">电话号码：</td>
+                    <td class="sitd sicontent hidden" colspan="1" id="" onclick="">
+                        <input type="text" id="phone_Tag" name="phoneNum" class="form-control" value="" />
+                    </td>
+                    <td class="sitd sititle hidden">QQ号码：</td>
+                    <td class="sitd sicontent hidden" colspan="1" id="" onclick="">
+                        <input type="text" name="qqNum" id="qq_Tag" value="" class="form-control" />
+                    </td>
+
+                    <td class="sitd sititle hidden">互联网使用：</td>
+                    <td class="sitd sicontent hidden">
+                        <select class="cs-select cs-skin-slide" id="webExp">
+                            <option value='0' rel=''>---</option>
+                            <option value='1' rel=''>精通</option>
+                            <option value='2' rel=''>一般</option>
+                            <option value='3' rel=''>很差</option>
+                        </select>
+                    </td>
+                    <td class="sitd sititle hidden">店员人数：</td>
+                    <td class="sitd sicontent hidden">
+                        <select class="cs-select cs-skin-slide" id="shopNum">
+                            <option value='0' rel=''>---</option>
+                            <option value='1' rel=''>1-3</option>
+                            <option value='2' rel=''>3-10</option>
+                            <option value='3' rel=''>10<</option>
+                        </select>
+                    </td>
+                </tr>
+            <tr class="">
+                <td class="sitd sititle">备注：</td>
+                @*<td class="sitd sicontent" id="">
+                        <div class="input-group b-a b-grey">
+                            <select class="cs-select cs-skin-slide input-group-addon full-width b-r b-grey text-master" id="remarkType_1">
+                                <option value='1' rel=''>行业（大分类）</option>
+                                <option value='2' rel=''>行业（小分类）</option>
+                                <option value='3' rel=''>用户来源</option>
+                                <option value='4' rel=''>关键词</option>
+                                <option value='5' rel=''>选择理由</option>
+                                <option value='6' rel=''>潜在需求</option>
+                                <option value='7' rel=''>态度</option>
+                                <option value='8' rel=''>经商年限</option>
+                                <option value='9' rel=''>其他</option>
+                            </select>
+                        </div>
+                    </td>*@
+                <td class="sitd sititle" colspan="7">
+                    <div class="input-group full-width">
+                        <input type="text" name="remarkContent" class="form-control full-width" id="remarkContent_1" value=""/>
+                    </div>
+                </td>
+            </tr>
+            @*<tr>
+                <td class="sitd sititle">备注2：</td>
+                <td class="sitd sititle ">
+                    <div class="input-group b-a b-grey">
+                        <select class="cs-select cs-skin-slide input-group-addon full-width b-r b-grey text-master" id="remarkType_2">
+                            <option value='1' rel=''>行业（大分类）</option>
+                            <option value='2' rel=''>行业（小分类）</option>
+                            <option value='3' rel=''>用户来源</option>
+                            <option value='4' rel=''>关键词</option>
+                            <option value='5' rel=''>选择理由</option>
+                            <option value='6' rel=''>潜在需求</option>
+                            <option value='7' rel=''>态度</option>
+                            <option value='8' rel=''>经商年限</option>
+                            <option value='9' rel=''>其他</option>
+                        </select>
+                    </div>
+                </td>
+
+                <td class="sitd sicontent " colspan="7">
+                    <div class="input-group full-width">
+                        <input type="text" id="remarkContent_2" name="remarkContent" class="form-control full-width" value=""/>
+                    </div>
+                </td>
+            </tr>*@
+
+                <tr>
+                    <td class="sitd sicontent" colspan="8"><input type="button" name="" id="saveBtn" onclick=" SaveExtInfo() " class="btn btn-success m-l-30 m-t-10 m-b-10" value="保存信息" /></td>
+                </tr>
+            </table>
+        </div>
+
+        <input type="hidden" name="industryMain_val" id="industryMain_val" value="," />
+        <input type="hidden" name="industrySecondary_val" id="industrySecondary_val" value="" />
+        <input type="hidden" name="userSource_val" id="userSource_val" value="," />
+        <input type="hidden" name="sourceKeyword_val" id="sourceKeyword_val" value="" />
+        <input type="hidden" name="choiceReason_val" id="choiceReason_val" value="," />
+        <input type="hidden" name="needType_val" id="needType_val" value="," />
+        <input type="hidden" name="attitude_val" id="attitude_val" value="" />
+        <input type="hidden" name="businessExp_val" id="businessExp_val" value="" />
+        <input type="hidden" value="@ViewBag.permission" id="perm" />
+
+        <div class="row m-t-15 select_area" id="">
+            @*<div class="col-sm-3" style="display: none;">
+                    <div class="m-l-15">
+                        <label>行业（大分类）</label>
+                        <div class="select-puppet" id="industryMain">
+                            <select class="cs-select cs-skin-slide" onchange=" SecondaryList(1) " id="type_1">
+                                <option value='0' rel=''>---</option>
+                            </select>
+                            <a class="tagAdd btn btn-default padding-5" onclick=" AddTagItem('industryMain') " href="javascript:void(0)">
+                                <i class="pg-plus text-master fs-16"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3" style="display: none;">
+                    <label>行业（小分类）</label>
+                    <div class="select-puppet" id="industrySecondary">
+                        <select class="cs-select cs-skin-slide" onchange="" id="type_2">
+                            <option value='0' rel=''>---</option>
+                        </select>
+                        <a class="tagAdd btn btn-default padding-5" onclick="AddTagItem('industrySecondary')" href="javascript:void(0)">
+                            <i class="pg-plus text-master fs-16"></i>
+                        </a>
+                    </div>
+                </div>*@
+
+            <div class="row m-t-15 ">
+                <div class="col-sm-3">
+                    <label>用户来源</label>
+                    <div class="select-puppet" id="userSource">
+                        <select class="cs-select cs-skin-slide" onchange=" SecondaryList(3) " id="type_3">
+                            <option value='0' rel=''>---</option>
+                        </select>
+                        <a class="tagAdd btn btn-default padding-5" onclick=" AddTagItem('userSource') " href="javascript:void(0)">
+                            <i class="pg-plus text-master fs-16"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <label>希望解决问题</label>
+                    <div class="select-puppet" id="mainQuestion">
+                        <select class="cs-select cs-skin-slide" onchange="" id="type_9">
+                            <option value='0' rel=''>---</option>
+                        </select>
+                        <a class="tagAdd btn btn-default padding-5" onclick="AddTagItem('mainQuestion')" href="javascript:void(0)">
+                            <i class="pg-plus text-master fs-16"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-sm-3 select_area">
+                    <div class="m-l-15">
+                        <label>选择我们的理由</label>
+                        <div class="select-puppet" id="choiceReason">
+                            <select class="cs-select cs-skin-slide" onchange="" id="type_5">
+                                <option value='0' rel=''>---</option>
+                            </select>
+                            <a class="tagAdd btn btn-default padding-5" onclick=" AddTagItem('choiceReason') " href="javascript:void(0)">
+                                <i class="pg-plus text-master fs-16"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 select_area">
+                    <label>潜在需求</label>
+                    <div class="select-puppet" id="needType">
+                        <select class="cs-select cs-skin-slide" onchange="" id="type_6">
+                            <option value='0' rel=''>---</option>
+                        </select>
+                        <a class="tagAdd btn btn-default padding-5" onclick=" AddTagItem('needType') " href="javascript:void(0)">
+                            <i class="pg-plus text-master fs-16"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-sm-3 select_area"  style="display: none;">
+                        <label>对我们的态度</label>
+                        <div class="select-puppet" id="attitude">
+                            <select class="cs-select cs-skin-slide" onchange="" id="type_7">
+                                <option value='0' rel=''>---</option>
+                            </select>
+                            <a class="tagAdd btn btn-default padding-5" onclick=" AddTagItem('attitude') " href="javascript:void(0)">
+                                <i class="pg-plus text-master fs-16"></i>
+                            </a>
+                        </div>
+                    </div>
+                @*<div class="col-sm-3 hidden">
+                        <label>经商年限</label>
+                        <div class="select-puppet" id="businessExp">
+                            <select class="cs-select cs-skin-slide" onchange="" id="type_8">
+                                <option value='0' rel=''>---</option>
+                                <option value='1' rel=''>1年<</option>
+                                <option value='2' rel=''>1年-3年</option>
+                                <option value='3' rel=''>3年-5年</option>
+                                <option value='4' rel=''>5-7年</option>
+                                <option value='5' rel=''>7年以上</option>
+                            </select>
+                            <a class="tagAdd btn btn-default padding-5" onclick="AddTagItem('businessExp')" href="javascript:void(0)">
+                                <i class="pg-plus text-master fs-16"></i>
+                            </a>
+                        </div>
+                    </div>*@
+            </div>
+        </div>
+    </div>
+    <hr />
+    <div class="row hidden" id="taskDiv">
+        <div class="m-l-20 m-r-20">
+            <div class="alert alert-warning alert-dismissible dailyNoticeText " role="alert" id="unfinished">
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="row hidden" id="forumDiv">
+        <div class="m-l-20 m-r-20">
+            <div class="alert alert-info alert-dismissible dailyNoticeText " role="alert" id="forumFeedback">
+            </div>
+        </div>
+
+    </div>
+
+<div style="display: none;" id="addSmsText">
+    <div class="panel-body">
+        <div class="row m-b-5">
+            短信内容:
+        </div>
+        <div class="row m-t-0">
+            <textarea id="smscon" oninput="txt_length()" onpropertychange="txt_length()" onkeyup="txt_length() " onchange="txt_length()" rows="5" cols="100%" style="width: 297px; height: 103px;" class="b-grey m-b-10" name="context"></textarea>
+        </div>
+        <div class="row left">
+            <div class="input-group transparent" style="width: 300px;">
+                <span class="input-group-addon" style="border-width: 0px;">
+                        字数：<span id="wordcnt" style="color: #16960e; font-weight: bold; margin-right: 35px;">0</span>
+                    </span>
+
+                <input type="hidden" id="smsCnt" value="" name="smsCnt"/>
+            </div>            
+        </div>
+    </div>
+</div>
+
+<div class="row padding-20" id="oldVisitInfo">
+        @*<div class="col-xs-12 col-sm-6 col-md-3 ShopInfoTitle">
+                <h5 class="m-t-0">客服回访</h5>
+            </div>*@
+        <table class="table table-hover no-footer" border="0" cellpadding="0" cellspacing="0" id="needVisitTable">
+            <thead>
+                <tr>
+                    <th width="50px"></th>
+                    <th>历史回访内容</th>
+                    <th width="80px">操作人</th>
+                    <th width="150px">来访时间</th>
+                    <th width="120px">状态</th>
+                    @*<th width="120px" class="text-center">操作</th>*@
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <div class="dataTables_wrapper visitListPageHtml">
+            <div class="dataTables_paginate pagination">
+                <ul><li class="prev disabled"><a href="javascript:void(0)"><i class="pg-arrow_left"></i></a></li><li class="active"><a href="javascript:void(0)">1</a></li><li class="next disabled"><a href="javascript:void(0)"><i class="pg-arrow_right"></i></a></li></ul>
+            </div>
+            <div class="dataTablePagText"></div>
+        </div>
+    </div>
+</div>
+<div style="display:none;">
+    <div id="SysTagQuestionsDiv">
+        <div class="panel selectSysTagQuestionsList">
+        </div>
+    </div>
+</div>
+<script type="text/html" id="SysTagQuestionsListScript">
+    <ul class="nav nav-tabs nav-tabs-simple">
+        {{each list }}
+        <li>
+            <a data-toggle="tab" href="#tagQuestionsTabList{{$value.tagTypeId}}">{{$value.tagTypeName}}</a>
+        </li>
+        {{/each}}
+    </ul>
+    <div class="tab-content">
+        {{each list }}
+        <div class="tab-pane bootstrap-tagsinput" id="tagQuestionsTabList{{$value.tagTypeId}}">
+            {{each $value.itemList as value i}}
+            <span class="tag label label-white" onclick="ShopAddTagClick(this)" tagid="{{value.id}}">{{value.t_Name}}</span>
+            {{/each}}
+        </div>
+        {{/each}}
+    </div>
+</script>
+
+<script type="text/html" id="UnfinishedTask">
+    {{each list }}
+    <span class="bold">未处理回访：</span>
+    <span class="textTipsContent">{{$value.t_mk}}[{{$value.dt_remark}}]</span>
+
+    <a href="/shopinfo/index/{{$value.accountid}}?td={{$value.id}}" target="_blank">回访</a>
+    <br />
+    {{/each}}
+
+</script>
+
+<script type="text/html" id="ForumFeedBack">
+    {{each list }}
+    <span class="bold">论坛反馈：</span>
+    <span class="textTipsContent"><a href="{{$value.url}}" target="_blank">{{$value.content}} [{{$value.time}}]</a></span>
+    <br />
+    {{/each}}
+
+</script>
+
+
+<script src="~/Scripts/plugins/artTemplate/template.js"></script>
+<script src="~/Scripts/plugins/bootstrap-tag/bootstrap-tagsinput.min.js"></script>
+<script src="~/Scripts/ShopInfo/ShopInfo20160304.js"></script>
+<script src="~/Scripts/jquery.sieve.min.js"></script>
+
+<script type="text/javascript">
+    $(function () {
+        GetShopSummarize();
+
+        setTimeout(GetSysInfoList, 500);
+
+        var tdid = $("#taskDailyId").val();
+        if (tdid != "0") {
+            AddVisitInfoButtonClick();
+            GetTaskDailyInfo();
+        }
+        setTimeout(GetShopTagJson, 800);
+        setTimeout(GetLastLogInfo, 1000);
+        setTimeout(GetVisitReason, 200);
+        setTimeout(GetVisitManner, 300);
+        setTimeout(GetVisitStatus, 1000);
+
+        GetUserQuestion();
+
+        setTimeout(function () {
+            GetNeedVisitList(1);
+            GetUnfinishedVisitList();
+            GetForumFeedback();
+
+            GetLogDetail();
+            GetLastClient();
+        }, 1500);
+
+        $(".SysTagListDiv").sieve({
+            searchInput: $('#SysShopTagNewInput'),
+            itemSelector: ".tagItem"
+        });
+
+        //$('tagInput').tagsinput({
+        //    typeahead: {
+        //        source: ['Amsterdam', 'Washington', 'Sydney', 'Beijing', 'Cairo']
+        //    }
+        //});
+
+        // clickTest ();
+        var tool = ["source", "formatmatch", "bold", "italic", "underline", "forecolor", "strikethrough", "paragraph", "fontfamily", "fontsize", "insertimage", "cleardoc"];
+        Visiteditor = new UE.ui.Editor({ toolbars: [tool] });
+        Visiteditor.render("VisitContent");
+
+        needVisiteditor = new UE.ui.Editor({ toolbars: [tool] });
+        needVisiteditor.render("needVisitContent");
+
+
+        var logVid = $("#LoadVisitInfoId").val();
+        if (logVid != "0") {
+            VisitReplyShow(Number(logVid));
+            $("#LoadVisitInfoId").val("0");
+        }
+    });
+
+
+    // function clickTest () {
+    //     $("#compete > .bootstrap-tagsinput > span > span[data-role='remove']").on("click", function () {
+    //         alert(1);
+    //     })
+    // }
+</script>
+<script type="text/html" id="loginTime">
+    (
+    <span title="在线时长" class="text-danger small-text">{{loginLong}}分钟</span>)
+</script>
+<script type="text/html" id="regTime">
+    <h6 class="hint-text m-t-0">注册时间</h6>
+    <h5 class="m-b-0">
+        <span class="text-success">
+            @Html.DisplayFor(model => model.RegTime)
+            @if (Model.Remark == "10")
+            {
+                <i class="p-r-10 fa fa-apple fs-16" data-toggle="tooltip" data-placement="left" title="iPhone注册"></i>
+            }
+            else if (Model.Remark == "11")
+            {
+                <i class="p-r-10 fa fa-android fs-16 android" data-toggle="tooltip" data-placement="left" title="安卓注册"></i>
+            }
+            else if (Model.Remark == "8")
+            {
+                <i class="p-r-10 fa fa-desktop text-complete fs-16" data-toggle="tooltip" data-placement="left" title="客户端注册"></i>
+            }
+            else if (Model.Remark == "9")
+            {
+
+            }
+            else if (Model.Remark == "12")
+            {
+                <i class="p-r-10 fa pg-ui fs-16 text-primary" data-toggle="tooltip" data-placement="left" title="网页注册"></i>
+            }
+            else if (Model.Remark == "0")
+            {
+                <i class="p-r-10 fa pg-ui fs-16 text-primary" data-toggle="tooltip" data-placement="left" title="网页注册"></i>
+            }
+            else if (Model.Remark == "13")
+            {
+                <i class="p-r-10 fa fa-apple fs-16" data-toggle="tooltip" data-placement="left" title="iPad注册"></i>
+            }
+        </span>
+
+        @*<span class="text-success">{{outlayNum}}</span> 笔（<span class="text-danger">{{outlayMoney}}</span> 元）*@
+    </h5>
+</script>
+<script type="text/html" id="endTime">
+    <h6 class="hint-text m-t-0">到期时间</h6>
+    <h5 class="m-b-0">
+        @if (Model.endtime == DateTime.MinValue)
+        {
+            <span class="text-success">很久很久以后</span>
+        }
+        else
+        {
+            <span class="text-danger">@Html.DisplayFor(model => model.endtime)</span>
+        }
+    </h5>
+</script>
+<script type="text/html" id="orderNumber">
+    <h6 class="hint-text m-t-0">订单</h6>
+    <h5 class=" m-b-0">
+        <span class="text-success">{{orderNum}}</span> 笔（<span class="text-danger">{{orderMoney}}</span> 元）<a href="javascript:void(0)" class="fs-12" onclick="GetShopOrder()">明细</a>
+    </h5>
+</script>
+<script type="text/html" id="ShopSummarizeTemplate">
+    <div class="row">
+        <p class="pull-left">总积分</p>
+        <p class="pull-right text-danger bold">@Html.DisplayFor(model => model.integral)</p>
+    </div>
+
+    @*<div class="row">
+        <p class="pull-left">总在线时长</p>*@
+    @*{{if (loginLong == 0)}}
+        <p class="pull-right text-danger bold">从未登录</p>
+        {{else}}*@
+    @*<p class="pull-right text-danger bold">{{loginLong}}</p>*@
+    @*{{/if}}*@
+    @*</div>*@
+    <div class="row">
+        <p class="pull-left">会员</p>
+        <p class="pull-right bold text-danger">{{userNum}}</p>
+    </div>
+    <div class="row">
+        <p class="pull-left">商品数</p>
+        <p class="pull-right bold text-danger">{{goodsNum}}</p>
+    </div>
+    <div class="row">
+        <p class="pull-left">销售</p>
+        <p class="pull-right bold">
+            {{saleNum}}笔（<span class="text-danger">{{saleMoney}}</span> 元）
+        </p>
+    </div>
+
+    <div class="row">
+        <p class="pull-left">优惠券</p>
+        <p class="pull-right bold">
+            <a href="javascript:void(0)" onclick=" GetShopCoupon() " title="点击查看详情">共 <span class="text-danger">{{couponNum}}</span> 张,使用 <span class="text-danger">{{useCouponNum}}</span> 张</a><a href="javascript:volid(0)" class="m-l-10" onclick=" bindingCoupon() ">绑定</a>
+        </p>
+    </div>
+    <div class="row">
+        <p class="pull-left">短信</p>
+        <p class="pull-right bold">
+            剩余：<span class="text-key m-r-5">@Html.DisplayFor(model => model.smsSurplusNum)</span>条，已发送<span id="smsSendAllNum" class="m-l-5">0</span> 条
+        </p>
+    </div>
+</script>
+<div style="display: none;">
+    <div id="alipayShowDiv" style="width: 300px;">
+        <table class="table table-bordered removeBottom">
+            <tr>
+                <th style="line-height: 26px; text-align: right;">支付宝账号</th>
+                <td><input id="aliAccount" class="span1 removeBottom" style="width: 180px;" type="text" /></td>
+            </tr>
+            <tr>
+                <th style="line-height: 26px; text-align: right;">支付宝Pid</th>
+                <td><input id="aliPid" class="span1 removeBottom" style="width: 180px;" type="text" /></td>
+            </tr>
+            <tr>
+                <th style="line-height: 26px; text-align: right;">支付宝Key</th>
+                <td><input id="aliKey" class="span1 removeBottom" style="width: 180px;" type="text" /></td>
+            </tr>
+        </table>
+    </div>
+</div>
+<div style="display: none;" id="orderDiv">
+    <div id="orderDisplay" style="width: 600px; height: 500px; overflow: auto;">
+        <table class="table table-hover   no-footer table-border-right ">
+            <thead>
+                <tr>
+                    <th>产品名称</th>
+                    <th>金额</th>
+                    <th>支付方式</th>
+                    @*<th>登录次数</th>*@
+                    <th>购买时间</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+    </div>
+    <div id="ordSum" class="m-t-10"></div>
+</div>
+<script type="text/html" id="VisitTagListScript">
+    <ul class="nav nav-tabs nav-tabs-simple">
+
+        {{each list }}
+
+
+        <li>
+            <a data-toggle="tab" href="#tagTabList{{$value.vTypeId}}">{{$value.vTypeName}}</a>
+        </li>
+        {{/each}}
+    </ul>
+    <div class="tab-content">
+        {{each list }}
+        <div class="tab-pane bootstrap-tagsinput" id="tagTabList{{$value.vTypeId}}">
+            {{each $value.ItemList as value i}}
+            <span class="tag label label-white" onclick="VisitAddTag(this)" tagid="{{value.id}}">{{value.tagName}}</span>
+            {{/each}}
+        </div>
+        {{/each}}
+    </div>
+</script>
+<script id="AppList-Tpl" type="text/html">
+    <table id="appInfoTb" class="table table-striped table-bordered sysAccounttable" style="color: #666;">
+        <thead>
+            <tr>
+                <th style="text-align: center;">AppKey</th>
+                <th>App名称</th>
+                <th>当前状态</th>
+                <th style="min-width: 130px;">到期时间</th>
+                <th style="min-width: 90px;">备注信息</th>
+                <th>Url地址</th>
+                <th>操作选项</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{each Data}}
+            <tr>
+                <td style="text-align: center;">
+                    <span>{{$value.AppKey}}</span>
+                </td>
+                <td>
+                    <span>
+                        {{$value.AppName}}
+                    </span>
+                </td>
+                <td>
+                    {{if $value.ActiveStatus==2}}
+                    <span class="statusBase Success"> {{$value.DisplayStatus}}</span>
+                    {{/if}}
+
+                    {{if $value.ActiveStatus==1}}
+                    <span class="statusBase warning"> {{$value.DisplayStatus}}</span>
+                    {{/if}}
+
+                    {{if $value.ActiveStatus==0}}
+                    <span class="statusBase Wait">{{$value.DisplayStatus}}</span>
+                    {{/if}}
+
+                    {{if $value.ActiveStatus==-1}}
+                    <span class="statusBase Fail">{{$value.DisplayStatus}}</span>
+
+                    {{/if}}
+                </td>
+
+
+
+                <td>
+                    {{if $value.ActiveStatus==2 || $value.ActiveStatus==-1}}
+                    <span title="剩余天数:{{$value.LastDays}}天">{{$value.EndDate}}</span>
+                    {{/if}}
+                </td>
+                <td>
+                    <span>{{$value.Remark}}  </span>
+                </td>
+                <td>
+                    {{if $value.ShortUrl!="" && $value.AppKey==1}}
+                    <a href="javascript:void(0)" onclick="OpenHtml()" style="display: inline;">{{$value.ShortUrl}}</a>
+                    {{/if}}
+
+                    {{if $value.AppKey==1}}
+                    <select style="margin-left: 10px;" id="HtmlThemesVal" onchange="SetHtmlThemesVal()">
+                        <option value="1">第一套</option>
+                        <option value="2">第二套</option>
+                        <option value="3">第三套</option>
+                    </select>
+
+                    {{/if}}
+
+                    {{if $value.ShortUrl!="" && $value.AppKey==2}}
+                    <a href="javascript:void(0)" onclick="OpenYouHui()" style="display: inline;">{{$value.ShortUrl}}</a>
+
+                    {{/if}}
+                </td>
+
+                <td>
+                    {{if $value.ActiveStatus==1 || $value.ActiveStatus==2}}
+                    {{if $value.AppKey!=3 && $value.AppKey!=5}}
+                    <span class="btn btn-warning" onclick="SetAppClose({{$value.AppKey }},{{$value.AppName}})">关闭授权  </span>
+
+                    {{/if}}
+                    {{/if}}
+
+                    {{if $value.ActiveStatus==0}}
+                    {{if $value.AppKey!=3 && $value.AppKey!=5 && $value.AppKey!=10}}
+                    <span class="btn btn-primary" onclick="SetAppActive('{{$value.AppKey}}')">开通授权</span>
+                    {{else if $value.AppKey==10}}
+                    <span class="btn btn-primary" onclick="SetAlipayActive(@ViewBag.AccId)">开通授权</span>
+                    {{/if}}
+                    {{/if}}
+                </td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</script>
+<script type="text/html" id="AccountUserListScript">
+    <table id="appInfoTb" class="table table-striped table-bordered tableTextCenter" style="color: #666; min-width:300px;">
+        <thead>
+            <tr>
+                <th style="padding-left: 8px!important;">名称</th>
+                <th>登录账号</th>
+                <th>权限</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {{each list}}
+            <tr>
+                <td>{{$value.name}}</td>
+                <td>{{$value.account}}</td>
+                <td>{{$value.grade}}</td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</script>
+<script type="text/html" id="OrderListScript">
+
+    {{each list}}
+    <tr>
+        <td>{{$value.opName}}</td>
+        <td class="v-align-middle">
+            ￥{{$value.RealPayMoney}}
+            {{if $value.commuteIntegralMoney!=null && $value.commuteIntegralMoney>0}}
+            <span class="icon-font icon-multiple m-l-10" title="{{$value.commuteIntegral}}分/￥{{$value.commuteIntegralMoney}}">抵现</span>
+            {{/if}}
+            {{if $value.couponMoney!=null && $value.couponMoney>0}}
+            <span class="icon-font-g icon-multiple m-l-10" title="￥{{$value.couponMoney}}">优惠券</span>
+            {{/if}}
+            {{if $value.invoiceId!=0 && $value.invoiceId!=null && $value.invoiceStatus==1}}
+            <img class="m-l-10" src="../../img/Invoice/invoiced.png" style="width: 60px" alt="" />
+            {{/if}}
+        </td>
+        @*<td>{{$value.RealPayMoney}}</td>*@
+        <td>{{$value.orderPayType}}</td>
+        @*<td>{{$value.LoginTimes}}</td>*@
+        <td>
+            {{$value.transactionDate}}
+        </td>
+    </tr>
+    {{/each}}
+
+
+</script>
+<script type="text/html" id="CouponListScript">
+    <table class="table table-hover   no-footer table-border-right ">
+        <thead>
+            <tr>
+                <th>优惠内容</th>
+                <th>优惠类型</th>
+                <th>激活时间</th>
+                <th>当前状态</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {{each list}}
+            <tr>
+            <tr>
+                <td>{{$value.couponDesc}}</</td>
+                <td>{{$value.couponTypeName}}</td>
+                <td>{{$value.usedDate}}</td>
+                <td>{{$value.couponStatusName}}</td>
+            </tr>
+            {{/each}}
+        </tbody>
+
+
+    </table>
+</script>
+<script type="text/html" id="needVisitTableScript">
+
+    {{each listData}}
+    <tr>
+        {{if $value.recordType=="用户来电"}}
+        <td></td>
+        {{else}}
+        <td style="vertical-align: middle">
+            <img src="../../img/phoneCall/In.png" style="width: 20px;" title="客服回访" alt="客服回访" />
+            @*<img src="../../img/phoneCall/Out.png" style="width: 30px" title="客服去电" alt="客服回访" />*@
+        </td>
+        {{/if}}
+
+
+        {{if $value.recordType=="用户来电"}}
+        <td>
+            @*<p>{{$value.Problem}}</p>*@
+            <p class="m-b-0" style="color: darkcyan">{{$value.FeedBack}}</p>
+        </td>
+        {{else}}
+        <td>
+            <p>{{$value.Problem}}</p>
+            <p class="m-b-0" style="color: darkcyan">{{$value.FeedBack}}</p>
+        </td>
+        {{/if}}
+        <td>{{$value.insertName}}</td>
+        <td style="width: 180px">{{$value.insertTime}}</td>
+        
+        <td>
+            {{if $value.handleStatName=="继续回访"}}
+            <a href="#top" visitinfoid="{{$value.id}}" onclick="VisitReplyShow('{{$value.id}}')">继续处理</a>
+            {{else}}
+            {{$value.handleStatName}}
+            {{/if}}
+        </td>
+        @*<td class="text-center">
+                {{if $value.handleStat==4}}
+                <a href="#top" visitinfoid="{{$value.id}}" onclick="VisitReplyShow({{$value.id}})">继续处理</a>
+                {{/if}}
+            </td>*@
+    </tr>
+    {{/each}}
+</script>
+<script type="text/html" id="GoOnVisitInfoTableScript">
+    <tr class="template">
+        <td class=" sititle">一级概要：</td>
+        <td typeid="visitReasonOne">{{visitReasonOne}}</td>
+
+        <td class=" sititle">二级概要</td>
+        <td typeid="visitReasonTwo">{{visitReasonTwo}}</td>
+
+        <td class=" sititle">三级概要</td>
+        <td typeid="visitReasonThree">{{visitReasonThree}}</td>
+    </tr>
+    <tr class="template">
+        <td class=" sititle">咨询途径：</td>
+        <td typeid="visitManner">{{visitManner}}</td>
+
+        <td class=" sititle">
+            询问时间
+        </td>
+        <td typeid="insertTime">{{insertTime}}</td>
+        <td colspan="2">
+            <div class="radio radio-warning">
+                <input type="radio" value="4" name="HandleStat" id="HandleStat10">
+                <label for="HandleStat10">需继续回访</label>
+                <input type="radio" value="2" name="HandleStat" id="HandleStat20">
+                <label for="HandleStat20">回访失败</label>
+                @*<input type="radio" value="3" name="HandleStat" id="HandleStat30">
+                    <label for="HandleStat30">已提交</label>*@
+                <input type="radio" value="1" checked="checked" name="HandleStat" id="HandleStat40">
+                <label for="HandleStat40">关闭事件</label>
+            </div>
+        </td>
+    </tr>
+    <tr class="template">
+        <td colspan="6" style="padding: 0px">
+            <div class="visitReplyItem">
+                <div style="background: #f5f5f5;"><span class="itemName">{{insertName}}</span><span class="itemTime">{{insertTime}}</span></div>
+                <div class="itemContent">
+
+                    {{#vi_Content}}
+                </div>
+            </div>
+            {{each replyList}}
+            <div class="visitReplyItem">
+                <div style="background: #f5f5f5;"><span class="itemName">{{$value.vr_Name}}</span><span class="itemTime">{{$value.vr_Time}}</span></div>
+                <div class="itemContent">
+                    {{#$value.vr_Content}}
+                </div>
+            </div>
+            {{/each}}
+        </td>
+    </tr>
+</script>
+

@@ -1,0 +1,188 @@
+﻿
+@{
+    ViewBag.Title = "订单续费分析";
+}
+
+@Styles.Render("~/style/form")
+<div class="page-where renewalWhere" style="margin-top: 10px;">
+    <div class="btn-group">
+        <button type="button" class="btn btn-default btn-select" value="1" onclick=" renewalWhereTimeButtonClick(this) ">本月</button>
+        <button type="button" class="btn btn-default" value="2" onclick=" renewalWhereTimeButtonClick(this) ">上月</button>
+        <button type="button" class="btn btn-default" value="3" onclick=" renewalWhereTimeButtonClick(this) ">最近三月</button>
+        <button type="button" class="btn btn-default" value="other" onclick=" renewalWhereTimeButtonClick(this) ">其他时间</button>
+    </div>
+    <div class="btn-group page-where-othertime" style="display: none;">
+        <button type="button" value="return" class="btn btn-default border-right0" onclick=" renewalWhereTimeButtonClick(this) ">返回</button>
+        <div class="page-where-time-input">
+            <div class="input-daterange input-group">
+                <input type="text" placeholder="开始时间" class="input-sm form-control" name="start" />
+                <span class="input-group-addon">to</span>
+                <input type="text" placeholder="结束时间" class="input-sm form-control" name="end" />
+            </div>
+        </div>
+    </div>
+    <button type="button" value="select" class="btn btn-default btn-inquire" onclick="GetOrderRenewalData()">查询</button>
+</div>
+
+@Scripts.Render("~/js/begin/form")
+<script src="~/Scripts/plugins/artTemplate/template.js"></script>
+
+
+<table class="table table-hover" id="orderRenewalList" style="width: 800px">
+    <thead>
+    <tr>
+        <th class="text-center">月份</th>
+        <th class="text-center">到期用户</th>
+        <th class="text-center">续费用户</th>
+        <th class="text-center">未续费用户</th>
+        <th class="text-center">续费率</th>
+        @*<th class="text-center">版本</th>*@
+        @*<th class="text-center">最长审核时间</th>
+            <th class="text-center">平均审核时间</th>*@
+        @*<th class="text-center">登录时间</th>*@
+    </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<script type="text/html" id="orderRenewalListScript">
+    {{each list}}
+    {{if $value.DailyFlag==null}}
+    <tr>
+        <td class="text-center v-align-middle" onclick="ShowDetails('{{$value.Date}}');" style="cursor: pointer">{{$value.Date}}<span class="pg-arrow_lright_line_alt" id="id_{{$value.Date}}"></></span></td>
+        <td class="text-center v-align-middle" style="cursor: pointer" onclick="GetDetailPage('OrderRenewal', '{{$value.ExAccidStr}}')">{{$value.ExpireUsr}}</td>
+        <td class="text-center v-align-middle" style="cursor: pointer" onclick="GetDetailPage('OrderRenewal', '{{$value.ReAccidStr}}')">{{$value.RenewalUsr}}</td>
+        <td class="text-center v-align-middle" style="cursor: pointer" onclick="GetDetailPage('OrderRenewal', '{{$value.NotReAccidStr}}')">{{$value.NotReUsr}}</td>
+        {{if $value.Ratio>=50}}
+        <td class="text-center v-align-middle" style="color: red">{{$value.Ratio}}%</td>
+        {{else}}
+        {{if $value.Ratio>=25}}
+        <td class="text-center v-align-middle" style="color: tomato">{{$value.Ratio}}%</td>
+        {{else}}
+        <td class="text-center v-align-middle" style="color: lightcoral">{{$value.Ratio}}%</td>
+        {{/if}}
+        {{/if}}
+
+    </tr>
+    {{else}}
+    <tr class="tr_{{$value.DailyFlag}}" style="display: none">
+        <td class="text-center v-align-middle" style="color: lightskyblue">&nbsp;{{$value.Date}}</td>
+        <td class="text-center v-align-middle" style="cursor: pointer" onclick="GetDetailPage('OrderRenewal', '{{$value.ExAccidStr}}' ) ">{{$value.ExpireUsr}}</td>
+        <td class="text-center v-align-middle" style="cursor: pointer" onclick="GetDetailPage('OrderRenewal', '{{$value.ReAccidStr}}' ) ">{{$value.RenewalUsr}}</td>
+        <td class="text-center v-align-middle" style="cursor: pointer" onclick="GetDetailPage('OrderRenewal', '{{$value.NotReAccidStr}}' ) ">{{$value.NotReUsr}}</td>
+        {{if $value.Ratio>=50}}
+        <td class="text-center v-align-middle" style="color: red">{{$value.Ratio}}%</td>
+        {{else}}
+        {{if $value.Ratio>=25}}
+        <td class="text-center v-align-middle" style="color: tomato">{{$value.Ratio}}%</td>
+        {{else}}
+        <td class="text-center v-align-middle" style="color: lightcoral">{{$value.Ratio}}%</td>
+        {{/if}}
+        {{/if}}
+    </tr>
+    {{/if}}
+
+    {{/each}}
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.renewalWhere .page-where-othertime .input-daterange').datepicker({
+            format: "yyyy-MM",
+            minViewMode: 1
+        });
+
+        //var wid = $(document).width() / 3;
+        //$("#orderRenewalList").css('width', wid);
+
+        GetOrderRenewalData();
+    });
+
+    function renewalWhereTimeButtonClick(obj) {
+        var value = obj.value;
+
+        $(obj).parent().find(".btn-select").removeClass("btn-select");
+        $(obj).addClass("btn-select");
+
+        if (value == "return") {
+            $(".renewalWhere .btn-group").show().filter(".page-where-othertime").hide();
+        } else {
+            $(obj).parent().find(".btn-select").removeClass("btn-select");
+            $(obj).addClass("btn-select");
+            if (value == "other") {
+                $(".renewalWhere .btn-group").hide().filter(".page-where-othertime").show();
+            }
+        }
+    }
+
+    function GetOrderRenewalData() {
+        var postJson = {};
+
+        var timeType = $(".renewalWhere .btn-group .btn.btn-select").val();
+        if (timeType == "other") {
+            postJson["type"] = 0;
+            var statTime = $(".renewalWhere .page-where-othertime input[name='start']").val();
+            var endTime = $(".renewalWhere .page-where-othertime input[name='end']").val();
+            if (statTime.length > 0) {
+                postJson["stDate"] = statTime;
+            }
+            if (endTime.length > 0) {
+                postJson["edDate"] = endTime;
+            }
+        } else {
+            var timeValue = $.timePeriod(0);
+            postJson["type"] = timeType;
+            postJson["stDate"] = timeValue.start.toLocaleDateString();
+            postJson["edDate"] = timeValue.end.toLocaleDateString();
+        }
+
+        var url = "/CustomerCare/GetOrderRenewal";
+
+        $.doAjax(url, postJson, function (msg) {
+            if (msg != "") {
+                var json = jQuery.parseJSON(msg);
+                $("#orderRenewalList tbody").html(template("orderRenewalListScript", { "list": json }));
+            }
+        }, true);
+
+    }
+
+    function GetDetailPage(type, obj) {
+        //$('#accids').val(obj);
+        //$('#type').val(type);
+        var postData = {
+            accids: obj,
+            type: type,
+            pageIndex: 1
+        }
+        //$("#accidForm").submit();
+        //$.post("/ActiveDetail/Test", postData, OpenWindow());
+
+        $.ajax({
+            type: "POST",
+            url: '/ActiveDetail/Index',
+            data: postData,
+            success: function (str_response) {
+                var obj = window.open("about:blank");
+                obj.document.write(str_response);
+            }
+        });
+
+        post('/ActiveDetail/Index', postData);
+    }
+
+    function ShowDetails(markId) {
+        if ($("#id_" + markId).attr('class') == "pg-arrow_minimize_line") {
+            $("#id_" + markId).attr('class', 'pg-arrow_lright_line_alt');
+            $("tr.tr_" + markId).hide();
+        } else {
+            $("tr.tr_" + markId).show();
+            $("tr.tr_" + markId).filter("[class='pg-arrow_minimize_line']").attr('class', 'pg-arrow_lright_line_alt');
+            $("#id_" + markId).attr('class', 'pg-arrow_minimize_line');
+
+        };
+    }
+
+</script>
+
+

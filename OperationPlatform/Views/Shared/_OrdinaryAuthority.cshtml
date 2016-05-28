@@ -1,0 +1,418 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-touch-fullscreen" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta content="" name="description" />
+    <meta content="" name="author" />
+    <title>@ViewBag.Title</title>
+    @RenderSection("HeadStyle", required: false)
+    @Styles.Render("~/style/begin/plugins")
+    @Styles.Render("~/style/begin/core")
+    <!-- jQuery -->
+    @Scripts.Render("~/jquery")
+    <script src="~/Scripts/global.js"></script>
+
+
+    <!-- BEGIN 用户自定义 CSS -->
+    <link href="/css/style.css" rel="stylesheet" type="text/css" />
+    <!--[if lte IE 9]>
+        <link href="/css/core/ie9.css" rel="stylesheet" type="text/css" />
+        <style>
+            body.menu-pin .page-container .page-content-wrapper .content {
+              padding-left: 250px;
+            }
+            .sidebar-header-controls {
+                display: none!important;
+            }
+            .page-sidebar {
+              -ms-transform: translate(0, 0)!important;
+              -webkit-transform: translate(0, 0)!important;
+              transform: translate(0, 0)!important;
+              left: 0;
+            }
+            .page-container .page-content-wrapper .content {
+              padding-left: 210px;
+            }
+            .page-container .page-content-wrapper .footer {
+              padding-left: 250px;
+            }
+        </style>
+    <![endif]-->
+    <!--[if lte IE 8]>
+        <style>
+            body.menu-pin .page-container .page-content-wrapper .content {
+              padding-left: 210px;
+            }
+            .sidebar-header-controls {
+                display: none!important;
+            }
+            .page-sidebar {
+              left: 0;
+            }
+            .page-container .page-content-wrapper .content {
+              padding-left: 250px;
+            }
+        </style>
+    <![endif]-->
+    <script type="text/javascript">
+        window.onload = function () {
+            // fix for windows 8
+            if (navigator.appVersion.indexOf("Windows NT 6.2") != -1)
+                document.head.innerHTML += '<link rel="stylesheet" type="text/css" href="/css/core/windows.chrome.fix.css" />'
+        }
+    </script>
+    <link href="~/css/plugins/dialog/ui-dialog.css" rel="stylesheet" />
+    <script src="~/Scripts/plugins/dialog/dialog.js"></script>
+    @RenderSection("style", required: false)
+</head>
+<body class="fixed-header mac desktop dashboard">
+    <!-- BEGIN SIDEBAR -->
+    <div class="page-sidebar" data-pages="sidebar">
+        <div id="appMenu" class="sidebar-overlay-slide from-top">
+        </div>
+        <!-- BEGIN SIDEBAR HEADER -->
+        <div class="sidebar-header">
+            <a href="/"><img src="/img/logoPro.png" alt="logo" class="brand" data-src="/img/logoPro.png" data-src-retina="img/logoPro.png" width="78"></a>
+            <div class="sidebar-header-controls">
+                <button data-toggle-pin="sidebar" class="btn btn-link" type="button">
+                    <i class="fa fs-12"></i>
+                </button>
+            </div>
+        </div>
+        <!-- END SIDEBAR HEADER -->
+        <!-- BEGIN SIDEBAR MENU -->
+        <div class="sidebar-menu">
+            <ul class="menu-items">
+                <li class="m-t-30">
+                    <a href="javascript:;">
+                        <span class="title">店铺管理</span>
+                        <span class=" arrow"></span>
+                    </a>
+                    <span class="icon-thumbnail">
+                        <i class="fs-14 fa pg-home"></i>
+                    </span>
+                    <ul class="sub-menu">
+                        <li class="">
+                            <a href="/ShopList/">店铺列表</a>
+                        </li>
+                        <li class="">
+                            <a href="/HomePage/ShopCheck">店铺审核</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="">
+                    <a href="javascript:;">
+                        <span class="title">运营分析</span>
+                        <span class="arrow"></span>
+                    </a>
+                    <span class="icon-thumbnail">
+                        <i class="fa fa-line-chart"></i>
+                    </span>
+                    <ul class="sub-menu">
+                        <li class="">
+                            <a href="/Operation/Tendency/">平台趋势</a>
+                        </li>
+                        <li class="">
+                            <a href="/Operation/MonthComparison">数据对比</a>
+                        </li>
+                        <li class="">
+                            <a href="/Operation/RegisterSource">用户来源</a>
+                        </li>
+                        <li class="">
+                            <a href="/Operation/ActiveAnalysis">活跃率分析</a>
+                        </li>
+                        <li class="">
+                            <a href="/UserRetention/Index">留存率分析</a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="">
+                    <a href="javascript:;">
+                        <span class="title">数据筛选</span>
+                        <span class="arrow"></span>
+                    </a>
+                    <span class="icon-thumbnail">
+                        <i class="fs-14 fa fa-filter"></i>
+                    </span>
+                    <ul class="sub-menu">
+                        <li class="">
+                            <a href="/FiltrateData/AccountFiltrate">筛选器</a>
+                        </li>
+                    </ul>
+                </li> 
+            </ul>
+            <div class="clearfix"></div>
+        </div>
+        <!-- END SIDEBAR MENU -->
+        <script>
+            // Check the menu is expanded or not.
+            checkMenuStatus();
+
+            function checkMenuStatus() { 
+                var $sideMenu = $('.sidebar-menu'),
+                    $pinBtn = $('.sidebar-header-controls>button[data-toggle-pin="sidebar"]');
+
+                if (sessionStorage.pinSwitch == 2) {
+                    $('body').attr('class', 'fixed-header mac desktop dashboard windows menu-pin');
+                } else {
+                    $('body').attr('class', 'fixed-header mac desktop dashboard windows');
+                };
+
+                if (sessionStorage.mainMenu) {
+                    $sideMenu.find('ul.menu-items > li:eq(' + sessionStorage.mainMenu + ')').addClass('open').find('span.arrow').addClass('open').parent().parent().find('.sub-menu').css('display', 'block');
+                };
+
+                if (sessionStorage.subMenu) {
+                    $sideMenu.find('ul.menu-items > li:eq(' + sessionStorage.mainMenu + ')').find('ul.sub-menu > li:eq(' + sessionStorage.subMenu + ')').addClass('open');
+                }
+
+                $pinBtn.on('click', function () {
+                    if ($('.menu-pin').size()) {
+                        sessionStorage.pinSwitch = 1;
+                    } else (
+                        sessionStorage.pinSwitch = 2
+                    );
+                });
+
+                $sideMenu.find('ul > li > a[href="javascript:;"]').on('click', function () {
+                    sessionStorage.mainMenu = $(this).parent().index();
+                });
+
+                $sideMenu.find('ul > li > ul.sub-menu > li > a').on('click', function () {
+                    sessionStorage.subMenu = $(this).parent().index();
+
+                });
+
+                $('.panel-collapse label').on('click', function (e) {
+                    e.stopPropagation();
+                })
+
+            }
+        </script>
+    </div>
+    <!-- END SIDEBAR -->
+    <!-- START PAGE-CONTAINER -->
+    <div class="page-container">
+        <!-- START PAGE HEADER WRAPPER -->
+        <!-- START HEADER -->
+        <div class="header ">
+            <!-- START MOBILE CONTROLS -->
+            <!-- LEFT SIDE -->
+            <div class="pull-left full-height visible-sm visible-xs">
+                <!-- START ACTION BAR -->
+                <div class="sm-action-bar">
+                    <a href="#" class="btn-link toggle-sidebar" data-toggle="sidebar">
+                        <span class="icon-set menu-hambuger"></span>
+                    </a>
+                </div>
+                <!-- END ACTION BAR -->
+            </div>
+            <!-- RIGHT SIDE -->
+            <div class="pull-right full-height visible-sm visible-xs">
+                <!-- START ACTION BAR -->
+                <div class="sm-action-bar">
+                    <div class="dropdown pull-right">
+                        <button class="profile-dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <div class="pull-left p-r-10 p-t-10 fs-16 font-heading">
+                                <i class="icon-set menu-hambuger-plus"></i>
+                            </div>
+                        </button>
+                        <ul class="dropdown-menu profile-dropdown" role="menu">
+                            <li>
+                                <a href="#"><i class="pg-settings_small"></i> 设置</a>
+                            </li>
+                            <li>
+                                <a href="https://www.teambition.com/project/552df97c206f9c1e6e70a947/tasks/scrum/5552ed7a4fd644712b3c6eae" target="_blank"><i class="pg-outdent"></i> 反馈提交</a>
+                            </li>
+                            <li>
+                                <a href="#"><i class="pg-signals"></i> 关于运营平台</a>
+                            </li>
+                            <li>
+                                <a href="https://yunying.yuanbei.biz/HomePage/NewPwd" target="_blank"><i class="pg-outdent"></i> 修改密码</a>
+                            </li>
+                            <li class="bg-danger">
+                                <a href="#" class="clearfix text-white" onclick=" location.href ='/Home/Exit'">
+                                    <span class="pull-left"><i class="pg-power"></i></span>
+                                    <span class="pull-left m-l-10">安全登出</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- END ACTION BAR -->
+            </div>
+            <!-- END MOBILE CONTROLS -->
+            <div class="pull-left sm-table">
+                <div class="header-inner">
+                    <div class="brand inline">
+                        <img src="/img/logoPro-b.png" alt="logo" data-src="/img/logoPro-b.png" data-src-retina="img/logoPro-b.png" width="78">
+                    </div>
+                    <!-- BEGIN NOTIFICATION DROPDOWN -->
+                    <ul class="notification-list no-margin hidden-sm hidden-xs b-grey b-l b-r no-style p-l-30 p-r-20">
+                        <li class="p-r-15 inline">
+                            <div class="dropdown">
+                                <a href="/">
+                                    主页
+                                </a>
+                            </div>
+                        </li>
+                        <!-- <li class="p-r-15 inline">
+                          <a href="#" class="icon-set clip "></a>
+                        </li>
+                        <li class="p-r-15 inline">
+                          <a href="#" class="icon-set grid-box"></a>
+                        </li> -->
+                    </ul>
+                    <!-- END NOTIFICATION DROPDOWN -->
+                    <div class="brand inline" id="seachCompany">
+
+                        <div class="input-group transparent pull-left hidden-sm hidden-xs m-r-10 m-l-10">
+                            <select id="seachCompany_SelectColumn" class="cs-select cs-skin-slide" data-init-plugin="cs-select">
+                                <option value="phoneNumber">电话号码</option>
+                                <option value="accid">店铺编号</option>
+                                <option value="companyName">店铺名称</option>
+                                <option value="userRealName">店主姓名</option>                                
+                                <option value="userEmail">电子邮箱</option>
+                                <option value="bbsUid">论坛ID</option>
+                            </select>
+                        </div>
+                        <div class="input-group transparent hidden-sm hidden-xs ">
+                            <span class="input-group-addon">
+                                <i class="pg-search" onclick="seachCompany_Click(event, 2)"></i>
+                            </span>
+                            <input type="text" class="form-control" placeholder="点此搜索内容" id="seachCompany_selectColmunValue" name="seachCompany_selectColmunValue" onkeyup="seachCompany_Click(event, 1)">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- <div class="pull-right visible-lg visible-md" id="exit">
+                <button class="btn btn-danger btn-cons m-t-10" onclick=" location.href ='/Home/Exit'">安全退出</button>
+            </div> -->
+            <div class=" pull-right">
+                <div class="visible-lg visible-md m-t-10">
+                    <!-- <div class="pull-left p-r-10 p-t-10 fs-16 font-heading">
+                <span class="semi-bold">David</span> <span class="text-master">Nest</span>
+            </div> -->
+                    <div class="dropdown pull-right">
+                        <button class="profile-dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <div class="pull-left p-r-10 p-t-10 fs-16 font-heading">
+                                <span class="pull-left p-r-10"><i class="pg-menu"></i></span>
+                                <span class="text-master">控制中心</span>
+                            </div>
+                        </button>
+                        <ul class="dropdown-menu profile-dropdown" role="menu">
+                            <li>
+                                <a href="#"><i class="pg-settings_small"></i> 设置</a>
+                            </li>
+                            <li>
+                                <a href="https://www.teambition.com/project/552df97c206f9c1e6e70a947/tasks/scrum/5552ed7a4fd644712b3c6eae"><i class="pg-outdent"></i> 反馈提交</a>
+                            </li>
+                            <li>
+                                <a href="#"><i class="pg-signals"></i> 关于运营平台</a>
+                            </li>
+                            <li>
+                                <a href="https://yunying.yuanbei.biz/HomePage/NewPwd" target="_blank"><i class="pg-outdent"></i> 修改密码</a>
+                            </li>
+                            <li class="bg-danger">
+                                <a href="#" class="clearfix text-white" onclick=" location.href ='/Home/Exit'">
+                                    <span class="pull-left"><i class="pg-power"></i></span>
+                                    <span class="pull-left m-l-10">安全登出</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- END HEADER -->
+        <!-- END PAGE HEADER WRAPPER -->
+        <!-- START PAGE CONTENT WRAPPER -->
+        <div class="page-content-wrapper">
+            <!-- START PAGE CONTENT -->
+            <div class="content sm-gutter">
+                <div class="container-fluid padding-25">
+                    @RenderBody()
+                </div>
+            </div>
+            <!-- END PAGE CONTENT -->
+            <!-- START COPYRIGHT -->
+            <!-- START CONTAINER FLUID -->
+            <div class="container-fluid footer">
+                <div class="copyright sm-text-center">
+                    <p class="small no-margin pull-left sm-pull-reset">
+                        <span class="hint-text">Copyright &copy; 2013 - 2015</span>
+                        <span class="font-montserrat">生意专家</span>.
+                        <span class="hint-text">All rights reserved. </span>
+                        <span class="sm-block"><a href="#" class="m-l-10 m-r-10">Terms of use</a> | <a href="#" class="m-l-10">Privacy Policy</a></span>
+                    </p>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+            <!-- END COPYRIGHT -->
+        </div>
+        <!-- END PAGE CONTENT WRAPPER -->
+    </div>
+    <!-- END PAGE CONTAINER -->
+    <!-- BEGIN 插件所需 JS -->
+    <!-- Modernizr -->
+    @Scripts.Render("~/js/modernizr")
+
+    @Scripts.Render("~/jquery/ui")
+    <!-- Bootstrap -->
+    @Scripts.Render("~/js/boostrapv")
+
+    <!-- BEGIN 主框架 CORE JS -->
+    @Scripts.Render("~/js/core")
+
+    <!-- BEGIN 用户定制级 JS -->
+    @RenderSection("scripts", required: false)
+
+
+    <script src="/Scripts/plugins/classie/classie.js"></script>
+    <script src="/Scripts/scripts.js"></script>
+
+    <script type="text/javascript">
+
+        function seachCompany_Click(evt, type) {
+
+
+            if (type == 1) {
+                evt = (evt) ? evt : ((window.event) ? window.event : "");
+                var currKey = 0;
+                currKey = evt.keyCode || evt.which || evt.charCode;
+                if (currKey == 13) {
+                    type = 2;
+                }
+            }
+
+            if (type == 2) {
+
+                var value = $("#seachCompany_selectColmunValue").val();
+                if ($.trim(value).length > 0) {
+
+                    var column = $("#seachCompany_SelectColumn").val();
+
+                    if (column == "accid") {
+                        window.open("/shopinfo/index/" + value);
+                    } else {
+                        var Q = "column=" + column + "&value=" + value;
+                        window.open("/ShopList/index?" + Q);
+                    }
+
+
+                } else {
+                    alert("请输入你要搜索的值");
+                }
+            }
+
+        }
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,313 @@
+﻿
+@{
+    ViewBag.Title = "客服用户类型比";
+}
+
+@section Style{
+    @Styles.Render("~/style/form")
+}
+<div class="page-where carePerWhere" style="margin-top: 10px;">
+    <div class="form-group inline whereitem">
+        <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" id="usrName" onchange="" style="width: 139px;">
+            <option value="all">全部客服</option>
+            <option value="安传亮">安传亮</option>
+            <option value="陈媚佳">陈媚佳</option>
+            <option value="刘霞">刘霞</option>
+            <option value="李紫娟">李紫娟</option>
+            @*<option value="张惜珏">张惜珏</option>*@
+            @*<option value="左韫宁">左韫宁</option>*@
+            <option value="马兰兰">马兰兰</option>
+            <option value="田震">田震</option>
+            <option value="陈俊峰">陈俊峰</option>
+            <option value="曹静">曹静</option>
+            <option value="宋鹤">宋鹤</option>
+            <option value="吴金龙">吴金龙</option>
+            <option value="系统">系统</option>
+        </select>
+    </div>
+
+    <div class="btn-group">
+        <button type="button" class="btn btn-default btn-select" value="1" onclick=" carePerWhereTimeButtonClick(this) ">昨日</button>
+        <button type="button" class="btn btn-default" value="7" onclick=" carePerWhereTimeButtonClick(this) ">7天</button>
+        <button type="button" class="btn btn-default" value="15" onclick=" carePerWhereTimeButtonClick(this) ">15天</button>
+        <button type="button" class="btn btn-default" value="30" onclick=" carePerWhereTimeButtonClick(this) ">30天</button>
+        <button type="button" class="btn btn-default" value="other" onclick=" carePerWhereTimeButtonClick(this) ">其他时间</button>
+    </div>
+    <div class="btn-group page-where-othertime" style="display: none;">
+        <button type="button" value="return" class="btn btn-default border-right0" onclick=" carePerWhereTimeButtonClick(this) ">返回</button>
+        <div class="page-where-time-input">
+            <div class="input-daterange input-group">
+                <input type="text" placeholder="开始时间" class="input-sm form-control" name="start"/>
+                <span class="input-group-addon">to</span>
+                <input type="text" placeholder="结束时间" class="input-sm form-control" name="end"/>
+            </div>
+        </div>
+    </div>
+    <button type="button" value="select" class="btn btn-default btn-inquire" onclick="GetSequenceData()">查询</button>
+</div>
+
+<div class="row" style="padding-top: 10px;padding-left: 0px">
+    <div class="col-md-4 col-lg-4 col-xlg-4  m-b-10">
+        <div class="panel no-border max-h-3 widget-loader-bar">
+            <div class="panel-heading pull-top">
+                <div class="panel-title"></div>
+                <div class="panel-controls">
+                    <ul>
+                        <li>
+                            <a data-toggle="refresh" class="portlet-refresh text-black" href="#"><i class="portlet-icon portlet-icon-refresh"></i></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="container-xs-height">
+                <div class="row-xs-height">
+                    <div class="col-md-6 col-sm-6 col-xs-12 text-center m-b-30" id="piechartNew">
+                        <span class="easyPieChart" data-percent="0">
+                            <span class="percent"></span>
+                        </span>
+                        <p class="m-t-20 m-b-10">
+                            <small>新注册客服数：</small>
+                            <strong><span class="text-complete fs-12 PartCount">0</span></strong>
+                        </p>
+                        <p class="m-t-10 m-b-10">
+                            <small>新注册总数：</small>
+                            <strong><span class="text-success fs-12 AllCount">0</span></strong>
+                        </p>
+                        <!-- <p class="text-light"><i class="fa fa-caret-up text-success p-r-5"></i> 同比增长：<span class="per-increase">0</span>%</p> -->
+                    </div>
+                    <div class="col-md-6 col-sm-6 col-xs-12 text-center m-b-30" id="piechartActive">
+                        <span class="easyPieChart" data-percent="0">
+                            <span class="percent"></span>
+                        </span>
+                        <p class="m-t-20 m-b-10">
+                            <small>活跃客服数：</small>
+                            <strong><span class="text-primary fs-12 PartCount">0</span></strong>
+                        </p>
+                        <p class="m-t-10 m-b-10">
+                            <small>活跃总数：</small>
+                            <strong><span class="text-success fs-12 AllCount">0</span></strong>
+                        </p>
+                        <!-- <p class="text-light"><i class="fa fa-caret-up text-success p-r-5"></i> 同比增长：<span class="per-increase">0</span>%</p> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-lg-4 col-xlg-4  m-b-10">
+        <div class="panel no-border max-h-3 widget-loader-bar">
+            <div class="panel-heading pull-top">
+                <div class="panel-title"></div>
+                <div class="panel-controls">
+                    <ul>
+                        <li>
+                            <a data-toggle="refresh" class="portlet-refresh text-black" href="#"><i class="portlet-icon portlet-icon-refresh"></i></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="container-xs-height">
+                <div class="row-xs-height">
+                    <div class="col-md-6 col-sm-6 col-xs-12 text-center m-b-30" id="piechartSleep">
+                        <span class="easyPieChart" data-percent="0">
+                            <span class="percent"></span>
+                        </span>
+                        <p class="m-t-20 m-b-10">
+                            <small>休眠客服数：</small>
+                            <strong><span class="text-complete fs-12 PartCount">0</span></strong>
+                        </p>
+                        <p class="m-t-10 m-b-10">
+                            <small>休眠总数：</small>
+                            <strong><span class="text-success fs-12 AllCount">0</span></strong>
+                        </p>
+                        <!-- <p class="text-light"><i class="fa fa-caret-up text-success p-r-5"></i> 同比增长：<span class="per-increase">0</span>%</p> -->
+                    </div>
+                    <div class="col-md-6 col-sm-6 col-xs-12 text-center m-b-30" id="piechartLost">
+                        <span class="easyPieChart" data-percent="0">
+                            <span class="percent"></span>
+                        </span>
+                        <p class="m-t-20 m-b-10">
+                            <small>流失客服数：</small>
+                            <strong><span class="text-primary fs-12 PartCount">0</span></strong>
+                        </p>
+                        <p class="m-t-10 m-b-10">
+                            <small>流失总数：</small>
+                            <strong><span class="text-success fs-12 AllCount">0</span></strong>
+                        </p>
+                        <!-- <p class="text-light"><i class="fa fa-caret-up text-success p-r-5"></i> 同比增长：<span class="per-increase">0</span>%</p> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@Scripts.Render("~/js/gaugeCharts")
+@*表单 & 表格*@
+@Scripts.Render("~/js/begin/form")
+@*D3*@
+@Scripts.Render("~/js/nvd3")
+<!-- <script src="~/Scripts/plugins/asset/echarts-all.js"></script> -->
+<script src="/Scripts/plugins/easypiechart/jquery.easypiechart.min.js"></script>
+<script src="/Scripts/plugins/gaugeCharts/dx.chartjs.js"></script>
+<script src="/Scripts/plugins/gaugeCharts/globalize.min.js"></script>
+
+<script>
+    $(function() {
+        var piechartNew = $('#piechartNew .easyPieChart').easyPieChart({
+            easing: 'easeOutBounce',
+            delay: 3000,
+            size: 120,
+            barColor: '#418bca',
+            trackColor: '#eee',
+            scaleColor: false,
+            lineWidth: 10,
+            trackWidth: 10,
+            lineCap: 'round',
+            onStep: function(from, to, percent) {
+                $(this.el).find('.percent').text(Math.round(percent));
+                // $(this.el).find('.percent').html('<i class="fa fa-user text-complete"></i>');
+            }
+        });
+        var piechartActive = $('#piechartActive .easyPieChart').easyPieChart({
+            easing: 'easeOutBounce',
+            delay: 3000,
+            size: 120,
+            barColor: '#6d5cae',
+            trackColor: '#eee',
+            scaleColor: false,
+            lineWidth: 10,
+            trackWidth: 10,
+            lineCap: 'round',
+            onStep: function(from, to, percent) {
+                $(this.el).find('.percent').text(Math.round(percent));
+                // $(this.el).find('.percent').html('<i class="fa fa-usd text-primary"></i>');
+            }
+        });
+        var piechartSleep = $('#piechartSleep .easyPieChart').easyPieChart({
+            easing: 'easeOutBounce',
+            delay: 3000,
+            size: 120,
+            barColor: '#418bca',
+            trackColor: '#eee',
+            scaleColor: false,
+            lineWidth: 10,
+            trackWidth: 10,
+            lineCap: 'round',
+            onStep: function(from, to, percent) {
+                $(this.el).find('.percent').text(Math.round(percent));
+                // $(this.el).find('.percent').html('<i class="fa fa-user text-complete"></i>');
+            }
+        });
+        var piechartLost = $('#piechartLost .easyPieChart').easyPieChart({
+            easing: 'easeOutBounce',
+            delay: 3000,
+            size: 120,
+            barColor: '#6d5cae',
+            trackColor: '#eee',
+            scaleColor: false,
+            lineWidth: 10,
+            trackWidth: 10,
+            lineCap: 'round',
+            onStep: function(from, to, percent) {
+                $(this.el).find('.percent').text(Math.round(percent));
+                // $(this.el).find('.percent').html('<i class="fa fa-usd text-primary"></i>');
+            }
+        });
+        var chart = window.chart = $('#piechartNew').data('easyPieChart');
+        $('.js_update').on('click', function() {
+            chart.update(Math.random() * 200 - 100);
+        });
+    });
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('.carePerWhere .page-where-othertime .input-daterange').datepicker();
+
+        GetData(1);
+        GetData(2);
+        GetData(3);
+        GetData(4);
+
+    });
+
+    function GetSequenceData() {
+        GetData(1);
+        GetData(2);
+        GetData(3);
+        GetData(4);
+    }
+
+    function carePerWhereTimeButtonClick(obj) {
+        var value = obj.value;
+
+        $(obj).parent().find(".btn-select").removeClass("btn-select");
+        $(obj).addClass("btn-select");
+
+        if (value == "return") {
+            $(".carePerWhere .btn-group").show().filter(".page-where-othertime").hide();
+        } else {
+            $(obj).parent().find(".btn-select").removeClass("btn-select");
+            $(obj).addClass("btn-select");
+            if (value == "other") {
+                $(".carePerWhere .btn-group").hide().filter(".page-where-othertime").show();
+            } 
+        }
+    }
+
+    function GetData(index) {
+        var postJson = {};
+
+        var timeType = $(".carePerWhere .btn-group .btn.btn-select").val();
+        if (timeType == "other") {
+            var statTime = $(".carePerWhere .page-where-othertime input[name='start']").val();
+            var endTime = $(".carePerWhere .page-where-othertime input[name='end']").val();
+            if (statTime.length > 0) {
+                postJson["startTime"] = statTime;
+            }
+            if (endTime.length > 0) {
+                postJson["endTime"] = endTime;
+            }
+        } else {
+            var timeValue = $.timePeriod(0 - Number(timeType));
+            postJson["startTime"] = timeValue.start.toLocaleDateString();
+            postJson["endTime"] = timeValue.end.toLocaleDateString();
+        }
+
+        var usrName = $("#usrName").val();
+        postJson["usrName"] = usrName;
+        postJson["index"] = index;
+
+        var url = "/CustomerCare/GetCarePartitionPer";
+
+        $.doAjax(url, postJson, function (msg) {
+            if (msg != "") {
+                var json = jQuery.parseJSON(msg);
+
+                $.each(json.ListData, function(i, n) {
+
+                    if (n.Series == "new") {
+                        $('#piechartNew .easyPieChart').data('easyPieChart').update(Number(n.Percent));
+                        $('#piechartNew .AllCount').html(n.AllCount);
+                        $('#piechartNew .PartCount').html(n.PartCount);
+                    } else if (n.Series == "active") {
+                        $('#piechartActive .easyPieChart').data('easyPieChart').update(Number(n.Percent));
+                        $('#piechartActive .AllCount').html(n.AllCount);
+                        $('#piechartActive .PartCount').html(n.PartCount);
+                    } else if (n.Series == "sleep") {
+                        $('#piechartSleep .easyPieChart').data('easyPieChart').update(Number(n.Percent));
+                        $('#piechartSleep .AllCount').html(n.AllCount);
+                        $('#piechartSleep .PartCount').html(n.PartCount);
+                    } else if (n.Series == "lost") {
+                        $('#piechartLost .easyPieChart').data('easyPieChart').update(Number(n.Percent));
+                        $('#piechartLost .AllCount').html(n.AllCount);
+                        $('#piechartLost .PartCount').html(n.PartCount);
+                    }
+
+                });
+            } else
+                alert("时间请勿超过一个月！");
+        }, true);
+
+    }
+</script>

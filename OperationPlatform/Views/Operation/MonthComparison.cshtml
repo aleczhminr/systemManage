@@ -1,0 +1,441 @@
+﻿@{
+    ViewBag.Title = "数据对比";
+}
+@section Style{
+    @Styles.Render("~/style/form")
+}
+<div class="page-where monthcomparisonWhere" style="margin-top: 10px;">
+    @*<div class="form-group inline whereitem">
+            <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" id="source" onchange="" style="width: 139px;">
+                <option value="all">全部来源</option>
+                <option value="1">网站</option>
+                <option value="2">IOS</option>
+                <option value="3">Android</option>
+            </select>
+        </div>*@
+    <div class="btn-group">
+        <button type="button" class="btn btn-default btn-select" value="3" onclick=" growUpwhereTimeButtonClick(this) ">最近三个月</button>
+        <button type="button" class="btn btn-default" value="6" onclick=" growUpwhereTimeButtonClick(this) ">最近半年</button>
+        <button type="button" class="btn btn-default" value="12" onclick=" growUpwhereTimeButtonClick(this) ">最近一年</button>
+        <button type="button" class="btn btn-default" value="other" onclick=" growUpwhereTimeButtonClick(this) ">其他时间</button>
+    </div>
+    <div class="btn-group page-where-othertime" style="display: none;">
+        <button type="button" value="return" class="btn btn-default border-right0" onclick="growUpwhereTimeButtonClick(this)">返回</button>
+        <div class="page-where-time-input">
+            <div class="input-daterange input-group">
+                <input type="text" placeholder="开始时间" class="input-sm form-control" name="start"/>
+                <span class="input-group-addon">to</span>
+                <input type="text" placeholder="结束时间" class="input-sm form-control" name="end"/>
+            </div>
+        </div>
+        <button type="button" value="select" class="btn btn-default btn-inquire" onclick="QueryClick()">查询</button>
+    </div>
+    <br />
+    <div class="checkbox" id="sectionCheck" style="display: none;">
+        <input type="checkbox" value="" id="sectionCbx">
+        <label for="sectionCbx">分端（Android、IOS、网站）对比</label>
+    </div>
+    <div class="page-where-right">
+        <div class="radio  radio -success">
+            <input type="radio" checked="checked" name="datatyle" value="shop" id="checkbox1">
+            <label for="checkbox1">店铺</label>
+            <input type="radio" value="reg" name="datatyle" id="checkbox2">
+            <label for="checkbox2">会员</label>
+            <input type="radio" value="sell" name="datatyle" id="checkbox3">
+            <label for="checkbox3">销售</label>
+            <input type="radio" value="goods" name="datatyle" id="checkbox4">
+            <label for="checkbox4">商品</label>
+            <input type="radio" value="sms" name="datatyle" id="checkbox5">
+            <label for="checkbox5">短信</label>
+            <input type="radio" value="order" name="datatyle" id="checkbox6">
+            <label for="checkbox6">订单</label>
+            <input type="radio" value="pay" name="datatyle" id="checkbox7">
+            <label for="checkbox7">支出</label>
+        </div>
+    </div>
+    <div class="checkbox" style="text-align: center;display: none;" id="orderCategory">
+        <input type="checkbox" value="orderCategory" id="orderCategoryCbx">
+        <label for="orderCategoryCbx">订单分端（Android、IOS、网站）对比</label>
+    </div>
+</div>
+<input type="hidden" id="sourceType" value="IOS,网站,Android" />
+<input type="hidden" id="sourceCnt" value=" " />
+<div id="summary" class="col-md-12 col-sm-12 col-xs-12" style="margin: 10px">
+
+</div>
+<div id="monthcomparisonWhereflashcontenttd" class="chartDiv">
+
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/js/begin/form")
+    <script src="~/Scripts/plugins/asset/echarts-all.js"></script>
+    <script src="~/Scripts/Operation/Operation.js"></script>
+    <script src="~/Scripts/plugins/summernote/js/summernote.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var peerData = {};
+            $('.monthcomparisonWhere .page-where-othertime .input-daterange').datepicker({
+                format: "yyyy-MM",
+                minViewMode: 1
+            });
+
+            //获取每月对比Android/IOS/PC端数据
+            $("#sectionCheck input:checkbox").click(function () {
+                if ( $("#sectionCbx").attr("checked")=="checked") {
+                    $("#sectionCbx").removeAttr("checked");
+                } else {
+                    $("#sectionCbx").attr("checked", "checked");
+                }
+                GetPeerData();
+                GetMonthComparisonJson();
+                GetSummary();
+            });
+
+            $(".monthcomparisonWhere .page-where-right input:radio").click(function () {
+                var currentRadio = this.value;
+                if (currentRadio =="shop"|| currentRadio=="sms") {
+                    $("#sectionCheck input:checkbox").attr("checked", false);
+                    $("#sectionCheck").hide();
+                } else {
+                    $("#sectionCheck").show();
+                }
+
+                GetPeerData();
+                GetMonthComparisonJson();
+                GetSummary();
+            });
+            GetPeerData();
+            GetMonthComparisonJson();
+            GetSummary();
+        });
+
+        function QueryClick() {
+            GetMonthComparisonJson();
+            GetSummary();
+        }
+
+        function growUpwhereTimeButtonClick(obj) {
+            var value = obj.value;
+            if (value == "return") {
+                $(".monthcomparisonWhere .btn-group").show().filter(".page-where-othertime").hide();
+            } else {
+                $(obj).parent().find(".btn-select").removeClass("btn-select");
+                $(obj).addClass("btn-select");
+                if (value == "other") {
+                    $(".monthcomparisonWhere .btn-group").hide().filter(".page-where-othertime").show();
+                } else {
+                    GetMonthComparisonJson();
+                    GetSummary();
+                }
+            }
+        }
+
+        function GetPeerData() {
+            var url = "/Operation/GetPeerMonthData";
+
+            $.doAjax(url, null, function (msg) {
+
+                if (msg != "") {
+                    var json = jQuery.parseJSON(msg);
+                    peerData = json[0];
+                }
+
+            }, true);
+        }
+
+        // 基于准备好的dom，初始化echarts图表
+        var myChart = echarts.init(document.getElementById('monthcomparisonWhereflashcontenttd'));
+
+        var option = {
+            title: {
+                text: '新增加店铺信息',
+                textAlign: "left",
+                x: "20",
+                y: "20"
+            },
+            tooltip: {
+                trigger: 'item',
+                formatter: function (a, b) {
+                    var html = "";
+                    var bj = a[0];
+                    var nowVal = Number(a[2]);
+                    var allVal = 0;
+                    var allFormerVal = 0;
+                    var index = Number(b.replace(bj + ":", ""));
+                    if (bj == "本月预测") {
+                        index = index - 1;
+                    }
+
+                    var legendIndex = 0;
+                    $.each(option.legend.data, function (i, n) {
+                        if (n == bj) {
+                            legendIndex = i;
+                        }
+                    });
+
+
+                    html = a[1] + "<br/>";
+                    //html += bj + "：" + nowVal + "";
+
+                    if (option.series.length > 1) {
+
+                        for (var i = 0; i < option.series.length; i++) {
+                            allVal += option.series[i].data[index];
+                            if (option.xAxis[0].data[index] == "本月预测") {
+                                allFormerVal += option.series[i].data[index - 2];
+                            } else
+                                allFormerVal += option.series[i].data[index - 1];
+                            //alert(allFormerVal);
+                        }
+
+                        for (var i = 0; i < option.series.length; i++) {
+                            if (i === 0) {
+                                html += option.series[i].name + "：" + option.series[i].data[index] + "";
+                            } else
+                                html += "<br/>" + option.series[i].name + "：" + option.series[i].data[index] + "";
+
+                            var per = (option.series[i].data[index] / allVal) * 100;
+                            html += "<br/>所占比例：" + changeTwoDecimal(per) + "%";
+
+                            if (index > 0) {
+                                if (option.xAxis[0].data[index] == "本月预测") {
+                                    var frontValPre = option.series[i].data[index - 2];
+
+                                    var differencePre = option.series[i].data[index] - frontValPre;
+                                    if (frontValPre > 0) {
+                                        var bfbPre = (differencePre / frontValPre) * 100;
+
+                                        html += "<br/>比上月增长：" + changeTwoDecimal(bfbPre) + "%" + "<br/>";
+                                    } else {
+                                        html += "<br/>";
+                                    }
+                                } else if (option.xAxis[0].data[index + 1] == "本月预测") {
+                                    switch (option.series[i].name) {
+                                        case "网站":
+                                            var frontValWeb = peerData.accNum - peerData.androidNum - peerData.iosNum - peerData.ipadNum;
+                                            //console.log(peerData.accNum);
+
+                                            var differenceWeb = option.series[i].data[index] - frontValWeb;
+                                            if (frontValWeb > 0) {
+                                                var bfbWeb = (differenceWeb / frontValWeb) * 100;
+
+                                                html += "<br/>比上月同期增长：" + changeTwoDecimal(bfbWeb) + "%" + "<br/>";
+                                            } else {
+                                                html += "<br/>";
+                                            }
+                                            break;
+                                        case "iPhone":
+                                            var frontValIos = parseInt(peerData.iosNum);
+                                            var differenceIos = option.series[i].data[index] - frontValIos;
+                                            if (frontValIos > 0) {
+                                                var bfbIos = (differenceIos / frontValIos) * 100;
+
+                                                html += "<br/>比上月同期增长：" + changeTwoDecimal(bfbIos) + "%" + "<br/>";
+                                            } else {
+                                                html += "<br/>";
+                                            }
+                                            break;
+                                        case "iPad":
+                                            var frontValPad = parseInt(peerData.ipadNum);
+                                            var differencePad = option.series[i].data[index] - frontValPad;
+                                            if (frontValPad > 0) {
+                                                var bfbPad = (differencePad / frontValPad) * 100;
+
+                                                html += "<br/>比上月同期增长：" + changeTwoDecimal(bfbPad) + "%" + "<br/>";
+                                            } else {
+                                                html += "<br/>";
+                                            }
+                                            break;
+                                        case "Android":
+                                            var frontValAnd = peerData.androidNum;
+
+                                            var differenceAnd = option.series[i].data[index] - frontValAnd;
+                                            if (frontValAnd > 0) {
+                                                var bfbAnd = (differenceAnd / frontValAnd) * 100;
+
+                                                html += "<br/>比上月同期增长：" + changeTwoDecimal(bfbAnd) + "%" + "<br/>";
+                                            } else {
+                                                html += "<br/>";
+                                            }
+                                            break;
+                                    }
+
+                                } else {
+                                    var frontVal = option.series[i].data[index - 1];
+
+                                    var difference = option.series[i].data[index] - frontVal;
+                                    if (frontVal > 0) {
+                                        var bfb = (difference / frontVal) * 100;
+
+                                        html += "<br/>比上月增长：" + changeTwoDecimal(bfb) + "%" + "<br/>";
+                                    } else {
+                                        html += "<br/>";
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+
+                    if (allFormerVal > 0) {
+                        if (option.xAxis[0].data[index + 1] == "本月预测") {
+                            allFormerVal = window.peerData.accNum;
+                        }
+                        var allPer = ((allVal - allFormerVal) / allFormerVal) * 100;
+                        html += "<br/>总数比上月增长：" + changeTwoDecimal(allPer) + "%";
+                    }
+
+                    return html;
+                }
+            },
+            legend: {
+                data: [
+                    '老用户',
+                    '新用户'
+                ],
+                y: "bottom"
+            },
+            toolbox: {
+                show: true,
+                feature: {
+                    mark: { show: true },
+                    dataView: { show: true, readOnly: false },
+                    magicType: { show: true, type: ['line', 'bar'] },
+                    restore: { show: true },
+                    saveAsImage: { show: true }
+                },
+                y: "20"
+            },
+            calculable: true,
+            grid: { y: 70, y2: 70, x2: 20 },
+            xAxis: [
+                {
+                    type: 'category',
+                    axisLine: { show: false }, //坐标轴线
+                    axisTick: { show: true }, //坐标轴小标记
+                    axisLabel: { show: true }, //坐标轴文本标签
+                    splitArea: { show: false }, //分隔区域
+                    splitLine: { show: true }, //分隔线
+                    data: ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期日']
+                }
+            ],
+            yAxis: [
+                {
+                    type: 'value',
+                    axisLabel: { formatter: '{value}' }
+                }
+            ],
+            series: [
+                {
+                    name: '老用户',
+                    type: 'bar',
+                    stack: '查询分析',
+                    data: [0, 0, 0, 0, 0, 0, 0],
+                    itemStyle: {
+                        normal: { color: "#87cefa", areaStyle: { type: 'default' } }
+                    }
+                },
+                {
+                    name: '新用户',
+                    type: 'bar',
+                    stack: '查询分析',
+                    itemStyle: {
+                        normal: {
+                            color: "#ff7f50",
+                            areaStyle: { type: 'default' },
+                            label: {
+                                show: true,
+                                position: 'top',
+                                formatter: function (a, b, c) {
+                                    for (var i = 0, l = option.xAxis[0].data.length; i < l; i++) {
+                                        if (option.xAxis[0].data[i] == b) {
+                                            return option.series[0].data[i] + c;
+                                        }
+                                    }
+                                },
+                                textStyle: { color: '#000' }
+                            }
+                        }
+                    },
+                    data: [0, 0, 0, 0, 0, 0, 0]
+                }
+            ]
+        };
+
+        myChart.on(echarts.config.EVENT.LEGEND_SELECTED, function (param) {
+            option.legend['selected'] = {};
+
+            //var str = "";
+            //var cnt = 0;
+
+            //for (var i = 0; i < option.series.length; i++) {
+            //    if (param.selected["" + option.series[i].name + ""] === true) {
+            //        str += option.series[i].name + ",";
+            //        cnt += 1;
+            //    }
+            //}
+            //console.log(param);
+            //console.log(str);
+            //$("#sourceType").val(str);
+            //$("#sourceCnt").val(cnt);
+
+            //GetMonthComparisonJson();
+            //console.log(param);
+            if (option.series.length > 0) {
+                for (var i = 0; i < option.xAxis.length; i++) {
+                    //console.log(option.xAxis);
+                    var index = 0;
+                    //var indexNoShow = 0;
+                    var all = 0;
+                    for (var k = 0; k < option.series.length; k++) {
+                        //console.log(option.series[k]);
+                        if (param.selected["" + option.series[k].name + ""] === true) {
+                            all += option.series[k].data[i];
+                            index = k;
+                            //console.log(option.legend);
+                        } else {
+                            option.legend.selected[option.series[k].name] = false;
+                            //indexNoShow += 1;
+                        }
+                        option.series[k].itemStyle.normal["label"] = {};
+                    } //for (var m = 0; m < option.series[k].data.length; m++) {
+                }
+                //console.log(index);
+                //console.log(all);
+
+                option.series[index].itemStyle.normal["label"] = {
+                    show: true,
+                    position: 'top',
+                    formatter: function (a, b, c) {
+                        //console.log(all);
+                        for (var i = 0, l = option.xAxis[0].data.length; i < l; i++) {
+                            if (option.xAxis[0].data[i] == b) {
+                                var all = 0;
+                                for (var k = 0; k < option.series.length; k++) {
+                                    if (param.selected["" + option.series[k].name + ""] === true) {
+                                        all += option.series[k].data[i];
+                                    }
+                                }
+                                return all;
+                            }
+                        }
+                    },
+                    textStyle: { color: '#000' }
+
+                };
+                //console.log(all);
+
+            }
+
+            myChart.clear().setOption(option);
+        });
+
+        // 为echarts对象加载数据
+        myChart.setOption(option);
+    </script>
+}
+
+
+
+

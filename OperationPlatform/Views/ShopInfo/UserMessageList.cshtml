@@ -1,0 +1,203 @@
+﻿@{
+    Layout = null;
+    ViewBag.Title = "店铺历史消息";
+}
+
+<link href="~/Scripts/plugins/tablesaw/tablesaw.css" rel="stylesheet" />
+<div class="panel">
+    <div class="panel-heading">
+        <div class="panel-title">
+            <div class="page-where msgWhere">
+                <div class="pull-left">
+                    <div class="cs-wrapper pull-left m-r-10">
+
+                        <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" name="msgType" id="msgType">
+                            <option value="-99">消息类型</option>
+                            <option value="1">短信</option>
+                            <option value="2">邮件</option>
+                            <option value="3">移动端推送</option>
+                            <option value="4">站内推送</option>
+                        </select>
+
+                    </div>
+
+                    <input type="hidden" id="timeType" value="" name="timePeriod" />
+                    <div class="btn-group page-where-othertime" style="float: left; margin-right: 10px">
+                        <div class="page-where-time-input">
+                            <div class="input-daterange input-group">
+                                <input type="text" class="input-sm form-control" placeholder="发送时间" name="start">
+                                <span class="input-group-addon">to</span>
+                                <input type="text" class="input-sm form-control" placeholder="发送时间" name="end">
+                            </div>
+                        </div>
+                    </div>
+                    <div style="float: left; margin-right: 10px; width: 120px">
+                        <input class="form-control" type="text" placeholder="标题" name="titleC" id="titleC">
+                    </div>
+                    <div style="float: left; margin-right: 10px; width: 80px">
+                        <input class="form-control" type="text" placeholder="内容" name="content" id="content">
+                    </div>
+
+                    <button type="button" value="select" class="btn btn-default btn-inquire" onclick=" GetMsgList(1) ">查询</button>
+                    <div class="clear"></div>
+                </div>
+            </div>
+        </div>
+        <!-- <div class="panel-controls"></div> -->
+    </div>
+    <div class="panel-body">
+        <div class="row column-seperation">
+            <table class="table table-hover  no-footer  tablesaw tablesaw-stack" data-tablesaw-mode="stack" data-tablesaw-minimap id="msgTable">
+                <thead>
+                    <tr>
+                        <th style="width: 150px;">标题 </th>
+                        <th style="width: 450px;">内容</th>
+                        <th style="width: 90px;">方式</th>
+                        <th style="width: 90px;">状态</th>
+                        <th style="width: 150px;">推送时间</th>
+                        <th style="width: 90px;">操作者</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <div class="dataTables_wrapper m-t-10" id="ListPageHtml">
+                <div class="dataTables_paginate pagination no-padding">
+                    <ul>
+                        <li class="prev disabled">
+                            <a href="javascript:void(0)">
+                                <i class="pg-arrow_left"></i>
+                            </a>
+                        </li>
+                        <li class="active">
+                            <a href="javascript:void(0)">1</a>
+                        </li>
+                        <li class="next disabled">
+                            <a href="javascript:void(0)">
+                                <i class="pg-arrow_right">
+                                </i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="dataTablePagText p-l-20"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="~/Scripts/ShopInfo/ShopInfo20160304.js"></script>
+<script src="~/Scripts/plugins/qtip/jquery.qtip.min.js"></script>
+<script src="~/Scripts/plugins/tablesaw/tablesaw.js"></script>
+<script type="text/javascript">
+    var timeOut = 0;
+    $(function () {
+        GetMsgList(1);
+        $('.msgWhere .input-daterange').datepicker({ format: 'yyyy-mm-dd' });
+    });
+
+    function GetMsgList(pageIndex) {
+        var postJson = {};
+        postJson["pageIndex"] = pageIndex;
+
+        var msgType = $("#msgType").val();
+        var accid = $("#ShopInfo").val();
+        var statTime = $(".msgWhere input[name='start']").val();
+        var endTime = $(".msgWhere input[name='end']").val();
+
+        var stDate = new Date();
+        var edDate = new Date();
+        if (statTime.length === 0 && endTime.length === 0) {
+            postJson["start"] = "";
+            postJson["end"] = "";
+        } else {
+            if (statTime.length > 0) {
+                postJson["start"] = statTime;
+            } else {
+                postJson["start"] = stDate.toLocaleDateString();
+            }
+            if (endTime.length > 0) {
+                postJson["end"] = endTime;
+            } else {
+                postJson["end"] = edDate.toLocaleDateString();
+            }
+        }
+
+        postJson["msgType"] = msgType;
+        postJson["accid"] = accid;
+
+        postJson["title"] = $("#titleC").val();
+        postJson["content"] = $("#content").val();
+
+        var url = "/ShopInfo/GetMessageList";
+
+        $.doAjax(url, postJson, function (msg) {
+            if (msg != "") {
+                var json = jQuery.parseJSON(msg);
+                $("#msgTable tbody").html(template("msgTableListScript", { "list": json.DataList }));
+
+                if (pageIndex == 1) {
+                    $("#ListPageHtml").attr("rowcount", parseInt(json.RowCount)).attr("maxpage", parseInt(json.PageCount));
+                    $("#ListPageHtml .dataTablePagText").html("共" + parseInt(json.RowCount) + "条");
+                }
+                var pageHtml = $.listPageHtml(pageIndex, $("#ListPageHtml").attr("maxpage"), "GetMsgList", 5);
+                $("#ListPageHtml .dataTables_paginate").html(pageHtml);
+
+                ShowMsgListTips();
+            }
+        }, true);
+    }
+
+    function ShowMsgListTips() {
+        $(".msg").qtip({
+            content: {
+                attr: 'title'
+            },
+            position: {
+                my: 'left center',
+                at: 'right center'
+            },
+            show: {
+                solo: true
+            },
+            style: {
+                classes: 'ui-tooltip-shadow ui-tooltip-light',
+                width: '60%'
+            }
+
+        });
+    }
+</script>
+<script type="text/html" id="msgTableListScript">
+    {{each list}}
+    <tr class="odd" role="row">
+        <td class="v-align-middle msg" style="width: 150px; cursor: pointer" title="{{$value.Title}}">{{$value.Title}}</td>
+        {{if $value.ChannelId==2 || $value.ChannelId==4}}
+        <td class="v-align-middle msg" style="cursor:pointer;width: 450px;word-break: keep-all;overflow: hidden;text-overflow: ellipsis;" title="{{$value.PushContent}}">浮动预览内容</td>
+        {{else}}
+        <td class="v-align-middle msg" style="cursor:pointer;width: 450px;word-break: keep-all;overflow: hidden;text-overflow: ellipsis;" title="{{$value.PushContent}}">{{$value.PushContent}}</td>
+        {{/if}}
+        
+        <td class="v-align-middle" style="width: 90px;">
+            {{if $value.ChannelId==1}}
+            短信
+            {{else if $value.ChannelId==2}}
+            邮件
+            {{else if $value.ChannelId==3}}
+            移动端
+            {{else}}
+            站内
+            {{/if}}
+        </td>
+        {{if $value.IsRead==1}}
+        <td class="v-align-middle" style="color: green;width: 90px;">已读</td>
+        {{else}}
+        <td class="v-align-middle" style="color: red;width: 90px;">未读</td>
+        {{/if}}
+        <td class="v-align-middle" style="width: 180px;">{{$value.PushTime}}</td>
+        <td class="v-align-middle" style="width: 90px;">{{$value.OperatorName}}</td>
+    </tr>
+    {{/each}}
+</script>
+
+

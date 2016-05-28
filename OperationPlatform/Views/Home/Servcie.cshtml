@@ -1,0 +1,318 @@
+﻿@{
+    ViewBag.Title = "首页";
+}
+@section Style{
+    @Styles.Render("~/style/nvd3")
+    @Styles.Render("~/style/form")
+    <style>
+        .page-container .page-content-wrapper {
+            background-color: #f5f5f5;
+        }
+    </style>
+}
+
+<div class="container-fluid p-t-20">
+    <div class="row">
+        <div class="col-md-12 col-lg-12 col-xlg-12 ">
+            <div class="widget-11 panel no-border no-margin widget-loader-bar">
+                <div class="panel-heading ">
+                    <div class="panel-title" style="font-size: 16px;">最近需要回访店铺 </div>
+                    <div class="panel-controls">
+                        <ul>
+                            <li>
+                                <div class="checkbox check-danger" style="margin: 0px;" id="IntervalTaskInfo">
+                                    <input type="checkbox" value="1" onclick="LoadTaskInfo(1)" id="checkbox1">
+                                    <label for="checkbox1">自动刷新</label>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="widget-11-table auto-overflow" id="refreshTask" style="height:auto">
+                    @Html.Action("_Index_TaskInfo")
+                </div>
+                <div class="padding-25" style="padding-top: 0px !important;">
+                    <p class="small no-margin">
+                        <a href="@Url.Action("Index","PlatformVisit")" target="_blank">
+                            <i class="fa fs-16 fa-arrow-circle-o-down text-success m-r-10"></i>
+                            <span class="hint-text ">查看更多店铺回访信息</span>
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<div class="container-fluid p-t-20">
+
+
+    <div class="row">
+        <div class="col-md-12 col-lg-12 col-xlg-12 ">
+            <div class="widget-11 panel no-border no-margin widget-loader-bar">
+                <div class="panel-heading smsReviewArea">
+                    <div class="panel-title smsReviewTitle">最新需要审核短信</div>
+                    <div class="alert alert-warning alert-dismissible smsNoticeText" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <strong>提示：</strong> <span class="textTipsContent">消息读取中...</span> <span class="textTipsDate"></span> <a href="javascript:void(0)" onclick="SetSmsTipsText()" class="textSaveBtn">记录信息</a>
+                    </div>
+                    <div class="panel-controls smsReviewAutoBtn">
+                        <ul>
+                            <li>
+                                <div class="checkbox check-danger" style="margin: 0px;" id="IntervalSmsReview">
+                                    <input type="checkbox" value="1" onclick="LoasSmsReview(1)" id="checkbox2">
+                                    <label for="checkbox2">自动刷新</label>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="widget-11-table auto-overflow" id="refreshSms" style="height:auto;clear:both;">
+
+                </div>
+                <div class="padding-25" style="padding-top: 0px !important;">
+                    <p class="small no-margin">
+                        <a href="/Sms/smsreview/" target="_blank">
+                            <i class="fa fs-16 fa-arrow-circle-o-down text-success m-r-10"></i>
+                            <span class="hint-text ">查看更多短信审核信息</span>
+                        </a>
+                        <a href="/sms/channeltest" target="_blank" class="m-l-20">
+                            <span class="hint-text ">测试短信</span>
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div style=" display:none;">
+    <textarea id="updateSmsContextText" cols="20" rows="2" style="width:390px; height:150px;" placeholder="修改短信内容"></textarea>
+</div>
+
+
+
+<div class="modal-body" style="display:none" id="SMsCheckdialog">
+    <input type="hidden" value="" id="notifyId" name="notifyId">
+    <div class="radio radio-success">
+        审核选项:
+        <input type="radio" checked="checked" value="2" name="reviewType" id="radio2Yes" onclick="reviewSmsType(this) ">
+        <label for="radio2Yes">审核通过</label>
+        <input type="radio" value="3" name="reviewType" id="radio2No" onclick="reviewSmsType(this) ">
+        <label for="radio2No">拒绝发送</label>
+    </div>
+    <!-- 2审核通过 3拒绝发送 -->
+    <textarea id="rejectDesc" placeholder="审核备注" style="height: 150px; width: 300px; display: none" name="reviewDesc" aria-valuetext=""></textarea>
+    <div class="radio radio-primary">
+        短信通道:
+        <input type="radio" checked="checked" value="0" name="channelType" id="dafaultChannel" onclick="changeChannel(this) ">
+        <label for="dafaultChannel">默认通道</label>
+        <input type="radio" value="1" name="channelType" id="changeChannel" onclick="changeChannel(this) ">
+        <label for="changeChannel">调整通道</label>
+    </div>
+    <div style="display: none;" id="selectGroup">
+        <!--  Template  -->
+    </div>
+    <div style="clear: both"></div>
+</div>
+
+<div style="width:0px; height:0px; overflow:hidden;">
+    <div id="aeroClipDiv" style=" overflow:hidden;position:relative; width:100px; height:18px;">
+        <div id="aeroClipModel-button" style=" width:100px; height:18px; text-align:center">复制短信内容</div>
+        <div id="aeroClipContext-Text" style=" display:none;"></div>
+    </div>
+</div>
+
+<div style="display: none;">
+    <textarea id="DailyMoodContextText" cols="20" rows="2" style="width: 390px; height: 150px;" placeholder="记录最新信息"></textarea>
+</div>
+
+<div style="display: none;" id="closeReason">
+    <div class="panel-body">
+        <div class="row m-b-5">
+            关闭理由:
+        </div>
+        <div class="row m-t-0">
+            <textarea id="visitCloseReason" rows="5" cols="100%" style="width: 297px; height: 103px;" class="b-grey m-b-10" name="context"></textarea>
+        </div>
+    </div>
+</div>
+
+<script type="text/html" id="ChannelList_Tpl">
+    <div class="cs-wrapper" style="display: block; margin-bottom: 10px;">
+        <div tabindex="0">
+            移动通道:
+            <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" name="mobile">
+                {{each Channel}}
+                <option value="{{$value.ChannelId}}">{{$value.ChannelName}}[{{$value.ChannelId}}]</option>
+                {{/each}}
+            </select>
+        </div>
+    </div>
+    <div class="cs-wrapper" style="display: block; margin-bottom: 10px">
+        <div tabindex="0">
+            联通通道:
+            <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" name="unicom">
+                {{each Channel}}
+                <option value="{{$value.ChannelId}}">{{$value.ChannelName}}[{{$value.ChannelId}}]</option>
+                {{/each}}
+            </select>
+        </div>
+    </div>
+    <div class="cs-wrapper" style="display: block; margin-bottom: 10px">
+        <div tabindex="0">
+            电信通道:
+            <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" name="telecom">
+                {{each Channel}}
+                <option value="{{$value.ChannelId}}">{{$value.ChannelName}}[{{$value.ChannelId}}]</option>
+                {{/each}}
+            </select>
+        </div>
+    </div>
+</script>
+
+<audio id="TipsAudio"><source src="/img/4082.wav" type="audio/mpeg" /></audio>
+<!-- Gauge Charts -->
+@section Scripts {
+    @Scripts.Render("~/js/gaugeCharts")
+    @*表单 & 表格*@
+    @Scripts.Render("~/js/begin/form")
+    @*D3*@
+    @Scripts.Render("~/js/nvd3")
+    <script src="~/Scripts/plugins/ZeroClipboard/jquery.zclip.min.js"></script>
+    <script src="~/Scripts/plugins/moment/moment.min.js"></script>
+    <script src="~/Scripts/Home/home.js"></script>
+    <script src="~/Scripts/plugins/artTemplate/template.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            setInterval(LoadTimeTimekeeping, 1000);
+            LoasSmsReview(1);
+            GetSmsTipsText();
+            GetChannel();
+        });
+
+        var smsReviewTime = 3;
+        var taskInfoTime = 30;
+        var shopReview = 60;
+
+
+        var TitleMsg = "";
+        var TitleMsgTip = "";
+        var TitleTimer;
+
+        function GetChannel() {
+            var url = "/sms/GetSmsChannel";
+            $.doAjax(url, null, function (data) {
+                if (data != "error") {
+                    var json = $.parseJSON(data);
+                    var strHtml = template("ChannelList_Tpl", json);
+                    $("#selectGroup").html(strHtml);
+                }
+            }, false);
+        }
+
+
+        var ZeroClipboardclip = null;
+        ZeroClipboardclip = new ZeroClipboard.Client();
+        ZeroClipboardclip.setHandCursor(true);
+        ZeroClipboard.setMoviePath("/Scripts/plugins/ZeroClipboard/ZeroClipboard.swf");
+        ZeroClipboardclip.addEventListener('load', function (client) {
+            var val = $("#aeroClipContext-Text").html();
+            ZeroClipboardclip.setText(val);
+        });
+        ZeroClipboardclip.addEventListener('complete', function (client, text) {
+            KDf435234234.close().remove();
+        });
+
+        ZeroClipboardclip.glue('aeroClipModel-button', "aeroClipDiv");
+
+        function GetSmsTipsText() {
+            var oItem = $(".smsNoticeText .textTipsContent");
+
+            var url = "/sms/GetSmsTipsText";
+            $.doAjax(url, "", function (msg) {
+                if (msg != "error") {
+                    var json = jQuery.parseJSON(msg);
+                    oItem.html(json.Content).attr("title", json.Content);
+                    moment.locale('zh-cn');
+                    var lastDate = moment.unix(json.insertTime).fromNow();
+                    $(".smsNoticeText .textTipsDate").html("[ " + lastDate + " ]");
+                } else {
+                    alert("读取失败");
+                }
+            }, false);
+        }
+
+        function SetSmsTipsText() {
+            dialog({
+                id: "DailyMoodContextTextDialog",
+                title: "记录信息",
+                content: document.getElementById("DailyMoodContextText"),
+                ok: function () {
+                    if ($("#DailyMoodContextText").attr("ajax") == null || $("#DailyMoodContextText").attr("ajax") == "false") {
+                        $("#DailyMoodContextText").attr("ajax", "true");
+
+                        var url = "/sms/SetSmsTipsText";
+                        $.doAjax(url, { "context": $("#DailyMoodContextText").val() }, function (msg) {
+                            if (msg != "error") {
+                                $("#DailyMoodContextText").attr("ajax", "false");
+                                if (Number(msg) > 0) {
+                                    $("#DailyMoodContextText").val("");
+                                    GetSmsTipsText();
+                                    dialog.get("DailyMoodContextTextDialog").close().remove();
+                                } else {
+                                    alert('信息保存失败，请联系技术！');
+                                }
+                            } else {
+                                alert("保存失败");
+                            }
+                        }, false);
+                    } else {
+                        alert('正在保存中！！！');
+                    }
+                    return false;
+                },
+                cancel: true
+            }).showModal();
+        }
+
+
+        function CloseVisit(id, accid) {
+            dialog({
+                id: "closeVisitDialog",
+                title: "关闭回访",
+                lock: true,
+                opacity: 0.57, // 透明度
+                content: document.getElementById("closeReason"),
+                ok: function () {
+                    var postJson = {};
+
+                    if ($("#visitCloseReason").val().length <= 0) {
+                        alert("关闭理由不可以为空！");
+                        return false;
+                    }
+
+                    postJson["visitId"] = id;
+                    postJson["accid"] = accid;
+                    postJson["reason"] = $("#visitCloseReason").val();
+
+                    var ur = "/PlatformVisit/CloseVisit";
+
+                    $.doAjax(ur, postJson, function (msg) {
+                        //alert(msg);
+                        if (msg != "0") {
+                            alert("已关闭！");
+                            LoadTaskInfo(1);
+                        } else {
+                            alert("关闭失败！");
+                        }
+                    }, true);
+                },
+                cancel: true
+            }).show();
+
+        }
+    </script>
+}
+
+@*局部刷新*@

@@ -1,0 +1,252 @@
+﻿@{
+    ViewBag.Title = "每日登录用户分析";
+}
+
+@section Style{
+
+    @Styles.Render("~/style/form")
+    <style type="text/css">
+        .hoverStyle th span{cursor: pointer}
+    </style>
+}
+
+<div class="page-where dailyWhere" style="margin-top: 10px;">
+    <div>
+        <div class="pull-left">
+            <div class="page-where-time-input  whereitem" id="insertTime">
+                <div class="input-daterange input-group">
+                    <input type="text" placeholder="注册时间" class="input-sm form-control min-height-37" name="start" id="dateTime" value="" />
+                </div>
+            </div>
+
+            <div class="form-group  whereitem">
+                <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" id="regSource" onchange="" style="width: 139px;">
+                    <option value="0">所有来源</option>
+                    <option value="30">Android注册</option>
+                    <option value="21">IOS注册</option>
+                    <option value="22">PC客户端注册</option>
+                    <option value="23">SEM注册</option>
+                    <option value="24">网站注册</option>
+                </select>
+            </div>
+            <div class="checkbox check-success " style="display: inline">
+                <input type="checkbox" value="newReg" id="newReg">
+                <label for="newReg">当天注册</label>
+            </div>
+            <div class="checkbox check-success " style="display: inline">
+                <input type="checkbox" value="noAction" id="noAction">
+                <label for="noAction">无操作</label>
+            </div>
+            <button type="button" value="select" class="btn btn-default btn-inquire" onclick=" GetDailyInfo(1) ">查询</button>
+            <div class="clear"></div>
+        </div>
+        <input type="hidden" id="displayOrder" value="">
+        <div class="clear"></div>
+    </div>
+</div>
+
+@Scripts.Render("~/js/begin/form")
+<script src="~/Scripts/plugins/artTemplate/template.js"></script>
+
+<div class="row column-seperation" style="margin-top: 10px;" id="templateContainer">
+
+    <table class="table table-hover table-condensed  no-footer" id="ListTable">
+        <thead>
+            <tr class="hoverStyle">
+                <th class=" text-center" style="width: 90px;">编号 </th>
+
+                <th style="min-width: 200px; width: 200px;">店铺名称</th>
+
+                <th class=" text-center" style="width: 110px;">
+                    <span rel="regTime desc" onclick=" changeOrd(this) " id="regtime">
+                        注册时间
+                        <i class="fa fa-caret-down"></i>
+                    </span>
+                </th>
+
+                <th class=" text-center" style="width: 100px;">来源</th>
+
+                <th class=" text-center" style="width: 110px;">
+                    <span rel="saleNum desc" onclick=" changeOrd(this) " id="salecnt">
+                        销售笔数
+                        <i class="fa fa-caret-down"></i>
+                    </span>
+                </th>
+                <th class=" text-center" style="width: 110px;">会员/零售笔数</th>
+
+                <th class=" text-center" style="width: 80px;">
+                    <span rel="smsNum desc" onclick=" changeOrd(this) " id="sms">
+                        短信数
+                        <i class="fa fa-caret-down"></i>
+                    </span>
+                </th>
+
+                <th class=" text-center" style="width: 80px;">
+                    <span rel="orderNum desc" onclick=" changeOrd(this) " id="ord">
+                        订单数
+                        <i class="fa fa-caret-down"></i>
+                    </span>
+                </th>
+
+                <th class=" text-center" style="width: 80px;">
+                    <span rel="goodsNum desc" onclick=" changeOrd(this) " id="good">
+                        商品数
+                        <i class="fa fa-caret-down"></i>
+                    </span>
+                </th>
+
+                <th class=" text-center" style="width: 80px;">
+                    <span rel="userNum desc" onclick=" changeOrd(this) " id="mem">
+                        会员数
+                        <i class="fa fa-caret-down"></i>
+                    </span>
+                </th>
+
+                <th class=" text-center" style="width: 110px;">
+                    <span rel="registration desc" onclick=" changeOrd(this) " id="sign">
+                        签到
+                        <i class="fa fa-caret-down" style="display: none"></i>
+                    </span>
+                </th>
+
+                <th class=" text-center" style="width: 110px;">
+                    <span rel="moodNum desc" onclick=" changeOrd(this) " id="mood">
+                        心情
+                        <i class="fa fa-caret-down"></i>
+                    </span>
+                </th>
+            </tr>
+        </thead>
+
+        <tbody id="tepmlateBody">
+            <script id="sourceList-Tpl" type="text/html">
+                {{if RowCount!=0}}
+                {{each UsrList}}
+                <tr>
+                    shopinfo/index/82836
+                    <td class=" text-center">{{$value.Id}}</td>
+                    <td>
+                        <a href="/shopinfo/index/{{$value.Id}}" target="_blank">
+                            {{$value.AccountName}}
+                        </a>
+                    </td>
+                    <td title="{{$value.RegTime}}" class=" text-center">{{$value.RegTime | dateFormat:'yyyy-MM-dd'}}</td>
+                    <td class=" text-center">{{$value.RegSource}}</td>
+                    <td class=" text-center">{{$value.SaleNum}}笔</td>
+                    <td class=" text-center">{{$value.MemberPaid}}笔/{{$value.Retail}}笔</td>
+                    <td class=" text-center">{{$value.SmsNum}}</td>
+                    <td class=" text-center">{{$value.OrderNum}}</td>
+                    <td class=" text-center">{{$value.GoodsNum}}</td>
+                    <td class=" text-center">{{$value.MemberNum}}</td>
+                    <td class=" text-center">{{$value.SignFlag}}</td>
+                    <td class=" text-center">{{$value.MoodNum}}</td>
+                </tr>
+                {{/each}}
+                {{else}}
+                <tr>
+                    <td>
+                    <td colspan="12">暂无数据</td>
+                </tr>
+                {{/if}}
+            </script>
+        </tbody>
+
+    </table>
+    <div class="dataTables_wrapper" id="ListPageHtml">
+        <div class="dataTables_paginate pagination">
+            <ul><li class="prev disabled"><a href="javascript:void(0)"><i class="pg-arrow_left"></i></a></li><li class="active"><a href="javascript:void(0)">1</a></li><li class="next disabled"><a href="javascript:void(0)"><i class="pg-arrow_right"></i></a></li></ul>
+        </div>
+        <div class="dataTablePagText"></div>
+    </div>
+
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.page-where-time-input .input-daterange').datepicker();
+        $("#templateContainer").find("i").css('display', 'none');
+    });
+
+    function GetDailyInfo(page) {
+        
+        var postData = {};
+        if ($("#dateTime").val() == "") {
+            alert("请输入日期！");
+            return;
+        }
+        postData["dateTime"] = $("#dateTime").val();
+        postData["source"] = $("#regSource").val();
+
+        if ($("#newReg").is(':checked')) {
+            postData["newReg"] = 1;
+        } else {
+            postData["newReg"] = 0;
+        }
+
+        if ($("#noAction").is(':checked')) {
+            postData["noAction"] = 1;
+        } else {
+            postData["noAction"] = 0;
+        }
+
+        postData["page"] = page;
+        postData["orderWhere"] = $("#displayOrder").val();
+
+        var sUrl = "/DailyAnalyze/GetDailyInfo";
+
+        $.doAjax(sUrl, postData, function (msg) {
+            if (msg != "error" && msg != "[]") {
+                var json = jQuery.parseJSON(msg);
+                //$("#num").html(Number(json.unrecordNum));
+                template.helper('dateFormat', function (date, format) {
+
+                    date = new Date(date);
+
+                    var map = {
+                        "M": date.getMonth() + 1, //月份
+                        "d": date.getDate(), //日
+                        "h": date.getHours(), //小时
+                        "m": date.getMinutes(), //分
+                        "s": date.getSeconds(), //秒
+                        "q": Math.floor((date.getMonth() + 3) / 3), //季度
+                        "S": date.getMilliseconds() //毫秒
+                    };
+                    format = format.replace(/([yMdhmsqS])+/g, function (all, t) {
+                        var v = map[t];
+                        if (v !== undefined) {
+                            if (all.length > 1) {
+                                v = '0' + v;
+                                v = v.substr(v.length - 2);
+                            }
+                            return v;
+                        } else if (t === 'y') {
+                            return (date.getFullYear() + '').substr(4 - all.length);
+                        }
+                        return all;
+                    });
+                    return format;
+                });
+                $("#tepmlateBody").html(template('sourceList-Tpl', json));
+
+                var maxPage = parseInt(json.RowCount / 15) + 1;
+
+                if (page == 1) {
+                    $("#ListPageHtml").attr("rowcount", json.RowCount).attr("maxpage", maxPage);
+                    $("#ListPageHtml .dataTablePagText").html("共" + json.RowCount + "条");
+                }
+                var pageHtml = $.listPageHtml(page, $("#ListPageHtml").attr("maxpage"), "GetDailyInfo", 5);
+                $("#ListPageHtml .dataTables_paginate").html(pageHtml);
+
+            }
+        }, true);
+    }
+
+    function changeOrd(obj) {
+        var vName = jQuery(obj).attr('rel');
+        $("#displayOrder").val(vName);
+        $("#templateContainer").find("i").css('display', 'none');
+        jQuery(obj).find("i").css('display', '');
+        //<i class="fa fa-caret-down"></i>
+        GetDailyInfo(1);
+    }
+</script>

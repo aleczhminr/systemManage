@@ -1,0 +1,151 @@
+﻿
+@{
+    ViewBag.Title = "回访";
+    Layout = null;
+}
+
+
+
+
+<div class="panel">
+    <div class="panel-heading">
+        <div class="panel-title">
+            <div class="page-where visitWhere">
+                <div class="pull-left"> 
+                    <div class="form-group  whereitem page-where-othertime ">
+                        <div class="input-daterange input-group">
+                            <input type="text" placeholder="录入时间" class="input-sm form-control" name="start" id="visitStartTime" />
+                            <span class="input-group-addon">to</span>
+                            <input type="text" placeholder="录入时间" class="input-sm form-control" name="end" id="visitEndTime" />
+                        </div>
+                    </div>
+                    <div class=" whereitem">
+                        <input type="text" placeholder="回访人" class="form-control width120" id="VisitInsertName" onkeyup="VisitInsertNameOnKeyUp(event)">
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </div>            
+        </div>
+        <!-- <div class="panel-controls"></div> -->
+    </div>
+    <div class="panel-body">
+        <div class="row column-seperation">
+            <table class="table table-hover  no-footer" id="visitListTable">
+                <thead>
+                    <tr>
+                        <th style="width: 90px;">记录类别 </th>
+                        <th>回访内容</th>
+                        <th style="width: 90px;">方式</th>
+                        <th style="width: 90px;">状态</th>
+                        <th style="width: 120px;">时间</th>
+                        <th style="width: 90px;">回访人</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <div class="dataTables_wrapper" id="visitListPageHtml">
+                <div class="dataTables_paginate pagination">
+                    <ul><li class="prev disabled"><a href="javascript:void(0)"><i class="pg-arrow_left"></i></a></li><li class="active"><a href="javascript:void(0)">1</a></li><li class="next disabled"><a href="javascript:void(0)"><i class="pg-arrow_right"></i></a></li></ul>
+                </div>
+                <div class="dataTablePagText"></div>
+            </div>
+        </div>        
+    </div>
+</div>
+
+
+<script src="~/Scripts/ShopInfo/ShopInfo20160304.js"></script>
+<script type="text/javascript">
+    var timeOut = 0;
+    $(function() {
+        GetShopVisitList(1);
+
+        $('.visitWhere .page-where-othertime .input-daterange').datepicker({ orientation: "top auto" }).on({
+            'hide': function(ev) {
+                var oldValue = $(ev.target);
+                if (oldValue.val() != oldValue.attr("old")) {
+                    timeOut = setTimeout("GetShopVisitList(1)", 500);
+                    oldValue.attr("old", oldValue.val());
+                }
+            },
+            'show': function(ev) {
+                clearTimeout(timeOut);
+            }
+        });
+    });
+    template.helper('contentToText', function (c) {
+        return $("<div>" + c + "</div>").text();
+    });
+    template.helper('problemForm', function (t) {
+        if (t == null) {
+            return "反馈问题：未填写"
+        } else {
+            return t;
+        }
+    });
+
+    function ShowVisitInfo(id) {
+        $("#modalSlideLeft table tbody").html("<tr><td>正在加载信息</td></tr>");
+        var url = "/PlatformVisit/GetVisitInfo/" + id;
+        $.doAjax(url, null, function (msg) {
+            if (msg != "" && msg != "null") {
+                var json = $.parseJSON(msg);
+                var table = template("VisitInfoScript", json);
+                $("#modalSlideLeft table tbody").html(table);
+            }
+
+        }, true);
+    }
+</script>
+<script type="text/html" id="ShopVisitListScript">
+    {{each listData}}
+    <tr class="odd" role="row">
+        <td class="v-align-middle">{{$value.recordType}}</td>
+        @*<td class="v-align-middle" onclick="ShowVisitInfo('{{$value.id}}')" data-toggle="modal" data-target="#modalSlideLeft">{{$value.vi_Content | contentToText}}</td>*@
+        <td class="v-align-middle" onclick="ShowVisitInfo({{$value.id}})" data-toggle="modal" data-target="#modalSlideLeft">
+            <p>{{$value.Problem | problemForm}}</p>
+            <p class="m-b-0" style="color: darkcyan">{{$value.FeedBack}}</p>
+        </td>
+        <td class="v-align-middle">{{$value.visitManner}}</td>
+        <td class="v-align-middle">{{$value.handleStatName}}</td>
+        <td class="v-align-middle">{{$value.insertTime}}</td>
+        <td class="v-align-middle">{{$value.insertName}}</td>
+    </tr>
+    {{/each}}
+</script>
+
+
+<script type="text/html" id="VisitInfoScript">
+    <tr>
+        <td class="text-right" style="width:110px;"><b>店铺名称：</b></td>
+        <td colspan="3">{{CompanyName}}【{{accid}}】</td>
+    </tr>
+    <tr>
+        <td class="text-right"><b>类别：</b></td>
+        <td>{{recordType}}</td>
+        <td class="text-right" style="width:110px;"><b>状态：</b></td>
+        <td>{{handleStatName}}</td>
+    </tr>
+    <tr>
+        <td class="text-right"><b>回访人：</b></td>
+        <td>{{insertName}}</td>
+        <td class="text-right"><b>回访时间：</b></td>
+        <td>{{insertTime}}</td>
+    </tr>
+    <tr>
+        <td colspan="4"><b>回访内容：</b></td>
+    </tr>
+    <tr>
+        <td colspan="4">
+            {{#vi_Content}}
+        </td>
+    </tr>
+    <tr>
+        <td colspan="4">
+            <span><b>标签：</b></span>
+            {{each tagList}}
+            <span class="tag label label-info" tagid="{{$value.id}}">{{$value.tagName}}</span>
+            {{/each}}
+        </td>
+    </tr>
+</script>

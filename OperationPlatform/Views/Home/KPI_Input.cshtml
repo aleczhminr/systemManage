@@ -1,0 +1,100 @@
+﻿@model Model.MonthlyKPI
+
+@{
+    ViewBag.Title = "KPI预设值";
+}
+
+@section Style{
+    @Styles.Render("~/style/form")
+
+
+}
+
+@using (Html.BeginForm("AddKpi", "Home", FormMethod.Post)) 
+{
+    @Html.AntiForgeryToken()
+    
+    <div class="form-horizontal">
+        <hr />
+        @Html.ValidationSummary(true)
+        <div class="form-group">
+            <label class="control-label" style="margin-left: 50px">年份 / 月份</label>
+            <span class="help" style="margin-left: 50px">e.g. "2015/01"</span>
+            <div class="">
+                @Html.TextBoxFor(model => model.MDate, new { @class = "form-control",style="width: 300px;margin-left: 50px" })
+                @Html.ValidationMessageFor(model => model.MDate)
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label" style="margin-left: 50px">注册量</label>
+            <span class="help" style="margin-left: 50px">e.g. "100"</span>
+            <div class="">
+                @Html.TextBoxFor(model => model.RegNum, new {@class = "form-control", style = "width: 300px;margin-left: 50px"})
+                @Html.ValidationMessageFor(model => model.RegNum)
+            </div>
+
+            <label class="" style="margin-left: 50px">销售笔数</label>
+            <span class="help" style="margin-left: 50px">e.g. "100"</span>
+            <div class="">
+                @Html.TextBoxFor(model => model.SellCount, new { @class = "form-control", style = "width: 300px;margin-left: 50px" })
+                @Html.ValidationMessageFor(model => model.SellCount)
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <label class="control-label" style="margin-left: 50px">新增会员</label>
+            <span class="help" style="margin-left: 50px">e.g. "100"</span>
+            <div class="">
+                @Html.TextBoxFor(model => model.UsrAdd, new {@class = "form-control", style = "width: 300px;margin-left: 50px"})
+                @Html.ValidationMessageFor(model => model.UsrAdd)
+            </div>
+
+            <label class="control-label" style="margin-left: 50px">新增商品</label>
+            <span class="help" style="margin-left: 50px">e.g. "100"</span>
+            <div class="">
+                @Html.TextBoxFor(model => model.Sku, new { @class = "form-control", style = "width: 300px;margin-left: 50px" })
+                @Html.ValidationMessageFor(model => model.Sku)
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label" style="margin-left: 50px">短信量</label>
+            <span class="help" style="margin-left: 50px">e.g. "100"</span>
+            <div class="">
+                @Html.TextBoxFor(model => model.Sms, new { @class = "form-control", style = "width: 300px;margin-left: 50px" })
+                @Html.ValidationMessageFor(model => model.Sms)
+            </div>
+
+            <label class="control-label" style="margin-left: 50px">订单量</label>
+            <span class="help" style="margin-left: 50px">e.g. "100"</span>
+            <div class="">
+                @Html.TextBoxFor(model => model.OrderCount, new { @class = "form-control", style = "width: 300px;margin-left: 50px" })
+                @Html.ValidationMessageFor(model => model.OrderCount)
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="创建" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+
+<div>
+    @Html.ActionLink("返回列表", "MonthlyReview")
+</div>
+
+@section Scripts {
+@Scripts.Render("~/js/begin/form")
+    <script>
+        $(document).ready(function() {
+            $("#MDate").datepicker({
+                format: "yyyy-mm",
+                minViewMode: 1
+            });
+        });
+    </script>
+}

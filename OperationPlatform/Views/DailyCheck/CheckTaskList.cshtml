@@ -1,0 +1,99 @@
+﻿@{
+    ViewBag.Title = "日检记录";
+}
+@section Style{
+
+    @Styles.Render("~/style/form")
+}
+
+<div class="panel">
+    <!-- 容器标题 -->
+    <div class="panel-heading">
+        <!-- 控制组  查询条件位置 -->
+        <div class="panel-controls">
+            <!-- <input type="text" id="search-table" class="form-control pull-right" placeholder=""> -->
+        </div>
+    </div>
+    <!-- 控件容器 -->
+    <div id="AccountActiveListTable" class="panel-body">
+        <!-- 表格本体 -->
+        <table class="table table-hover AccountListTableId"></table>
+        <!-- 分页信息 -->
+        <div class="dataTables_wrapper AccountListPageHtmlId" id="ListPageHtml">
+            <div class="dataTablePagText dataTables_info"></div>
+            <div class="dataTables_paginate paging_bootstrap pagination">
+                <ul>
+                    <li class="prev disabled">
+                        <a href="javascript:void(0)">
+                            <i class="pg-arrow_left"></i>
+                        </a>
+                    </li>
+                    <li class="active">
+                        <a href="javascript:void(0)">1</a>
+                    </li>
+                    <li class="next disabled">
+                        <a href="javascript:void(0)">
+                            <i class="pg-arrow_right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/html" id="checkTaskListScript">
+    <table class="table table-hover AccountListTableId">
+        <thead>
+            <tr>
+                <th>任务名称</th>
+                <th class="text-center">状态</th>
+                <th class="text-center">操作人</th>
+                <th class="text-center">操作时间</th>
+                <th class="text-center">备注</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{each listData}}
+            <tr>
+                <td class="v-align-middle">{{$value.TaskName}}</td>
+                <td class="text-center v-align-middle">{{$value.TaskValue}}</td>
+                <td class="text-center v-align-middle">{{$value.Operator}}</td>
+                <td class="text-center v-align-middle">{{$value.OperateTime}}</td>
+                <td class="text-center v-align-middle">{{$value.Remark}}</td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</script>
+
+@section Scripts{
+    @Scripts.Render("~/js/begin/form")
+    <script src="~/Scripts/plugins/artTemplate/template.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            GetCheckTaskList(1);
+        });
+
+
+        function GetCheckTaskList(page) {
+            var url = "/DailyCheck/GetRecordList",
+                postJson = {};
+
+            postJson["page"] = page;
+
+            $.doAjax(url, postJson, function (msg) {
+                if (msg != "null" && msg != "") {
+                    var json = $.parseJSON(msg);
+                    $("#AccountActiveListTable table").replaceWith(template("checkTaskListScript", json));
+                    if (page == 1) {
+                        $("#ListPageHtml").attr("rowcount", json.rowCount).attr("maxpage", json.maxPage);
+                        $("#ListPageHtml .dataTablePagText").html("共" + json.rowCount + "条");
+                    }
+                    var pageHtml = $.listPageHtml(page, $("#ListPageHtml").attr("maxpage"), "GetCheckTaskList", 5);
+                    $("#ListPageHtml .dataTables_paginate").html(pageHtml);
+
+                }
+            }, true);
+        }
+    </script>
+}

@@ -1,0 +1,99 @@
+﻿
+@{
+    Layout = null;
+    ViewBag.Title = "店铺短信内容";
+}
+
+
+<div class="panel">
+    <div class="panel-heading">
+        <div class="panel-title">
+            <div class="page-where smsWhere" style=" margin-top:10px;"> 
+                <div class="pull-left">
+                    <div class="form-group  whereitem">
+                        <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" id="smsSendStatus" onchange="GetShopSmsList(1)">
+                            <option value="all">发送状态</option>
+                            <option value="1">发送成功</option>
+                            <option value="-1">发送失败</option>
+                        </select>
+                    </div>
+                    <div class="form-group m-b-10 whereitem">
+                        <input type="text" placeholder="电话号码" class="form-control width120" id="smsPhoneNumber" onkeyup="SmsInputOnKeyUp(event)" />
+                    </div> 
+                    <div class="form-group  whereitem page-where-othertime ">
+                        <div class="input-daterange input-group">
+                            <input type="text" placeholder="开始时间" class="input-sm form-control" name="start" id="startTime" />
+                            <span class="input-group-addon">to</span>
+                            <input type="text" placeholder="结束时间" class="input-sm form-control" name="end" id="endTime" />
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </div>            
+        </div>
+    </div>
+    <div class="panel-body">
+        <div class="row column-seperation padding">
+            <table class="table table-hover table-condensed  no-footer" id="smsListTable">
+                <thead>
+                    <tr>
+                    <th style="width: 120px;">短信类型 </th>
+                    <th style="width: 150px;">接收号码</th>
+                    <th style="width: 180px;">发送时间</th>
+                    <th style="width: 120px;">短信状态</th>
+                    <th>短信内容</th>
+                    <th style="width: 120px;">操作</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <div class="dataTables_wrapper m-l-10" id="ListPageHtml">
+                <div class="dataTables_paginate pagination">
+                    <ul><li class="prev disabled"><a href="javascript:void(0)"><i class="pg-arrow_left"></i></a></li><li class="active"><a href="javascript:void(0)">1</a></li><li class="next disabled"><a href="javascript:void(0)"><i class="pg-arrow_right"></i></a></li></ul>
+                </div>
+                <div class="dataTablePagText"></div>
+            </div>
+        </div>         
+    </div>
+</div>
+
+<script type="text/javascript">
+    var timeOut = 0;
+    $(function () {
+        GetShopSmsList(1);
+        $.Pages.initSelectFxPlugin();
+        $('.smsWhere .page-where-othertime .input-daterange').datepicker({ orientation: "top auto" }).on({
+            'hide': function (ev) {
+                var oldValue =$( ev.target);
+                if (oldValue.val() != oldValue.attr("old")) {
+                    timeOut=setTimeout("GetShopSmsList(1)", 500);
+                    oldValue.attr("old", oldValue.val());
+                }
+        }, 'show': function (ev) {
+            clearTimeout(timeOut);
+        }
+        });
+    })
+    template.helper('dateFormat', function (free) {
+        if (free == 1) {
+            return '<span title="本条属于免费短信" style="color:#468847;margin-right:5px;">[免费]</span>'
+        } else {
+            return "";
+        }
+    });
+</script>
+
+<script type="text/html" id="ShopSmsListScript">
+    {{each listData}}
+    <tr class="odd" role="row">
+        <td class="v-align-middle">{{$value.smsTypeName}}</td>
+        <td class="v-align-middle">{{$value.phoneNumber}}</td>
+        <td class="v-align-middle">{{$value.sendTime}}</td>
+        <td class="v-align-middle">{{$value.smsStatusName}}</td>
+        <td class="v-align-middle">{{#$value.isFree | dateFormat}}{{$value.smsContent}}</td>
+        <td class="v-align-middle"></td>
+    </tr> 
+    {{/each}}
+</script>
+
+

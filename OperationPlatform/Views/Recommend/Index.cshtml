@@ -1,0 +1,148 @@
+﻿
+@{
+    ViewBag.Title = "推荐注册（转介绍）";
+}
+
+@section Style{
+    @Styles.Render("~/style/form")
+}
+
+<div class="panel">
+    <div class="panel-heading">
+        <div class="panel-title">
+            <div class="page-where-time-input  whereitem" id="recTime">
+                <div class="input-daterange input-group">
+                    <input type="text" placeholder="推荐日期" class="input m-r-20 form-control min-height-37" name="start" id="dateTime" value=""/>
+                </div>
+            </div>
+            <div class="pull-left p-l-20 p-r-20">
+
+                <input class="form-control" type="text" placeholder="店铺ID" name="accId" id="accId">
+            </div>
+
+
+            <button type="button" value="select" class="btn btn-default btn-inquire" onclick=" GetRecInfo(1) ">查询</button>
+            <div class="clearfix"></div>
+            <input type="hidden" id="displayOrder" value="">
+        </div>
+        <div class="panel-controls">
+            <div class="form-group" id="recStatus">
+                <div class="radio radio-success">
+                    <input id="recStatus_1" type="radio" name="statusType" onclick="statusTypeOnClick(0)" value="2" checked="checked">
+                    <label for="recStatus_1">推荐成功</label>
+                    <input id="recStatus_2" type="radio" name="statusType" onclick="statusTypeOnClick(1)" value="1">
+                    <label for="recStatus_2">推荐失败</label>
+                    <input id="recStatus_3" type="radio" name="statusType" onclick="statusTypeOnClick(2)" value="-1">
+                    <label for="recStatus_3">全部推荐</label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="panel-body">
+        <div id="templateContainer" class="row column-seperation m-t-10">
+
+            <table id="ListTable" class="table table-hover">
+                <thead>
+                    <tr class="">
+                        <th>店铺名称</th>
+                        @*<th class=" text-center">推荐方式</th>*@
+                        <th class=" text-center">注册时间</th>
+                        <th class=" text-center">推荐填写内容</th>
+                        <th class=" text-center">推荐店铺名称</th>
+                        <th class=" text-center">推荐状态</th>
+                    </tr>
+                </thead>
+
+                <tbody id="tepmlateBody">
+                <script id="sourceList-Tpl" type="text/html">
+                    {{if data.RowCount!=0}}
+                    {{each data.Data}}
+                    <tr>
+                        <td class="v-align-middle">
+                            <a href="/shopinfo/index/{{$value.AccId}}" target="_blank">
+                                {{$value.AccName}}
+                            </a>
+                        </td>
+                        @*<td class="text-danger text-center">被推荐</td>*@
+                        <td class=" text-center">{{$value.CreateTime}}</td>
+                        <td class=" text-center">{{$value.RecommendValue}}</td>
+                        <td class=" text-center">
+                            <a href="/shopinfo/index/{{$value.RecommendAccId}}" target="_blank">
+                                {{$value.ReAccName}}
+                            </a>
+                            {{if $value.ReTimes>3}}
+                            <span>/(推荐<span style="color: red">{{$value.ReTimes}}</span>次)</span>
+                            {{else}}
+                            <span>/(推荐<span style="color: green">{{$value.ReTimes}}</span>次)</span>
+                            {{/if}}
+                        </td>
+                    {{if $value.ReStatus==1}}
+                    <td class=" text-success text-center">推荐成功</td>
+                    {{else}}
+                    <td class=" text-danger text-center">推荐失败</td>
+                    {{/if}}
+                    </tr>
+                    {{/each}}
+                    {{else}}
+                    <tr>
+                    <td>
+                    <td colspan="12">暂无数据</td>
+                    </tr>
+                    {{/if}}
+                    </script>
+                </tbody>
+
+            </table>
+        <div class="dataTables_wrapper" id="ListPageHtml">
+            <div class="dataTables_paginate pagination">
+                <ul><li class="prev disabled"><a href="javascript:void(0)"><i class="pg-arrow_left"></i></a></li><li class="active"><a href="javascript:void(0)">1</a></li><li class="next disabled"><a href="javascript:void(0)"><i class="pg-arrow_right"></i></a></li></ul>
+            </div>
+            <div class="dataTablePagText"></div>
+        </div>
+
+        </div>
+    </div>
+</div>
+
+@Scripts.Render("~/js/begin/form")
+<script src="~/Scripts/plugins/artTemplate/template.js"></script>
+
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.page-where-time-input .input-daterange').datepicker();
+        GetRecInfo(1);
+    });
+
+    function GetRecInfo(page) {
+
+        var postData = {};
+
+        postData["date"] = $("#dateTime").val();
+        postData["page"] = page;
+        postData["accId"] = $("#accId").val();
+        postData["type"] = $("#recStatus input:radio:checked").val();;
+
+        var sUrl = "/Recommend/GetRecList";
+
+        $.doAjax(sUrl, postData, function (msg) {
+            if (msg != "error" && msg != "[]") {
+                var json = jQuery.parseJSON(msg);
+                //$("#num").html(Number(json.unrecordNum));
+                $("#tepmlateBody").html(template('sourceList-Tpl', { 'data': json }));
+
+                if (page == 1) {
+                    $("#ListPageHtml").attr("rowcount", json.RowCount).attr("maxpage", json.maxPage);
+                    $("#ListPageHtml .dataTablePagText").html("共" + json.RowCount + "条");
+                }
+                var pageHtml = $.listPageHtml(page, $("#ListPageHtml").attr("maxpage"), "GetRecInfo", 5);
+                $("#ListPageHtml .dataTables_paginate").html(pageHtml);
+            }
+        }, true);
+    }
+
+    function statusTypeOnClick(obj) {
+        GetRecInfo(1);
+    }
+</script>

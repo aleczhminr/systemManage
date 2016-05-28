@@ -1,0 +1,205 @@
+﻿@{
+    ViewBag.Title = "新手任务审核";
+}
+@section Style{
+
+    @Styles.Render("~/style/form")
+    <link href="~/css/IntegralManage/Integral.css" rel="stylesheet" />
+    <link href="~/css/plugins/summernote/summernote.css" rel="stylesheet" />
+}
+<!-- 容器开始 -->
+<div class="panel">
+    <!-- 容器标题 -->
+    <div class="panel-heading">
+        <!-- 控制组  查询条件位置 -->
+        <div class="page-where">
+            <div class="page-where-left margin-right-10">
+                <input type="text" id="accountIdText" class="form-control pull-right width120" placeholder="店铺ID">
+            </div>
+            <div class="page-where-left  margin-right-10">
+                <input type="text" id="projectNameText" class="form-control pull-right" placeholder="任务名称">
+            </div>
+            <div class="page-where-left  margin-right-10">
+                <select id="StoreStateSelect" class="cs-select cs-skin-slide" data-init-plugin="cs-select" onchange="GetTaskControlsList(1);">
+                    <option value="-1">全部</option>
+                    <option value="0">等待审核</option>
+                    <option value="2">审核通过</option>
+                    <option value="1">处理成功</option>
+                </select>
+            </div>
+            <div class="page-where-left  margin-right-10">
+                <div class="input-daterange input-group">
+                    <input type="text" class="input-sm form-control" placeholder="任务时间" name="start">
+                    <span class="input-group-addon">to</span>
+                    <input type="text" class="input-sm form-control" placeholder="任务时间" name="end">
+                </div>
+            </div>
+            <div class="page-where-left  margin-right-10">
+                <input type="button" onclick="GetTaskControlsList(1);" value="查询" class="btn btn-default btn-inquire">
+            </div>
+            <div class="page-where-left  margin-right-10">
+                <input type="button" category="all" onclick="GetThisCategoryTask(this);" value="全部" class="btn btn-default btn-inquire">
+            </div>
+
+            <div class="clear"></div>
+        </div>
+    </div>
+    <!-- 控件容器 -->
+    <div id="TaskControlsListTable" class="panel-body">
+        <!-- 表格本体 -->
+        <table class="table table-hover TaskControlsTableId"></table>
+        <!-- 分页信息 -->
+        <div class="dataTables_wrapper AccountListPageHtmlId" id="ListPageHtml">
+            <div class="dataTablePagText dataTables_info"></div>
+            <div class="dataTables_paginate paging_bootstrap pagination">
+                <ul>
+                    <li class="prev disabled">
+                        <a href="javascript:void(0)">
+                            <i class="pg-arrow_left"></i>
+                        </a>
+                    </li>
+                    <li class="active">
+                        <a href="javascript:void(0)">1</a>
+                    </li>
+                    <li class="next disabled">
+                        <a href="javascript:void(0)">
+                            <i class="pg-arrow_right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- <div class="row column-seperation m-t-10" id="AccountActiveListTable">
+    <table></table>
+</div> -->
+<input type="hidden" name="accid" value="" id="accidH" />
+<input type="hidden" name="content" value="" id="contentH" />
+
+<script type="text/html" id="TaskControlsScript">
+    <table class="table table-hover TaskControlsTableId">
+        <thead>
+        <tr>
+            <th style="width: 250px">任务名称</th>
+            <th>店铺名称</th>
+            <th class="text-center" style="width: 220px">操作时间</th>
+            <th class="text-center" aria-activedescendant="" style="width: 120px">状态</th>
+            @*<th class="text-center">备注</th>*@
+            <th class="text-center" style="width: 120px">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{each listData}}
+        <tr logid="{{$value.id}}">
+            <td>
+                {{$value.t_type}} -
+                <a href="javascript:;" category="{{$value.t_explan}}" onclick="GetThisCategoryTask(this)">
+                    {{$value.t_explan}}
+                </a>
+            </td>
+
+            <td><a href="/shopinfo/index/{{$value.acc_id}}" target="_blank">{{$value.CompanyName}}</a>【{{$value.acc_id}}】</td>
+            @*<a href="javascript:;" advance="{{# $value.t_advance}}" onclick="AdvanceContentShow(this);">è¯¦æƒ…</a>*@
+            <td class="text-center">
+                {{if DateCalculate($value.t_time) <=7 }}
+                {{$value.t_time}}
+                {{else}}
+                <span style="color: #BBBBBB;">{{$value.t_time}}</span>
+
+
+                {{/if}}
+            </td>
+            <td class="text-center">
+                {{if $value.t_status==1 || $value.t_status==2 }}
+                <span style="color: #008000;">{{$value.t_StatusName}}</span>
+                {{else}}
+                {{$value.t_StatusName}}
+                {{/if}}
+            </td>
+            <td class="text-center">
+                {{if $value.t_status==0 }}
+                <a href="javascript:void(0)" tid="{{$value.id}}" onclick="TaskControlsAudit(this)">审核</a>
+                {{if $value.t_advance != null && $value.t_advance!=""}}
+                | <a href="javascript:;" advance="{{$value.t_advance}}" accid="{{$value.acc_id}}" onclick="AdvanceContentShow(this, 2);">详情</a>
+                {{else}}
+                {{if $value.t_source != null && $value.t_source!=""}}
+                | <a href="javascript:;" advance='{{$value.t_source}}' onclick="AdvanceContentShow(this, 1);">备注</a>
+                {{/if}}
+                {{/if}}
+                {{else}}
+                {{if $value.t_advance != null && $value.t_advance!=""}}
+
+                {{if $value.t_source != null && $value.t_source!=""}}
+                 <a href="javascript:;" advance='{{$value.t_source}}' onclick="AdvanceContentShow(this, 1);">备注</a> |
+                {{/if}}
+                <a href="javascript:;" advance="{{$value.t_advance}}" accid="{{$value.acc_id}}" onclick="AdvanceContentShow(this,2);">详情</a>
+                    {{else}}
+                        {{if $value.t_source != null && $value.t_source!=""}}
+                        <a href="javascript:;" advance='{{$value.t_source}}' onclick="AdvanceContentShow(this,1);">备注</a>
+                        {{/if}}
+                    {{/if}}
+                    {{/if}}
+                </td>
+            </tr>
+            {{/each}}
+
+
+        </tbody>
+    </table>
+</script>
+
+<div style="display:none;">
+    <div class="AuditHtml " id="VisitDiv">
+        <div id="VisitContent" style="height:246px"></div>
+    </div>
+</div>
+<div id="advanceContent" class="modal slide-up" role="dialog" aria-labelledby="advanceContentModal" style="top:30%">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="advanceContentModal"></h4>
+            </div>
+            <div class="modal-body">
+                <article style="padding: 15px; line-height: 1.5;">
+                    ...
+                </article>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" onclick="ImportFeedBack()">导入反馈</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+@section Scripts{
+    @Scripts.Render("~/js/begin/form")
+    <script src="~/Scripts/plugins/artTemplate/template.js"></script>
+    <script src="~/Scripts/IntegralManage/Integral.js"></script>
+    <script src="~/Scripts/plugins/summernote/js/summernote.min.js"></script>
+    <script src="~/Scripts/plugins/Ueditor/ueditor.config.js"></script>
+    <script src="~/Scripts/plugins/Ueditor/ueditor.all.min.js"></script>
+    <script type="text/javascript">
+
+        var tool = ["source", "formatmatch", "bold", "italic", "underline", "forecolor", "strikethrough", "paragraph", "fontfamily", "fontsize", "insertimage", "cleardoc"];
+        var Visiteditor = new UE.ui.Editor({ toolbars: [tool] });
+        Visiteditor.render("VisitContent");
+
+        $(document).ready(function () {
+            $('.page-where .input-daterange').datepicker({ format: 'yyyy-mm-dd' });
+            GetTaskControlsList(1);
+        });
+
+        template.helper('DateCalculate', function (endDate) {
+            var endTime = new Date(Date.parse(endDate.replace(/-/g, "/"))).getTime();
+            var dates = Math.abs((Date.now() - endTime)) / (1000 * 60 * 60 * 24);
+            return Math.round(dates);
+        });
+
+    </script>
+}
+
+
+
+

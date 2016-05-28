@@ -1,0 +1,353 @@
+﻿@{
+    ViewBag.Title = "触发消息模板设置";
+}
+
+@section Style{
+    @Styles.Render("~/style/form")
+    <link href="~/css/MsgCenter/MsgCenter.css" rel="stylesheet" />
+    <link href="~/css/plugins/summernote/summernote.css" rel="stylesheet" />
+    <link href="~/css/plugins/boostrapv3/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/css/plugins/datatables-responsive/css/datatables.responsive.css" rel="stylesheet" />
+
+    <style type="text/css">
+        .form-group .f-wInitial label {
+            font-weight: normal;
+        }
+
+        .form-inline {
+            display: inline;
+            width: 80%;
+        }
+
+        .icon-multiple {
+            background-color: #959595;
+        }
+
+        .icon-font {
+            display: inline-block;
+            color: #fff;
+            font-style: normal;
+            font-size: 12px;
+            line-height: 16px;
+            text-align: center;
+            border-radius: 1px;
+            margin-right: 3px;
+            padding: 0px 1px 0px 2px;
+            background-color: green;
+            margin-top: 2px;
+        }
+    </style>
+
+}
+<div class="panel panel-default" id="messageCenter">
+    <div class="panel-body no-scroll ">        
+        <div class="form-group">
+            <label>事件类别</label>
+            <span class="help" style="color: darkred">如已存在模板则更新现有模板</span>
+            <div class="row">
+                <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" name="" id="eventId">
+                    <option value="1">注册后</option>
+                    <option value="2">首次登录后</option>
+                    <option value="3">订单付费后</option>
+                    <option value="4">优惠券到账后</option>
+                    <option value="5">实物订单发货后</option>
+                    <option value="6">反馈转为需求后</option>
+                    <option value="7">需求开发完成后</option>
+                    <option value="8">销售商品后</option>
+                    @*订单购买消息模板*@
+                    <option value="101">高级版/行业版/连锁版购买后</option>
+                    <option value="102">手机橱窗购买后</option>
+                    <option value="103">短信包购买后</option>
+                    <option value="104">实物商品购买后</option>
+                    <option value="105">京东订单购买后</option>
+                    <option value="106">话费充值购买后</option>
+                    <option value="107">行业版购买后</option>
+                    <option value="108">连锁版购买后</option>
+                </select>
+            </div>
+        </div>
+
+        @*需要添加标准占位符内容提醒*@
+
+        @*<div class="form-group">*@
+        <label>发送方式：</label>
+        @*<div class="checkbox check-success">*@
+
+        <div class="row checkbox check-success">
+            <input type="checkbox" name="datatyle" value="Sms" id="checkbox1" rel="1">
+            <label for="checkbox1">短信</label>
+        </div>
+
+        <div class="form-group hidden m-t-20 row" id="Sms">
+
+            @*<label class="col-sm-3 control-label">短信</label>*@
+            <div class="col-sm-9">
+                <label>内容</label>
+                <div class="row">
+                    <input type="text" class="form-control" id="SmsContent" />
+                </div>
+            </div>
+
+        </div>
+        <hr class="SmsHr hidden" />
+        <div class="row checkbox check-success">
+            <input type="checkbox" value="Pub" name="datatyle" id="checkbox2" rel="2">
+            <label for="checkbox2">站内消息</label>
+        </div>
+
+        <div class="form-group hidden m-t-20 row" id="Pub">
+
+            @*<label class="col-sm-3 control-label">站内消息</label>*@
+            <div class="col-sm-9">
+                <label>标题</label>
+                <div class="row">
+                    <input type="text" class="form-control" id="PubTitle" />
+                </div>
+                <label>内容</label>
+                <div class="row">
+                    <div id="PubContent"></div>
+                </div>
+            </div>
+        </div>
+        <hr class="PubHr hidden" />
+        <div class="row checkbox check-success">
+            <input type="checkbox" value="Mobile" name="datatyle" id="checkbox3" rel="3">
+            <label for="checkbox3">移动端推送</label>
+        </div>
+
+        <div class="form-group hidden m-t-20 row" id="Mobile">
+
+            @*<label class="col-sm-3 control-label">移动端推送</label>*@
+            <div class="col-sm-9">
+                <label>标题</label>
+                <div class="row">
+                    <input type="text" class="form-control" id="MobileTitle" />
+                </div>
+
+                <label>内容类型</label>
+                <div class="row">
+                    <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" name="" id="ContentType" onchange="ChangeMobileType()">
+                        <option value="text" selected="true">纯文本</option>
+                        <option value="web">网页地址</option>
+                        <option value="view">功能页面</option>
+                        <option value="bbs">论坛</option>
+                    </select>
+                </div>
+
+                <div id="MobileStr" class="hidden">
+                    <label>URL地址</label>
+                    <div class="row">
+                        <input type="text" class="form-control" id="ContentUrlStr" />
+                    </div>
+                </div>
+
+                <div id="MobileView" class="hidden">
+                    <label>链接内容</label>
+                    <div class="row">
+                        <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" name="" id="ContentUrlView">
+                            <option value="GoodsAdd">新增商品</option>
+                            <option value="GoodsManage">商品管理</option>
+                            <option value="MemberAdd">新增会员</option>
+                            <option value="MemberManage">会员管理</option>
+                            <option value="SaleAdd">收银记账</option>
+                            <option value="SaleQuery">查询销售</option>
+                            <option value="ExpenditureManage">支出管理</option>
+                            <option value="AnalysisManage">智能分析</option>
+                            <option value="InAppPurchase">购买套餐</option>
+                        </select>
+                    </div>
+                </div>
+
+
+                <label>内容</label>
+                <div class="row">
+                    @*<input type="text" class="form-control" id="MobileContent" />*@
+                    <div id="MobileContent"></div>
+                </div>
+            </div>
+
+        </div>
+        <hr class="MobileHr hidden" />
+        <div class="row checkbox check-success">
+            <input type="checkbox" value="Email" name="datatyle" id="checkbox4" rel="4">
+            <label for="checkbox4">电子邮件</label>
+        </div>
+
+        <div class="form-group hidden m-t-20 row" id="Email">
+
+            @*<label class="col-sm-3 control-label">电子邮件</label>*@
+            <div class="col-sm-9">
+                <label>邮件标题</label>
+                <div class="row">
+                    <input type="text" class="form-control" id="EmailTitle" />
+                </div>
+                <label>邮件内容</label>
+                <div class="row">
+                    <div id="EmailContent"></div>
+                </div>
+            </div>
+
+        </div>
+
+        <div>
+            <button class="btn btn-success btn-cons msgBaseBtn" onclick="SubmitTemplate()">提交消息模板</button>
+        </div>
+    </div>
+
+</div>
+
+
+@section Scripts{
+    @Scripts.Render("~/js/begin/form")
+    @*<script src="~/Scripts/MsgCenter/MsgCenter.js"></script>*@
+    <script src="~/Scripts/plugins/summernote/js/summernote.min.js"></script>
+    <script src="~/Scripts/MessageSending/SendingRule.js"></script>
+    @*<script src="~/Scripts/MsgCenter/SendMessage.js"></script>*@
+    <script type="text/javascript">
+        $(document).ready(function() {
+
+            $("input:checkbox").each(function() {
+                $(this).prop('checked', false);
+            });
+            $("#Sms").addClass('hidden');
+            $("#Pub").addClass('hidden');
+            $("#Mobile").addClass('hidden');
+            $("#Email").addClass('hidden');
+
+            $(".SmsHr").addClass('hidden');
+            $(".PubHr").addClass('hidden');
+            $(".MobileHr").addClass('hidden');
+
+            $("input:checkbox").click(function() {
+                $("#Sms").addClass('hidden');
+                $("#Pub").addClass('hidden');
+                $("#Mobile").addClass('hidden');
+                $("#Email").addClass('hidden');
+
+                $(".SmsHr").addClass('hidden');
+                $(".PubHr").addClass('hidden');
+                $(".MobileHr").addClass('hidden');
+
+                var columnList = $("input:checkbox:checked");
+
+                $.each(columnList, function(i, n) {
+                    $("#" + n.value).removeClass('hidden');
+                    if (n.value != 'Email') {
+                        $("." + n.value + "Hr").removeClass('hidden');
+                    }
+
+                    if (n.value != 'Sms') {
+                        $("#" + n.value + "Content").summernote({
+                            height: 150,
+                            onfocus: function(e) {
+                                $('body').addClass('overlay-disabled');
+                            },
+                            onblur: function(e) {
+                                $('body').removeClass('overlay-disabled');
+                            }
+                        });
+                    }
+                });
+            });
+            //$('#expireTime .input-group.date').datepicker();
+
+        });
+
+        function ChangeMobileType() {
+            if ($("#ContentType").val() == "web" || $("#ContentType").val() == "bbs") {
+                $("#MobileStr").removeClass("hidden");
+                $("#MobileView").addClass("hidden");
+            } else if ($("#ContentType").val() == "view") {
+                $("#MobileView").removeClass("hidden");
+                $("#MobileStr").addClass("hidden");
+            } else {
+                $("#MobileView").addClass("hidden");
+                $("#MobileStr").addClass("hidden");
+            }
+        }
+
+        function SubmitTemplate() {
+            var postJson = {};
+            var url = "";
+
+            url = "/MessageSending/AddTemplate";
+
+            //if ($("#MissionTarget").val() == "") {
+            //    alert("请先填写任务目的!");
+            //    return false;
+            //} else {
+            //    postJson["missionTarget"] = $("#MissionTarget").val();
+            //}
+
+            //if ($("#MissionName").val() == "") {
+            //    alert("请先填写任务名称!");
+            //    return false;
+            //} else {
+            //    postJson["missionName"] = $("#MissionName").val();
+            //}
+
+            //if ($("#UserDesc").val() == "") {
+            //    alert("请先填写发送目标描述!");
+            //    return false;
+            //} else {
+            //    postJson["userDesc"] = $("#UserDesc").val();
+            //}
+
+            postJson["eventId"] = $("#eventId").val();
+
+            var columnList = $("input:checkbox:checked");
+            if (columnList.length == 0) {
+                alert("请选择发送方式！");
+                return false;
+            } else {
+                $.each(columnList, function(i, n) {
+                    if (n.value == "Sms") {
+                        postJson[n.value + "Content"] = $("#SmsContent").val();
+                    } else if (n.value == "Mobile") { //移动端消息类型处理
+                        postJson[n.value + "Title"] = $("#" + n.value + "Title").val();
+                        postJson[n.value + "Content"] = escape($("#" + n.value + "Content").code());
+                        postJson["contentType"] = $("#ContentType").val();
+
+                        switch ($("#ContentType").val()) {
+                        case "web":
+                        case "bbs":
+                            postJson["contentUrl"] = $("#ContentUrlStr").val();
+                            break;
+                        case "view":
+                            postJson["contentUrl"] = $("#ContentUrlView").val();
+                            break;
+                        case "text":
+                            break;
+                        }
+
+                    } else {
+                        if (n.value != "on") {
+                            postJson[n.value + "Title"] = $("#" + n.value + "Title").val();
+                            postJson[n.value + "Content"] = escape($("#" + n.value + "Content").code());
+                        }
+                    }
+
+                });
+            }
+
+            $.doAjax(url, postJson, function(msg) {
+                if (msg != "") {
+                    if (msg == "0") {
+                        alert("添加模板信息出错！");
+                        return false;
+                    } else {
+                        alert("添加成功！");
+                        location.reload();
+                    }
+
+                }
+            }, true);
+        }
+    </script>
+}
+
+
+
+
+
+

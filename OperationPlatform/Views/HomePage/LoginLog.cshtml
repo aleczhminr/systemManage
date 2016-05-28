@@ -1,0 +1,31 @@
+﻿
+@{
+    ViewBag.Title = "LoginLog";
+}
+
+<script type="text/javascript">
+    function Show(msg) {
+        alert(msg);
+    }
+</script>
+
+<h2>Index</h2>
+<div class="row">
+    <div class="col-md-8">
+        <section id="loginForm">
+            <div class="form-group">
+                @using (Ajax.BeginForm("LoginLog", new AjaxOptions() {OnSuccess = "Show"}))
+                {
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="登录日志" name="changePWD" class="btn btn-default"/>
+                    </div>
+                }
+            </div>
+        </section>
+    </div>
+</div>
+
+@section scripts{
+    @Html.Raw(@ViewBag.dataCount)
+    @Html.Raw(@ViewBag.data)
+}

@@ -1,0 +1,159 @@
+﻿
+@{
+    ViewBag.Title = "店铺详情列表";
+}
+@section Style{
+    @Styles.Render("~/style/form")
+}
+<div class="page-where acctionactiveWhere" id="GroupWhereDiv">
+    <div class="GroupWhereDiv">
+        <div class="page-where-time-input whereitem">
+            <div class="input-daterange input-group">
+                <input type="text" placeholder="开始时间" id="mainStartTime" class="input-sm form-control" name="start" value="@ViewBag.DateNowString" />
+                <span class="input-group-addon">to</span>
+                <input type="text" id="mainEndTime" placeholder="结束时间" class="input-sm form-control" name="end" value="@ViewBag.DateNowString" />
+            </div>
+        </div>
+        <div class="checkbox check-success whereitem" id="mainActiveCheckBoxList">
+            <input type="checkbox"  value="1" id="checkbox1" name="activeCheckBoxList" />
+            <label for="checkbox1">新注册</label>
+            <input type="checkbox"  value="3,4" id="checkbox2" name="activeCheckBoxList" />
+            <label for="checkbox2">需关怀</label>
+            <input type="checkbox"  value="5" id="checkbox3" name="activeCheckBoxList" />
+            <label for="checkbox3">活跃</label>
+            <input type="checkbox"  value="7" id="checkbox4" name="activeCheckBoxList" />
+            <label for="checkbox4">忠诚</label>
+            <input type="checkbox"  value="-1" id="checkbox5" name="activeCheckBoxList" />
+            <label for="checkbox5">休眠</label>
+            <input type="checkbox"  value="-3" id="checkbox6" name="activeCheckBoxList" />
+            <label for="checkbox6">流失</label>
+        </div>
+        <div class="checkbox check-success whereitem" style=" margin-top:10px;">
+            <input type="checkbox"  value="1" id="isContinue" name="isContinue" />
+            <label for="isContinue">只显示持续店铺</label>
+        </div>
+        <div class="whereitem">
+            <button class="btn btn-default btn-cons Grouping" onclick="GetShopActiveList(1)">查询</button>
+            <a href="javascript:void(0)" onclick="showGroupWhere(0)" class="m-l-20 Grouping">查看状态改变</a>
+        </div>
+        <div class="clear"></div>
+    </div>
+    <div class="Grouping alert alert-danger m-b-10" id="selectTextShow" style="display:none;">
+
+    </div>
+    <div class="Grouping" style="display:none;">
+        <div class="page-where-time-input whereitem">
+            <div class="input-daterange input-group">
+                <input type="text" placeholder="开始时间" id="followStartTime" class="input-sm form-control" name="start" value="@ViewBag.DateNowString" />
+                <span class="input-group-addon">to</span>
+                <input type="text" id="followEndTime" placeholder="结束时间" class="input-sm form-control" name="end" value="@ViewBag.DateNowString" />
+            </div>
+        </div>
+        <div class="checkbox check-success whereitem" id="followActiveCheckBoxList">
+            <input type="checkbox"  value="1" id="checkbox11" name="activeCheckBoxList" />
+            <label for="checkbox11">新注册</label>
+            <input type="checkbox"  value="3,4" id="checkbox12" name="activeCheckBoxList" />
+            <label for="checkbox12">需关怀</label>
+            <input type="checkbox"  value="5" id="checkbox13" name="activeCheckBoxList" />
+            <label for="checkbox13">活跃</label>
+            <input type="checkbox"  value="7" id="checkbox14" name="activeCheckBoxList" />
+            <label for="checkbox14">忠诚</label>
+            <input type="checkbox"  value="-1" id="checkbox15" name="activeCheckBoxList" />
+            <label for="checkbox15">休眠</label>
+            <input type="checkbox"  value="-3" id="checkbox16" name="activeCheckBoxList" />
+            <label for="checkbox16">流失</label>
+        </div>
+        <div class="checkbox check-success whereitem" style=" margin-top:10px;">
+            <input type="checkbox"  value="1" id="isfollowContinue" name="isContinue" />
+            <label for="isfollowContinue">只显示持续店铺</label>
+        </div>
+        <div class="whereitem">
+            <button class="btn btn-default btn-cons" onclick="GetGroupShopActiveList(1)">查询</button>
+            <a href="javascript:void(0)" onclick="showGroupWhere(1)" class="m-l-20">返回每日数据</a>
+        </div>
+        <div class="clear"></div>
+    </div>
+</div>
+  
+<div class="row column-seperation m-t-10" id="AccountActiveListTable">
+    <table></table>
+    <div class="dataTables_wrapper AccountListPageHtmlId" id="ListPageHtml">
+        <div class="dataTables_paginate pagination">
+            <ul><li class="prev disabled"><a href="javascript:void(0)"><i class="pg-arrow_left"></i></a></li><li class="active"><a href="javascript:void(0)">1</a></li><li class="next disabled"><a href="javascript:void(0)"><i class="pg-arrow_right"></i></a></li></ul>
+        </div>
+        <div class="dataTablePagText"></div>
+    </div>
+</div>
+<script type="text/html" id="AccountActiveListScript">
+    @RenderPage("~/Views/Shared/_AccountListTable.cshtml")
+</script>
+
+@section Scripts{
+    @Scripts.Render("~/js/begin/form")
+    <script src="~/Scripts/Operation/Operation.js"></script>
+    <script src="~/Scripts/plugins/summernote/js/summernote.min.js"></script>
+    <script src="~/Scripts/plugins/artTemplate/template.js"></script>
+<script src="~/Scripts/AccountListTable.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            GetShopActiveList(1);
+            showWhereTextShow();
+
+            $('.acctionactiveWhere .page-where-time-input .input-daterange').datepicker();
+
+
+            $("#GroupWhereDiv input").change(function () {
+                showWhereTextShow();
+            });
+        });
+
+
+        function showGroupWhere(t) {
+            if (t == 0) {
+                $("#GroupWhereDiv div.Grouping").show();
+                $("#GroupWhereDiv button.Grouping,#GroupWhereDiv a.Grouping").hide();
+            } else {
+                $("#GroupWhereDiv div.Grouping").hide();
+                $("#GroupWhereDiv button.Grouping,#GroupWhereDiv a.Grouping").show();
+            }
+        }
+        function showWhereTextShow() {
+            var groupWhere = $("#GroupWhereDiv");
+
+            var html = "【";
+
+
+            html += $("#mainStartTime").val();
+            html += " 到 ";
+            html += $("#mainEndTime").val();
+            html += " 的";
+
+            var mainCheckList = $("#mainActiveCheckBoxList  input:checkbox:checked")
+            $.each(mainCheckList, function (i, n) {
+                html += " [ " + $(n).next().text() + " ] ";
+            });
+
+
+
+
+
+            html += "】与【";
+
+
+            html += $("#followStartTime").val();
+            html += " 到 ";
+            html += $("#followEndTime").val();
+            html += "的 ";
+
+            var mainCheckList = $("#followActiveCheckBoxList  input:checkbox:checked");
+            $.each(mainCheckList, function (i, n) {
+                html += " [ " + $(n).next().text() + " ] ";
+            });
+
+            html += " 】相同的用户";
+
+
+            $("#selectTextShow").html(html);
+        }
+    </script>
+}

@@ -1,0 +1,253 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{1114C246-67B0-4E3A-B1DF-C2010676B3F6}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Model</RootNamespace>
+    <AssemblyName>Model</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework">
+      <HintPath>..\packages\EntityFramework.6.0.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="Hangfire.Core, Version=1.5.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Hangfire.Core.1.5.3\lib\net45\Hangfire.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Hangfire.SqlServer, Version=1.5.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Hangfire.SqlServer.1.5.3\lib\net45\Hangfire.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Owin, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.3.0.0\lib\net45\Microsoft.Owin.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Host.SystemWeb, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Host.SystemWeb.3.0.0\lib\net45\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
+      <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ActiveChangeModel.cs" />
+    <Compile Include="ActiveStatus.cs" />
+    <Compile Include="AgentModel.cs" />
+    <Compile Include="AlipayInfoModel.cs" />
+    <Compile Include="AlipayUserInfo.cs" />
+    <Compile Include="AlphaApplyModel.cs" />
+    <Compile Include="ApiModel.cs" />
+    <Compile Include="CarePercentModel.cs" />
+    <Compile Include="chartDataModel.cs" />
+    <Compile Include="ConditionSettingModel.cs" />
+    <Compile Include="ConversionFunnel.cs" />
+    <Compile Include="CRM_Aut_Record.cs" />
+    <Compile Include="CustomerAnalyzeModel.cs" />
+    <Compile Include="Enum\AlipayInfoEnum.cs" />
+    <Compile Include="Enum\AlphaApplyEnum.cs" />
+    <Compile Include="Enum\Evaluation.cs" />
+    <Compile Include="Enum\ExchangeLogEnum.cs" />
+    <Compile Include="Enum\ManageUserEnum.cs" />
+    <Compile Include="Enum\Task_JournalEnum.cs" />
+    <Compile Include="Enum\WithdrawalEnum.cs" />
+    <Compile Include="EvaluationModel.cs" />
+    <Compile Include="FusionPieModel.cs" />
+    <Compile Include="HourAnalysisDataM.cs" />
+    <Compile Include="IndustryAnalyzeModel.cs" />
+    <Compile Include="IndustryFilter.cs" />
+    <Compile Include="IntegralExchangeModel.cs" />
+    <Compile Include="IntegralPieModel.cs" />
+    <Compile Include="IntegralStore.cs" />
+    <Compile Include="MessageBatch.cs" />
+    <Compile Include="MessagePushingModel.cs" />
+    <Compile Include="MobileMapModel.cs" />
+    <Compile Include="NewUsrOrder.cs" />
+    <Compile Include="ProxyModel.cs" />
+    <Compile Include="ProxyRequestModel.cs" />
+    <Compile Include="P_Sys_PortraitDictionaryModel.cs" />
+    <Compile Include="P_Sys_PortraitRemarkModel.cs" />
+    <Compile Include="P_Sys_UserPortraitModel.cs" />
+    <Compile Include="RechargeRecord.cs" />
+    <Compile Include="RecommendModel.cs" />
+    <Compile Include="RegUsrDiff.cs" />
+    <Compile Include="ReportModel.cs" />
+    <Compile Include="RequirementManage.cs" />
+    <Compile Include="ShopAlipay.cs" />
+    <Compile Include="SourceFilterModel.cs" />
+    <Compile Include="Sys_DailyCheck.cs" />
+    <Compile Include="DailyUsrModel.cs" />
+    <Compile Include="DapperWhere.cs" />
+    <Compile Include="DashBoardModel.cs" />
+    <Compile Include="DataCompareModel.cs" />
+    <Compile Include="DxChartModel.cs" />
+    <Compile Include="EmailAccount.cs" />
+    <Compile Include="EmailTemplates.cs" />
+    <Compile Include="EmailType.cs" />
+    <Compile Include="Enum\AccountEnum.cs" />
+    <Compile Include="Enum\AppAuEnum.cs" />
+    <Compile Include="Enum\CouponEnum.cs" />
+    <Compile Include="Enum\OrderEnum.cs" />
+    <Compile Include="Enum\smsEnum.cs" />
+    <Compile Include="Enum\SysTaskEnum.cs" />
+    <Compile Include="Enum\VisitInfoEnum.cs" />
+    <Compile Include="FeedbackModel.cs" />
+    <Compile Include="FiltrateData.cs" />
+    <Compile Include="HtmlCouponCount.cs" />
+    <Compile Include="KPICompareModel.cs" />
+    <Compile Include="Model4View\OrderInfoModel.cs" />
+    <Compile Include="Model4View\SmsListViewModel.cs" />
+    <Compile Include="Model4View\TaskDailyInfoViewModel.cs" />
+    <Compile Include="Model4View\UncheckedShopModel.cs" />
+    <Compile Include="MonthlyKPI.cs" />
+    <Compile Include="O2O\goodsPic.cs" />
+    <Compile Include="O2O\NewGoodsInfo.cs" />
+    <Compile Include="O2O\NewGoodsList.cs" />
+    <Compile Include="OrderRenewalModel.cs" />
+    <Compile Include="Order_Project_Model.cs" />
+    <Compile Include="PanelShowModel.cs" />
+    <Compile Include="PayAfterServDataModel.cs" />
+    <Compile Include="PromotionLink.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ServiceStatModel.cs" />
+    <Compile Include="SingleOrderUsrType.cs" />
+    <Compile Include="SingleUserAnalyze.cs" />
+    <Compile Include="SmsChannel.cs" />
+    <Compile Include="Sms_Consume.cs" />
+    <Compile Include="Sms_DayConsume.cs" />
+    <Compile Include="Sms_Passage.cs" />
+    <Compile Include="Sms_Performance.cs" />
+    <Compile Include="Sms_Recharge.cs" />
+    <Compile Include="Sms_Reconciliation.cs" />
+    <Compile Include="SourceAnalyzeModel.cs" />
+    <Compile Include="SynthesisIFilter.cs" />
+    <Compile Include="SynthesisIFilterLog.cs" />
+    <Compile Include="SysRpt_ShopActive.cs" />
+    <Compile Include="SysRpt_ShopDayInfo.cs" />
+    <Compile Include="SysRpt_ShopInfo.cs" />
+    <Compile Include="SysRpt_ShopLogin.cs" />
+    <Compile Include="SysRpt_WebDayInfo.cs" />
+    <Compile Include="Sys_Account.cs" />
+    <Compile Include="Sys_AccountRep.cs" />
+    <Compile Include="Sys_Ads.cs" />
+    <Compile Include="Sys_agent_Loginfo.cs" />
+    <Compile Include="Sys_agent_mess.cs" />
+    <Compile Include="Sys_DailyCheckRecord.cs" />
+    <Compile Include="Sys_DayCheck.cs" />
+    <Compile Include="Sys_DayCheckLog.cs" />
+    <Compile Include="Sys_DayCheckType.cs" />
+    <Compile Include="Sys_ManageLog.cs" />
+    <Compile Include="sys_ManageRep.cs" />
+    <Compile Include="Sys_Manage_User.cs" />
+    <Compile Include="Sys_ProvinceCityList.cs" />
+    <Compile Include="Sys_RecordType.cs" />
+    <Compile Include="Sys_SysAreaCity.cs" />
+    <Compile Include="Sys_SysAreaData.cs" />
+    <Compile Include="Sys_SysAreaData4Echarts.cs" />
+    <Compile Include="Sys_SysRevisit_AccInfo.cs" />
+    <Compile Include="Sys_TagInfo.cs" />
+    <Compile Include="Sys_TagNexus.cs" />
+    <Compile Include="Sys_TaskDaily.cs" />
+    <Compile Include="Sys_TaskRecord.cs" />
+    <Compile Include="Sys_TaskType.cs" />
+    <Compile Include="Sys_UserMessageModel.cs" />
+    <Compile Include="Sys_Visit.cs" />
+    <Compile Include="Sys_VisitEmail.cs" />
+    <Compile Include="Sys_VisitEmailSnap.cs" />
+    <Compile Include="Sys_VisitInfo.cs" />
+    <Compile Include="Sys_VisitManner.cs" />
+    <Compile Include="Sys_VisitReason.cs" />
+    <Compile Include="Sys_VisitReply.cs" />
+    <Compile Include="Sys_VisitSms.cs" />
+    <Compile Include="Sys_VisitSmsSnap.cs" />
+    <Compile Include="Sys_VisitTag.cs" />
+    <Compile Include="Sys_VisitTagNexus.cs" />
+    <Compile Include="Sys_Visit_Question.cs" />
+    <Compile Include="tb_user_infor.cs" />
+    <Compile Include="TendencySummaryModel.cs" />
+    <Compile Include="TriggerTemplateModel.cs" />
+    <Compile Include="T_Account.cs" />
+    <Compile Include="T_Account_User.cs" />
+    <Compile Include="t_App_Au.cs" />
+    <Compile Include="T_Business.cs" />
+    <Compile Include="T_Common_Sms.cs" />
+    <Compile Include="T_ExchangeLog.cs" />
+    <Compile Include="T_GoodsInfo.cs" />
+    <Compile Include="t_GoodsPic.cs" />
+    <Compile Include="T_Goods_Attribute.cs" />
+    <Compile Include="T_LOG.cs" />
+    <Compile Include="T_MaterialGoodsModel.cs" />
+    <Compile Include="T_NoticeText.cs" />
+    <Compile Include="T_OrderInfo.cs" />
+    <Compile Include="T_Order_CouponInfo.cs" />
+    <Compile Include="T_Order_CouponList.cs" />
+    <Compile Include="T_Order_Invoice.cs" />
+    <Compile Include="T_Order_Project.cs" />
+    <Compile Include="T_OutLink.cs" />
+    <Compile Include="T_OutLinkType.cs" />
+    <Compile Include="t_PayRecord.cs" />
+    <Compile Include="T_PreFixVer.cs" />
+    <Compile Include="T_SaleInfo.cs" />
+    <Compile Include="T_Sms_List.cs" />
+    <Compile Include="T_Sms_Notify.cs" />
+    <Compile Include="T_Task_Journal.cs" />
+    <Compile Include="T_UserInfo.cs" />
+    <Compile Include="UserPortraitModel.cs" />
+    <Compile Include="UserRetentionModel.cs" />
+    <Compile Include="VennSetsModel.cs" />
+    <Compile Include="VisitAnalyzeDetailModel.cs" />
+    <Compile Include="VisitPeriodModel.cs" />
+    <Compile Include="WithdrawalRecordModel.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

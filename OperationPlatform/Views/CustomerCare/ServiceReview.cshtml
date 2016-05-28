@@ -1,0 +1,393 @@
+﻿
+@{
+    ViewBag.Title = "客服数据汇总";
+    Layout = null;
+}
+
+<div class="page-where serviceSummary" style=" margin-top:10px;">
+    <div class="btn-group">
+        <button type="button" class="btn btn-default btn-select" value="7" onclick="servSummarywhereTimeButtonClick(this)">7天</button>
+        <button type="button" class="btn btn-default" value="1m" onclick="servSummarywhereTimeButtonClick(this)">1个月</button>
+        <button type="button" class="btn btn-default" value="3m" onclick="servSummarywhereTimeButtonClick(this)">3个月</button>
+        <button type="button" class="btn btn-default" value="other" onclick="servSummarywhereTimeButtonClick(this)">其他时间</button>
+    </div>
+    <div class="btn-group page-where-othertime" style="display:none;">
+        <button type="button" value="return" class="btn btn-default border-right0" onclick="servSummarywhereTimeButtonClick(this)">返回</button>
+        <div class="page-where-time-input">
+            <div class="input-daterange input-group">
+                <input type="text" placeholder="开始时间" class="input-sm form-control" name="start" />
+                <span class="input-group-addon">to</span>
+                <input type="text" placeholder="结束时间" class="input-sm form-control" name="end" />
+            </div>
+        </div>
+        <button type="button" value="select" class="btn btn-default btn-inquire" onclick="GetServStatChartJson()">查询</button>
+    </div>
+</div>
+<div id="perUsrNum" style="width: 80%; height: 300px; margin-top: 15px; margin-left: 15px; margin-right: 15px;"></div>
+<hr style="width: 80%; margin-top: 10px; margin-left: 15px; margin-right: 15px;" />
+<div id="pieContainer" style="width: 80%; height: 250px; margin-top: 15px; margin-left: 15px; margin-right: 15px;">
+    <div id="perCustomerService" style="width: 38%; height: 250px; padding-right: 15px; float: left;"></div>
+    <div>
+        <table id="tb" style="width: 1px; float: left; height: 250px;">
+            <tr>
+                <td width="1px" bgcolor="#F2F2F3"></td>
+            </tr>
+        </table>
+    </div>
+    <div id="perChannel" style="height: 250px; width: 38%; float: left;"></div>
+</div>
+
+<script src="~/Scripts/plugins/asset/echarts-all.js"></script>
+<script type="text/javascript">
+    var myChartUsrNum = echarts.init(document.getElementById('perUsrNum'));
+
+    var optionUsrNum = {
+        title: {
+            text: '服务新老用户量比例',
+            textAlign: "center",
+            x: "center",
+        },
+        tooltip: {
+            trigger: 'item',
+            formatter: function (a, b) {
+                var html = "";
+                var bj = a[0];
+                var nowVal = Number(a[2]);
+                var index = Number(b.replace(bj + ":", ""));
+
+                var legendIndex = 0;
+                $.each(optionUsrNum.legend.data, function (i, n) {
+                    if (n == bj) {
+                        legendIndex = i;
+                    }
+                });
+
+
+                html = a[1] + "<br/>";
+                html += bj + "：" + nowVal + "";
+
+                if (optionUsrNum.series.length > 1) {
+                    var allVal = 0;
+
+                    for (var i = 0; i < optionUsrNum.series.length; i++) {
+                        allVal += optionUsrNum.series[i].data[index];
+                    }
+
+                    var nowVal = optionUsrNum.series[legendIndex].data[index];
+
+                    if (allVal > 0) {
+                        var per = (nowVal / allVal) * 100;
+                        html += "<br/>所占比例：" + changeTwoDecimal(per) + "%";
+                    }
+                }
+
+                return html;
+            }
+        },
+        legend: {
+            data: [
+                '旧用户',
+                '新用户'
+            ],
+            y: "bottom"
+        },
+        toolbox: {
+            show: true,
+            feature: {
+                mark: { show: true },
+                dataView: { show: true, readOnly: false },
+                magicType: { show: true, type: ['line', 'bar'] },
+                restore: { show: true },
+                saveAsImage: { show: true }
+            }
+        },
+        calculable: true,
+        grid: { y: 65, y2: 70, x2: 20 },
+        xAxis: [
+            {
+                type: 'category',
+                axisLine: { show: false },//坐标轴线
+                axisTick: { show: true },//坐标轴小标记
+                axisLabel: { show: true },//坐标轴文本标签
+                splitArea: { show: false },//分隔区域
+                splitLine: { show: true },//分隔线
+                data: ['坐标轴']
+            }
+        ],
+        yAxis: [
+            {
+                type: 'value',
+                scale: true
+            }
+        ],
+        axis: { scale: true },
+        dataZoom: {
+            show: true,
+            realtime: true,
+            y: 30,
+            height: 20,
+            start: 0,
+            end: 100
+        },
+        series: [
+            {
+                name: '旧用户',
+                type: 'bar',
+                stack: '查询分析',
+                data: [0],
+                itemStyle: {
+                    normal: { color: "#87cefa", areaStyle: { type: 'default' } }
+                }
+            },
+            {
+                name: '新用户',
+                type: 'bar',
+                stack: '查询分析',
+                itemStyle: {
+                    normal: {
+                        color: "#ff7f50",
+                        areaStyle: { type: 'default' }
+                    }
+                },
+                data: [0]
+            }
+        ]
+    };
+
+    myChartUsrNum.setOption(optionUsrNum);
+</script>
+
+<script type="text/javascript">
+    var myChartChannel = echarts.init(document.getElementById('perChannel'));
+
+    var optionChannel = {
+        title: {
+            text: '客服渠道百分比',
+            x: 'center'
+        },
+        tooltip: {
+            trigger: 'item',
+            formatter: "{a} <br/>{b} : {c} ({d}%)"
+        },
+        legend: {
+            show: false,
+            orient: 'vertical',
+            x: 'left',
+            data: ['渠道']
+        },
+        toolbox: {
+            show: false,
+            feature: {
+                mark: { show: true },
+                dataView: { show: true, readOnly: false },
+                magicType: {
+                    show: true,
+                    type: ['pie', 'funnel'],
+                    optionChannel: {
+                        funnel: {
+                            x: '25%',
+                            width: '50%',
+                            funnelAlign: 'left'
+                        }
+                    }
+                },
+                restore: { show: true },
+                saveAsImage: { show: true }
+            }
+        },
+        calculable: true,
+        series: [
+            {
+                name: '客服渠道百分比',
+                type: 'pie',
+                radius: '55%',
+                center: ['50%', '60%'],
+                data: [
+                    { value: 0, name: '渠道' }
+                ]
+            }
+        ]
+    };
+
+
+    myChartChannel.setOption(optionChannel);
+
+</script>
+
+<script type="text/javascript">
+    var myChartCustomerService = echarts.init(document.getElementById('perCustomerService'));
+
+    var optionCustomerService = {
+        title: {
+            text: '客服量百分比',
+            x: 'center'
+        },
+        tooltip: {
+            trigger: 'item',
+            formatter: "{a} <br/>{b} : {c} ({d}%)"
+        },
+        legend: {
+            show: false,
+            orient: 'vertical',
+            x: 'left',
+            data: ['客服']
+        },
+        toolbox: {
+            show: false,
+            feature: {
+                mark: { show: true },
+                dataView: { show: true, readOnly: false },
+                magicType: {
+                    show: true,
+                    type: ['pie', 'funnel'],
+                    optionCustomerService: {
+                        funnel: {
+                            x: '25%',
+                            width: '50%',
+                            funnelAlign: 'left',
+                            max: 1548
+                        }
+                    }
+                },
+                restore: { show: true },
+                saveAsImage: { show: true }
+            }
+        },
+        calculable: true,
+        series: [
+            {
+                name: '客服量',
+                type: 'pie',
+                radius: '55%',
+                center: ['50%', '60%'],
+                data: [
+                    { value: 0, name: '客服' }
+                ]
+            }
+        ]
+    };
+
+
+    myChartCustomerService.setOption(optionCustomerService);
+
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.serviceSummary .page-where-othertime .input-daterange').datepicker();
+
+        GetServStatChartJson();
+    });
+
+    function servSummarywhereTimeButtonClick(obj) {
+        var value = obj.value;
+        if (value == "return") {
+            $(".serviceSummary .btn-group").show().filter(".page-where-othertime").hide();
+        } else {
+            $(obj).parent().find(".btn-select").removeClass("btn-select");
+            $(obj).addClass("btn-select");
+            if (value == "other") {
+                $(".serviceSummary .btn-group").hide().filter(".page-where-othertime").show();
+            } else {
+                GetServStatChartJson();
+            }
+        }
+    }
+
+    function GetServStatChartJson() {
+        var sUrl = "/CustomerCare/getServiceInfo";
+        
+        var postData = {};
+
+        var timeType = $(".serviceSummary .btn-group .btn.btn-select").val();
+        if (timeType == "other") {
+            var statTime = $(".serviceSummary .page-where-othertime input[name='start']").val();
+            var endTime = $(".serviceSummary .page-where-othertime input[name='end']").val();
+            if (statTime.length > 0) {
+                postData["startTime"] = statTime;
+            }
+            if (endTime.length > 0) {
+                postData["endTime"] = endTime;
+            }
+        } else if (timeType == "7") {
+            var timeValue = $.timePeriod(-7);
+            postData["startTime"] = timeValue.start.toLocaleDateString();
+            postData["endTime"] = timeValue.end.toLocaleDateString();
+        }else if (timeType == "1m") {
+            var timeValue = $.timePeriod(-30);
+            postData["startTime"] = timeValue.start.toLocaleDateString();
+            postData["endTime"] = timeValue.end.toLocaleDateString();
+        } else if (timeType == "3m") {
+            var timeValue = $.timePeriod(-90);
+            postData["startTime"] = timeValue.start.toLocaleDateString();
+            postData["endTime"] = timeValue.end.toLocaleDateString();
+        }
+
+        $.doAjax(sUrl, postData, function (msg) {
+            if (msg != "error" && msg != "[]" && msg.channelPer != "[]" && msg.servPersonPer != "[]" && msg.usrList != "[]") {
+
+                var json = jQuery.parseJSON(msg);
+                var XLable = new Array();
+                var tbDataChannel = new Array();
+                var tbLabelChannel = new Array();
+                var tbDataCustomerService = new Array();
+                var tbLabelCustomerService = new Array();
+                var tbDataNewUsr = new Array();
+                var tbDataOldUsr = new Array();
+
+                //for (var i = 0; i < 10; i++) {
+                //    tbData[i] = new Array();
+                //}
+
+                $.each(json.channelPer, function (i, n) {
+                    tbLabelChannel.push(n.key);
+                    tbDataChannel.push({
+                        value: n.value,
+                        name: n.key
+                    });
+                });
+
+                optionChannel.legend.data = tbLabelChannel;
+                optionChannel.series[0].data = tbDataChannel;
+
+                $.each(json.servPersonPer, function (i, n) {
+                    tbLabelCustomerService.push(n.key);
+                    tbDataCustomerService.push({
+                        value: n.value,
+                        name: n.key
+                    });
+                });
+                optionCustomerService.legend.data = tbLabelCustomerService;
+                optionCustomerService.series[0].data = tbDataCustomerService;
+
+
+                $.each(json.usrList, function (i, n) {
+                    tbDataNewUsr.push(n.newUsr);
+                    tbDataOldUsr.push(n.oldUsr);
+                    XLable.push(n.XLable);
+                });
+
+                optionUsrNum.xAxis[0].data = XLable;
+                optionUsrNum.series[0].data = tbDataOldUsr;
+                optionUsrNum.series[1].data = tbDataNewUsr;
+
+                myChartChannel.clear().setOption(optionChannel);
+                myChartCustomerService.clear().setOption(optionCustomerService);
+                myChartUsrNum.clear().setOption(optionUsrNum);
+            }
+            }, true);
+        }
+
+        
+
+    function changeTwoDecimal(x) {
+        var f_x = parseFloat(x);
+        if (isNaN(f_x)) {
+            return x;
+        }
+        var f_x = Math.round(x * 100) / 100;
+
+        return f_x;
+    }
+</script>
+

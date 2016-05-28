@@ -1,0 +1,355 @@
+﻿@{
+    ViewBag.Title = "店铺信息";
+}
+@section Style{
+
+    @Styles.Render("~/style/form")
+    <link href="~/css/ShopInfo/ShopInfo.css" rel="stylesheet" />
+    <link href="~/css/plugins/summernote/summernote.css" rel="stylesheet" />
+    <link href="~/Scripts/plugins/qtip/jquery.qtip.min.css" rel="stylesheet" />
+    <style type="text/css">
+        .UserBoard .page-container .page-content-wrapper {
+            background-color: #f5f5f5;
+        }
+
+        .nav-tabs-fillup ~ .tab-content {
+            background-color: #f5f5f5;
+        }
+    </style>
+
+}
+
+<div class="shopInfoCountent">
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs nav-tabs-fillup">
+        <li class="active">
+            <a data-toggle="tab" href="#slide1" onclick="PageLoad(0)"><span>店铺资料</span></a>
+        </li>
+        <li>
+            <a data-toggle="tab" href="#slide2" onclick="PageLoad(1)"><span>店铺销售</span></a>
+        </li>
+        <li>
+            <a data-toggle="tab" href="#slide3" onclick="PageLoad(2)"><span>店铺短信</span></a>
+        </li>
+        <li>
+            <a data-toggle="tab" href="#slide4" onclick="PageLoad(3)"><span>店铺商品</span></a>
+        </li>
+        <li>
+            <a data-toggle="tab" href="#slide5" onclick="PageLoad(4)"><span>店铺支出</span></a>
+        </li>
+        <li>
+            <a data-toggle="tab" href="#slide6" onclick="PageLoad(5)"><span>店铺成长</span></a>
+        </li>
+        <li>
+            <a data-toggle="tab" href="#slide7" onclick=" PageLoad(6) "><span>店铺回访</span></a>
+        </li>
+        <li>
+            <a data-toggle="tab" href="#slide8" onclick="PageLoad(7)"><span>店铺分析</span></a>
+        </li>
+        <li>
+            <a data-toggle="tab" href="#slide9" onclick="PageLoad(8)"><span>消息推送</span></a>
+        </li>
+    </ul>
+    <!-- Tab panes -->
+    <div class="tab-content no-padding ">
+        <div class="tab-pane slide-left active pageIndex" id="slide1">
+
+        </div>
+        <div class="tab-pane slide-left pageIndex" id="slide2">
+
+        </div>
+        <div class="tab-pane slide-left pageIndex" id="slide3">
+
+        </div>
+        <div class="tab-pane slide-left pageIndex" id="slide4">
+
+        </div>
+        <div class="tab-pane slide-left pageIndex" id="slide5">
+
+        </div>
+        <div class="tab-pane slide-left pageIndex" id="slide6">
+
+        </div>
+        <div class="tab-pane slide-left pageIndex" id="slide7">
+
+        </div>
+        <div class="tab-pane slide-left pageIndex" id="slide8">
+
+        </div>
+        <div class="tab-pane slide-left pageIndex" id="slide9">
+
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade slide-right" id="modalSlideLeft" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog ">
+        <div class="modal-content-wrapper">
+            <div class="modal-content table-block" style=" padding-left:10px; padding-right:10px;">
+                <table class="table no-footer table-border-right">
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+<div id="builder" class="quickview-wrapper builder hidden-sm hidden-xs">
+    <div class="p-l-30 p-r-30 ">
+        <a href="#" data-toggle-element="#builder" data-toggle="quickview" class="builder-close quickview-toggle pg-close"></a>
+        <a data-toggle-element="#builder" data-toggle="quickview" class="builder-toggle"><i class="pg pg-theme"></i></a>
+        <ul class="nav nav-tabs nav-tabs-simple nav-tabs-primary m-t-10">
+            <li class="active">
+                <a href="#tabNecessary" data-toggle="tab">必须问题</a>
+            </li>
+            <li>
+                <a href="#tabOthers" data-toggle="tab">其他问题</a>
+            </li>
+        </ul>
+        <div class="tab-content m-b-30 p-l-0">
+            <div id="tabNecessary" class="tab-pane active ">
+                <div class="scroll-wrapper scrollable" style="position: relative;">
+                    <div class="scrollable scroll-content" style="margin-bottom: -17px; margin-right: -17px; height: 905px;overflow: hidden">
+                        <div class="p-l-10 p-r-50">
+                            <h5 class="semi-bold">
+                                @*必须问题*@
+                            </h5>
+                            <div id="necessaryQ">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="tabOthers" class="tab-pane ">
+                <div class="scroll-wrapper scrollable" style="position: relative;">
+                    <div class="scrollable scroll-content" style="margin-bottom: -17px; margin-right: -17px;overflow: hidden">
+                        <div class="p-l-10 p-r-50">
+                            <h5 class="semi-bold">
+                                @*其他问题*@
+                            </h5>
+                            <div id="commonQ">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="scroll-element scroll-x">
+
+                        <div class="scroll-element_outer">
+                            <div class="scroll-element_size"></div>
+                            <div class="scroll-element_track"></div>
+                            @*<div class="scroll-bar hidden" style=""></div>*@
+                        </div>
+                    </div>
+                    <div class="scroll-element scroll-y">
+                        <div class="scroll-element_outer">
+                            <div class="scroll-element_size"></div>
+                            <div class="scroll-element_track"></div>
+                            @*<div class="scroll-bar hidden" style=""></div>*@
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @*<div class="pull-bottom p-b-15 p-l-15 p-r-15 b-t b-grey p-t-15 m-l-15 m-r-15 bg-white builder-footer">
+                <div class="pull-right">
+                    <form id="exportForm" method="POST" action="http://104.236.62.59/builder_process.php">
+                        <input type="hidden" value="1" id="layout" name="layout">
+                        <input type="hidden" value="1" id="colors" name="colors">
+                        <input type="hidden" value="1" id="content" name="content">
+                        <button class="btn btn-cons btn-primary" id="btnExport">Export</button>
+                    </form>
+                </div>
+            </div>*@
+    </div>
+</div>
+
+<input type="hidden" value="@ViewBag.AccId " id="ShopInfo" />
+<input type="hidden" value="@ViewBag.TaskDailyId" id="taskDailyId" />
+<input type="hidden" value="@ViewBag.VisitId" id="LoadVisitInfoId" />
+@section Scripts{
+    @Scripts.Render("~/js/begin/form")
+    <script src="~/Scripts/plugins/summernote/js/summernote.min.js"></script>
+    <script src="~/Scripts/plugins/qtip/jquery.qtip.min.js"></script>
+    <script src="~/Scripts/plugins/Ueditor/ueditor.config.js"></script>
+    <script src="~/Scripts/plugins/Ueditor/ueditor.all.min.js"></script>
+    <script type="text/javascript">
+        var Visiteditor = null;
+        var needVisiteditor = null;
+        $(function () {
+            PageLoad(0);
+        });
+
+        function PageLoad(e, postData) {
+            var url = "";
+            var accid = $("#ShopInfo").val();
+            var html = $.trim($(".shopInfoCountent .tab-content .tab-pane.pageIndex").eq(e).html());
+            if (html != "") {
+                return false;
+            }
+            switch (e) {
+                case 0:
+                    url = "/shopinfo/ShopInfo/" + accid;
+                    break;
+                case 1:
+                    url = "/shopinfo/ShopSale";
+                    break;
+                case 2:
+                    url = "/shopinfo/ShopSmsList";
+                    break;
+                case 3:
+                    url = "/shopinfo/ShopGoodsList";
+                    break;
+                case 4:
+                    url = "/shopinfo/ShopPayList";
+                    break;
+                case 5:
+                    url = "/shopinfo/ShopGrowUp";
+                    break;
+                case 6:
+                    url = "/shopinfo/ShopVisit";
+                    break;
+                case 7:
+                    url = "/UserBoard/Index/" + accid;
+                    break;
+                case 8:
+                    //url = "/shopinfo/MsgCenterList";
+                    url = "/shopinfo/UserMessageList";
+                    break;
+                default:
+                    url = "/shopinfo/ShopInfo/" + accid;
+                    break;
+            }
+
+            $.doAjax(url, postData, function (msg) {
+                $(".shopInfoCountent .tab-content .tab-pane.pageIndex").eq(e).html(msg);
+            });
+        }
+
+        function StopEdit(obj) {
+            var nameStr = $(obj).attr('name');
+
+            var accid = "";
+            var qid = "";
+            var reply = "";
+
+            if ($(obj).val().trim().length != 0) {
+
+                $("#" + nameStr + "_text").html('<div class="padding-5">' + $(obj).val() + '</div>');
+                $("#" + nameStr + "_text").css('clear', 'both');
+                $("#" + nameStr + "_text").css('width', '100%');
+                $("#" + nameStr + "_text").css('background-color', 'antiquewhite');
+
+                accid = $("#ShopInfo").val();
+                qid = $(obj).attr('name');
+                reply = $(obj).val();
+
+                AddReply(accid, qid, reply);
+
+            } else {
+                $("#" + nameStr + "_text").html('<img src="../../img/TextEdit.png" alt="编辑" style="width: 20px" title="编辑" />');
+                $("#" + nameStr + "_text").css('clear', '');
+                $("#" + nameStr + "_text").css('width', '');
+                $("#" + nameStr + "_text").css('background-color', '');
+                //$("#" + nameStr + "_text").css('background-color', 'lightcoral');
+
+                accid = $("#ShopInfo").val();
+                qid = $(obj).attr('name');
+                reply = "";
+
+                AddReply(accid, qid, reply);
+            }
+
+            $("#" + nameStr + "_text").removeClass('hidden');
+            $(obj).parents("div:first").addClass('hidden');
+
+
+        }
+
+        function ShowEdit(obj) {
+            $(obj).addClass('hidden');
+
+            var nameStr = $(obj).attr('rel') + "_edit";
+            $("#" + nameStr).parents("div:first").removeClass('hidden');
+
+            //$("#")
+
+            if ($(obj).children('img').length <= 0) {
+                $("#" + nameStr).val($(obj).children("div:first").html().trim());
+            } else {
+                $("#" + nameStr).val();
+            }
+        }
+
+
+        function AddReply(accid, qid, reply) {
+            //int accId, int qid, string reply
+            var jsonPost = {};
+
+            jsonPost["accId"] = accid;
+            jsonPost["qid"] = qid;
+            jsonPost["reply"] = reply;
+
+            var url = "/PlatformVisit/AddReply";
+            $.doAjax(url, jsonPost, function (msg) {
+                if (msg == "0") {
+                    alert("添加回复出错！");
+                }
+
+            }, true);
+        }
+
+        function GetUserQuestion() {
+            var jsonPost = {};
+
+            jsonPost["accId"] = $("#ShopInfo").val();
+
+            var url = "/PlatformVisit/GetUserQuestion";
+            $.doAjax(url, jsonPost, function (msg) {
+                if (msg != "null" && msg != "") {
+                    var json = $.parseJSON(msg);
+                    console.log(json);
+
+                    $("#necessaryQ").html(template("question", { "listData": json.DataList.important }));
+                    $("#commonQ").html(template("question", { "listData": json.DataList.common }));
+                }
+
+            }, true);
+        }
+    </script>
+
+    <script type="text/html" id="question">
+
+        {{each listData}}
+        <div>
+            <div>
+                <div class="no-margin" style="font-weight: bold;float: left">
+                    {{$value.Qtext}}
+                </div>
+                @*<p class="small hint-text m-b-5 m-t-0" style="font-size: 10px">
+                        {{$value.Qdesc}}
+                    </p>*@
+
+                {{if $value.Reply==null || $value.Reply==''}}
+                <div id="{{$value.Qid}}_text" rel="{{$value.Qid}}" class="m-b-20" style="cursor: pointer; border-radius: 5px;float: left" onclick="ShowEdit(this);">
+                    <img src="../../img/TextEdit.png" alt="编辑" style="width: 20px" title="编辑"/>
+                </div>
+                {{else}}
+                <div id="{{$value.Qid}}_text" rel="{{$value.Qid}}" class="m-b-20" style="background-color: antiquewhite; cursor: pointer; border-radius: 5px;clear:both;width:100%" onclick="ShowEdit(this);">
+                    <div class="padding-5">
+                        {{$value.Reply}}
+                    </div>
+                </div>
+
+                {{/if}}
+                <div class=""></div>
+            </div>
+
+            <div class="row p-b-35 hidden">
+                <textarea id="{{$value.Qid}}_edit" class="b-grey m-b-10" style="width: 268px; height: 97px;" cols="100%" rows="5" name="{{$value.Qid}}" onblur="StopEdit(this)"> </textarea>
+            </div>
+        </div>
+        {{/each}}
+    </script>
+}

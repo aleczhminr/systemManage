@@ -1,0 +1,169 @@
+﻿@{
+    ViewBag.Title = "PC网页端消息";
+}
+@section Style{
+    @Styles.Render("~/style/form")
+<link href="~/Scripts/plugins/qtip/jquery.qtip.min.css" rel="stylesheet" />
+<link href="~/css/MsgCenter/MsgCenter.css" rel="stylesheet" />
+}
+<div id="msgListArea">
+    <div class="MsgWhereArea alert alert-info">
+        <div class="infoArea">
+            <span>消息类型：</span>
+            <select onchange="ChangeShowType()" id="msgShowType" rel="msg">
+                <option value="1">普通消息</option>
+                <option value="2">公告消息</option>
+                <option value="3">API接口消息</option>
+            </select>
+            <span class="sumArea">
+                <span>总计消息：<span class="numStyle SumMsgCount"></span> 条</span>
+                <span>，已读消息：<span class="numStyle SumMsgRead"></span> 条</span>
+            </span>
+            <span class="ChangeBtnArea">
+                <a href="javascript:void(0)" class="showAnalysis btn btn-primary" onclick="ChangeShowView(2)">显示简单统计</a>
+                <a href="javascript:void(0)" class="showMsgList btn btn-primary" onclick="ChangeShowView(1)">返回消息中心</a>
+            </span>
+        </div>
+    </div>
+    <div class="MsgCenter MsgTable">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>消息标题</th>
+                    <th>创建日期</th>
+                    <th>发送人员</th>
+                    <th>消息详情</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Template -->
+            </tbody>
+        </table>
+        <div class="pageArea" style="text-align: center;">
+            <ul class="pagination" id="paginationArea" style="display: inline-block;margin: 0;height: initial;"></ul>
+        </div>
+    </div>
+
+    <div class="analyArea MsgTable">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>消息标题</th>
+                    <th class="tdCenter">推送店铺</th>
+                    <th class="tdCenter">弹窗数量</th>
+                    <th class="tdCenter">已读数量</th>
+                    <th>发送日期</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Template -->
+            </tbody>
+        </table>
+        <div class="moreArea" style="text-align: center;">
+            <a href="javascript:void(0)" class="btn btn-primary analysisLoadMore" onclick="LoadMoreAnalysis()">点击加载更多</a>
+        </div>
+    </div>
+
+    <div id="MessageInfoBox" rel="" style="display:none;color:#666;">
+        <div class="alert alert-info"><span>消息发送总数：<span class="msgInfoCount" style="color:#f50;">?</span> 已读消息：<span class="msgReadCount" style="color:#f50;">?</span></span></div>
+        <div style="height:450px;width:650px;overflow-y:auto;">
+            <table width="100%" border="0" align="center" class="table">
+                <thead>
+                    <tr>
+                        <th>店铺Id</th>
+                        <th>消息标题</th>
+                        <th style="text-align:center;">弹窗状态</th>
+                        <th style="text-align:center;">阅读状态</th>
+                        <th>创建时间</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="trLoading" style="display:none;"><td colspan="5" style="height: 80px;width:100%;background-image: url(../css/loading_s.gif); background-position: 42% 50%; background-repeat: no-repeat;background-color:#F1FDE9;text-align:center;vertical-align: middle;">正在加载...</td></tr>
+                    <tr class='morebtn' style="display:none;"><td colspan='5' style='text-align: center;'><span style='font-weight:bold;color: #259FFF;'><a href='javascript:void(0)' onclick="LoadMoreMsgInfoList()" style="color: #259FFF;">[ 点击加载更多 ]</a></span></td></tr>
+                    <tr>
+                        <td colspan="5" style="text-align:center; background:#F7F7F7">
+                            &nbsp;
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script id="msgList-tpl" type="text/html">
+    {{each msgList}}
+    <tr id="{{$value._id}}">
+        <td class="thClass">
+            {{if $value.global==1}}
+            <span class="msgType msgNotice">系统公告</span>
+            {{else}}
+            <span class="msgType msgNormal">普通消息</span>
+            {{/if}}
+            <span class="msgTitle" onclick="GetMessageInfoList('{{$value._id}}',1);" rel="{{$value.msgContent}}">{{$value.msgTitle}}</span>
+            {{if $value.toAccId!=null && $value.toAccId.length>1}}
+            <span class="msgSendNum">({{$value.toAccId.length}})</span>
+            {{/if}}
+        </td>
+        <td class="thClass">{{$value.createTime}}</td>
+        <td class="thClass">{{$value.operatorName}}</td>
+        <td><a href="javascript:" onclick="GetMessageInfoList('{{$value._id}}',1);">消息详情</a></td>
+    </tr>
+    {{/each}}
+</script>
+
+<script id="MsgInfoList_Tpl" type="text/html">
+    {{each msgList}}
+    <tr class="msgItem">
+        <td><span>{{$value.toAccId}}</span></td>
+        <td><span>{{$value.msgTitle}}</span></td>
+        <td style="text-align:center;">
+            {{if $value.isPush==1}}
+            <span style="color:#468847;cursor:help;" title="弹窗时间：{{$value.pushTime}}">已弹窗</span>
+            {{else}}
+            <span>-</span>
+            {{/if}}
+        </td>
+        <td style="text-align:center;">
+            {{if $value.isRead==1}}
+            <span style="color:#468847;cursor:help;" title="阅读时间：{{$value.readTime}}">已阅读</span>
+            {{else}}
+            <span>-</span>
+            {{/if}}
+        </td>
+        <td>{{$value.createTime}}</td>
+    </tr>
+    {{/each}}
+</script>
+
+<script id="analysis_Tpl" type="text/html">
+    {{each msgList}}
+    <tr>
+        <td class="thClass">
+            <span class="msgTitle">{{$value._id.msgTitle}}</span>
+        </td>
+        <td class="thClass tdCenter">{{$value.msgCount}}</td>
+        <td class="thClass tdCenter">{{$value.SumPush}}</td>
+        <td class="thClass tdCenter">{{$value.SumRead}}</td>
+        <td>{{$value.msgDate}}</td>
+    </tr>
+    {{/each}}
+</script>
+
+
+
+
+@section Scripts{
+    @Scripts.Render("~/js/begin/form")
+    <script src="~/Scripts/plugins/artTemplate/template.js"></script>
+<script src="~/Scripts/MsgCenter/MsgCenter.js"></script>
+<script src="~/Scripts/plugins/jqPaginato/jqPaginator.min.js"></script>
+<script src="~/Scripts/MsgCenter/PCMessageList.js"></script>
+<script src="~/Scripts/plugins/qtip/jquery.qtip.min.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        GetMsgList(1);
+    });
+
+</script>
+}

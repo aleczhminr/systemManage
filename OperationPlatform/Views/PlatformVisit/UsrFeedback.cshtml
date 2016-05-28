@@ -1,0 +1,787 @@
+﻿@{
+    ViewBag.Title = "用户反馈";
+}
+
+@section Style{
+    @Styles.Render("~/style/form")
+}
+
+<link href="~/Scripts/plugins/qtip/jquery.qtip.min.css" rel="stylesheet" />
+
+<div class="panel">
+    <div class="panel-heading page-where feedbackWhere">
+        <div class="panel-title">
+
+            <div class="cs-wrapper pull-left m-r-10">
+
+                <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" name="visitStatus" id="visitStatus">
+                    <option value="-99">回访状态</option>
+                    <option value="0">未回访</option>
+                    <option value="1">已回访</option>
+                    @*<option value="3">论坛</option>*@
+                </select>
+
+            </div>
+
+            <div class="cs-wrapper pull-left m-r-10">
+
+                <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" name="feedType" id="feedType">
+                    <option value="-99">非系统来源</option>
+                    <option value="0">iOS</option>
+                    <option value="1">前台反馈</option>
+                    <option value="2">Android</option>
+                    <option value="3">系统推荐</option>
+                    <option value="4">iPad</option>
+                    <option value="5">论坛反馈</option>
+                    <option value="6">客服反馈</option>
+                    <option value="7">推广建议</option>
+                    <option value="8">商城反馈</option>
+                </select>
+
+            </div>
+
+            <input type="hidden" id="timeType" value="" name="timePeriod" />
+            <div class="btn-group page-where-othertime" style="float: left; margin-right: 10px">
+                <div class="page-where-time-input">
+                    <div class="input-daterange input-group">
+                        <input type="text" class="input-sm form-control" placeholder="开始时间" name="start">
+                        <span class="input-group-addon">to</span>
+                        <input type="text" class="input-sm form-control" placeholder="结束时间" name="end">
+                    </div>
+                </div>
+            </div>
+            <div style="float: left; margin-right: 10px; width: 120px">
+                <input class="form-control" type="text" placeholder="反馈内容" name="content" id="content">
+            </div>
+            <div style="float: left; margin-right: 10px; width: 80px">
+                <input class="form-control" type="text" placeholder="店铺ID" name="accId" id="accId">
+            </div>
+            @*<div style="float: left; margin-right: 10px; width: 120px">
+                    <input class="form-control" type="text" placeholder="业务名称" name="busName" id="busName">
+                </div>
+                <div style="float: left; margin-right: 10px; width: 80px">
+                    <input class="form-control" type="text" placeholder="备注" name="remark" id="remark">
+                </div>*@
+            <button type="button" value="select" class="btn btn-default btn-inquire" onclick="GetNewList()">查询</button>
+
+            <button type="button" value="select" class=" btn btn-success btn-inquire m-l-30" onclick="GetPage()">导入论坛反馈</button>
+            @*<div style="float: right; margin-right: 10px; width: 80px">
+                    <input class="form-control" type="text" placeholder="论坛网页地址" name="urlFeedBack" id="urlFeedBack">
+                </div>*@
+
+            <div class="clearfix"></div>
+        </div>
+    </div>
+
+    <input type="hidden" name="pageNo" id="pageNo" value="" />
+
+    <div style="display: none;">
+        <div id="addShowDiv" style="width: 400px;">
+            <table class="table table-bordered removeBottom">
+                <tr>
+                    <th style="line-height: 26px; text-align: right;">论坛地址</th>
+                    <td><input id="urlFeedBack" class="span1 removeBottom" style="width: 300px;" type="text" onblur="GetContent()" /></td>
+                </tr>
+                <tr class="ct hidden">
+                    <th style="line-height: 26px; text-align: right;">内容</th>
+                    <td><input id="urlContent" class="span1 removeBottom" style="width: 300px;" type="text" readonly /></td>
+                </tr>
+                <tr class="ct hidden">
+                    <th style="line-height: 26px; text-align: right;">用户</th>
+                    <td><input id="urlUser" class="span1 removeBottom" style="width: 300px;" type="text" readonly /></td>
+                </tr>
+                <tr>
+                    <th style="line-height: 26px; text-align: right;">反馈备注</th>
+                    <td><input id="urlFeedBackRemark" class="span1 removeBottom" style="width: 300px;" type="text" /></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div style=" display:none;" id="reqDiv">
+        <div class="panel-body">
+            <div class="row m-t-10 m-b-10" style="height: 100px;" id="">
+                <div class="cs-wrapper" style="display: block; margin-bottom: 10px;">
+                    <div tabindex="0">
+                        对应终端:
+                        <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" name="" onchange="GetReq()" id="deviceType">
+                            <option value="0">PC端</option>
+                            <option value="1">iOS</option>
+                            <option value="2">Android</option>
+                            <option value="3">iPad</option>
+                        </select>
+                        <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" name="reqType" onchange="GetReq()" id="reqType">
+                            <option value="1">功能</option>
+                            <option value="2">Bug</option>
+                            <option value="3">优化</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="cs-wrapper" style="display: block; margin-bottom: 10px">
+                    <div tabindex="0">
+                        功能模块:
+                        <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" name="reqCate" onchange="GetReq()" id="reqCate">
+                            <option value="0">正在加载</option>
+                        </select>
+                        <span style="cursor: pointer" class="btn-xs btn-success" id="addCate" onclick="AddType()">添加</span>
+                        <input type="text" name="cate" value="" placeholder="分类名称" id="cateText" style="display: none" />
+                    </div>
+                </div>
+
+                <div class="cs-wrapper" style="display: block; margin-bottom: 10px">
+                    <div tabindex="0" id="userVal">
+                        用户价值:
+                        <input id="userVal_high" type="radio" checked="checked" value="1" name="userVal" onclick="GetReq()">
+                        <label for="userVal_high">高</label>
+                        <input id="userVal_medium" type="radio" onclick="GetReq()" value="2" name="userVal">
+                        <label for="userVal_medium">中</label>
+                        <input id="userVal_low" type="radio" onclick="GetReq()" value="3" name="userVal">
+                        <label for="userVal_low">低</label>
+                    </div>
+                </div>
+
+                <div class="cs-wrapper" style="display: block; margin-bottom: 10px">
+                    <div tabindex="0" id="diff">
+                        开发难度:
+                        <input id="difficult_high" type="radio" checked="checked" value="1" name="difficult" onclick="GetReq()">
+                        <label for="userVal_high">高</label>
+                        <input id="difficult_medium" type="radio" onclick="GetReq()" value="2" name="difficult">
+                        <label for="difficult_medium">中</label>
+                        <input id="difficult_low" type="radio" onclick="GetReq()" value="3" name="difficult">
+                        <label for="difficult_low">低</label>
+                    </div>
+                </div>
+
+            </div>
+            <div class="row m-t-40">
+                添加说明:
+                <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" name="reqCate" id="reqDesc">
+                    <option value="0">正在加载</option>
+                </select>
+                <span style="cursor: pointer" class="btn-xs btn-success" id="addDesc" onclick="AddDesc()">添加</span>
+                <input type="text" name="cate" value="" placeholder="需求说明" id="descText" style="display: none" />
+            </div>
+        </div>
+    </div>
+    @*<div id="summary" class="col-md-12 col-sm-12 col-xs-12" style="margin: 10px">
+
+        </div>*@
+
+    <div class="panel-body no-padding">
+        <div class="table-responsive">
+            <table class="table table-hover table-detailed dataTable" id="ListTable">
+                <thead>
+                    <tr>
+                        <th width="60" class="text-center">店铺ID</th>
+                        <th width="15%">店铺名称</th>
+                        <th>反馈内容</th>
+                        <th width="100" class="text-center">反馈时间</th>
+                        <th width="60" class="text-center">状态</th>
+                        @*<th class="text-center">操作</th>*@
+                        <th width="60" class="text-center">来源</th>
+                        <th width="60" class="text-center">需求状态</th>
+                        @*<th class="text-center">支付类型</th>
+                            <th class="text-center">支付金额</th>
+                            <th class="text-center">购买时间</th>*@
+                        @*<th class="text-center">操作</th>*@
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <div class="dataTables_wrapper m-t-10" id="ListPageHtml">
+                <div class="dataTables_paginate pagination no-padding">
+                    <ul>
+                        <li class="prev disabled">
+                            <a href="javascript:void(0)">
+                                <i class="pg-arrow_left"></i>
+                            </a>
+                        </li>
+                        <li class="active">
+                            <a href="javascript:void(0)">1</a>
+                        </li>
+                        <li class="next disabled">
+                            <a href="javascript:void(0)">
+                                <i class="pg-arrow_right">
+                                </i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="dataTablePagText p-l-20"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/html" id="ListTableScript">
+    {{each list}}
+    <tr>
+        <td class="v-align-middle text-center">{{$value.accountid}}</td>
+
+        <td>
+            <a href="/shopinfo/index/{{$value.accountid}}?td={{$value.id}}" target="_blank" data-toggle="tooltip" data-placement="left" title="{{$value.companyName}} 【{{$value.UserRealName}}】">
+                <img src="/img/Shop/{{$value.Edit | $aotjbImg}}" style="margin-right: 10px;" alt="{{$value.Edit}}" />
+                <span style="{{$value.LoginLast |$logLength}}">{{$value.companyName | dateFormat}}</span>
+            </a>
+        </td>
+
+        {{if $value.vi_id==0}}
+        <td>
+            {{if $value.forumUrl!="" && $value.forumUrl!=null}}
+            <a href="{{$value.forumUrl}}" class="msg" target="_blank" title="{{$value.dt_remark}}">{{$value.t_mk}}</a>
+            {{else}}
+            <p style="cursor: pointer" class="msg" title="{{$value.t_mk}}">{{$value.t_mk}}</p>
+            {{/if}}
+        </td>
+        {{else}}
+        <td onclick="ShowVisitInfo('{{$value.vi_id}}')" data-toggle="modal" data-target="#myModal">
+
+            <p style="cursor: pointer" class="msg" title="{{$value.t_mk}}">
+                {{$value.t_mk}}
+            </p>
+
+        </td>
+        {{/if}}
+        <td class="v-align-middle text-center">{{$value.inertTime}}</td>
+
+        {{if $value.vi_id==0}}
+        {{if $value.dt_Source!="论坛反馈" && $value.dt_Source!="客服反馈" && $value.dt_Source!="推广建议"}}
+        <td class="v-align-middle text-center" style="color: red">未回访</td>
+        {{else if $value.dt_Source=="论坛反馈"}}
+
+        <td class="v-align-middle text-center" style="color: orange">论坛反馈</td>
+        {{else if $value.dt_Source=="客服反馈"}}
+        <td class="v-align-middle text-center" style="color: mediumslateblue">客服反馈</td>
+        {{else if $value.dt_Source=="推广建议"}}
+        <td class="v-align-middle text-center" style="color:darkcyan">推广建议</td>
+        {{/if}}
+
+        {{else}}
+        <td class="v-align-middle text-center" style="color: green">已回访</td>
+
+        {{/if}}
+        {{if $value.dt_Source=="前台反馈"}}
+        <td class="v-align-middle text-center">前台</td>
+        {{else}}
+        <td class="v-align-middle text-center">{{$value.dt_Source}}</td>
+        {{/if}}
+
+        {{if $value.RequirementId=="" || $value.RequirementId==0 || $value.RequirementId==null}}
+        <td class="v-align-middle text-center"><button class="btn-success btn btn-sm" onclick="AddReq('{{$value.accountid}}', '{{$value.id}}', '{{$value.t_mk}}')">新增处理</button></td>
+        {{else}}
+
+        {{if $value.Status==0}}
+        <td align="center">
+            <span class="msg" style="cursor:pointer;color:crimson" title="{{$value.Description}}">未处理</span>
+        </td>
+        {{else if $value.Status==2}}
+        <td align="center">
+            <span class="msg" style="cursor:pointer;color:red" title="{{$value.Description}}">处理中</span>
+        </td>
+        {{else if $value.Status==3}}
+        <td align="center">
+            <span class="msg" style="cursor:pointer;color:green" title="{{$value.Description}}">处理完成</span>
+        </td>
+        {{else if $value.Status==1}}
+        <td align="center">
+            <span class="msg" style="cursor:pointer;color:darkred" title="{{$value.Description}}">已分配</span>
+        </td>
+        {{else}}
+        <td align="center">
+            <span class="msg" style="cursor:pointer;color:firebrick" title="{{$value.Description}}">废弃/关闭</span>
+        </td>
+        {{/if}}
+        {{/if}}
+
+        @*<td class="v-align-middle text-center">
+                <a href="/shopinfo/index/{{$value.accountid}}?td={{$value.id}}" target="_blank">回访</a>
+            </td>*@
+    </tr>
+    {{/each}}
+</script>
+
+<div class="modal fade slide-right" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog ">
+        <div class="modal-content-wrapper">
+            <div class="modal-content table-block" style=" padding-left:10px; padding-right:10px;">
+                <table class="table no-footer table-border-right">
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<script type="text/html" id="visitScript">
+    <tr>
+        <td class="text-right" style="width:110px;"><b>店铺名称：</b></td>
+        <td colspan="3">{{CompanyName}}【{{accid}}】</td>
+    </tr>
+    <tr>
+        <td class="text-right"><b>事件概要</b></td>
+        <td colspan="3">{{visitReasonOne}} - {{visitReasonTwo}} - {{visitReasonThree}}</td>
+    </tr>
+    <tr>
+        <td class="text-right"><b>类别：</b></td>
+        <td>{{recordType}}</td>
+        <td class="text-right" style="width:110px;"><b>状态：</b></td>
+        <td>{{handleStatName}}</td>
+    </tr>
+    <tr>
+        <td class="text-right"><b>回访人：</b></td>
+        <td>{{insertName}}</td>
+        <td class="text-right"><b>回访时间：</b></td>
+        <td>{{insertTime}}</td>
+    </tr>
+    <tr>
+        <td colspan="4"><b>回访内容：</b></td>
+    </tr>
+    <tr>
+        <td colspan="4">
+            <div class="visitReplyItem">
+                <div class="itemContent">
+                    {{#vi_Content}}
+                </div>
+            </div>
+            {{each replyList}}
+            <div class="visitReplyItem">
+                <div style="background: #f5f5f5;"><span class="itemName">{{$value.vr_Name}}</span><span class="itemTime">{{$value.vr_Time}}</span></div>
+                <div class="itemContent">
+                    {{#$value.vr_Content}}
+                </div>
+            </div>
+            {{/each}}
+        </td>
+    </tr>
+    <tr>
+        <td colspan="4">
+            <span><b>标签：</b></span>
+            {{each tagList}}
+            <span class="tag label label-info" tagid="{{$value.id}}">{{$value.tagName}}</span>
+            {{/each}}
+        </td>
+    </tr>
+</script>
+
+@section Scripts{
+    @Scripts.Render("~/js/begin/form")
+    <script src="~/Scripts/plugins/artTemplate/template.js"></script>
+    <script src="~/Scripts/ShopList/ShopList.js"></script>
+    <script src="~/Scripts/plugins/qtip/jquery.qtip.min.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            $('.feedbackWhere .input-daterange').datepicker({ format: 'yyyy-mm-dd' });
+            GetFeedbackList(1);
+            GetSummary();
+        });
+
+        template.helper('dateFormat', function(data) {
+            if (data == "" || data == undefined || data == null) {
+                return "-";
+            };
+            if (data == "1900-01-01 00:00:00") {
+                return "从未登录";
+            } else {
+                return data.toString().substr(0, 10);
+            };
+        });
+
+        function GetFeedbackList(pageIndex) {
+            var postJson = {};
+
+            $("#pageNo").val(pageIndex);
+
+            postJson["pageIndex"] = pageIndex;
+
+            var visitStatus = $("#visitStatus").val();
+            var feedType = $("#feedType").val();
+
+            var statTime = $(".feedbackWhere input[name='start']").val();
+            var endTime = $(".feedbackWhere input[name='end']").val();
+
+            var stDate = new Date();
+            var edDate = new Date();
+            if (statTime.length === 0 && endTime.length === 0) {
+                postJson["start"] = stDate.toLocaleDateString();
+                postJson["end"] = edDate.toLocaleDateString(-1);
+            } else {
+                if (statTime.length > 0) {
+                    postJson["start"] = statTime;
+                } else {
+                    postJson["start"] = stDate.toLocaleDateString();
+                }
+                if (endTime.length > 0) {
+                    postJson["end"] = endTime;
+                } else {
+                    postJson["end"] = edDate.toLocaleDateString();
+                }
+            }
+
+            var content = $("#content").val();
+            var accId = $("#accId").val();
+            if (accId.length <= 0) {
+                accId = 0;
+            }
+            //var busName = $("#busName").val();
+            //var remark = $("#remark").val();
+
+            //postJson["transactionStatus"] = transactionStatus;
+            //postJson["orderStatus"] = orderStatus;
+            //postJson["payType"] = payType;
+            //postJson["accId"] = accId;
+            postJson["visitStatus"] = visitStatus;
+            postJson["feedType"] = feedType;
+            postJson["content"] = content;
+            postJson["accId"] = accId;
+
+            var url = "/PlatformVisit/GetFeedbackList";
+
+            $.doAjax(url, postJson, function(msg) {
+                if (msg != "" && msg != null) {
+                    var json = jQuery.parseJSON(msg);
+                    if (json == null) {
+                        return false;
+                    }
+                    $("#ListTable tbody").html(template("ListTableScript", { "list": jQuery.parseJSON(json.listData) }));
+
+                    if (pageIndex == 1) {
+                        $("#ListPageHtml").attr("rowcount", parseInt(json.rowCount)).attr("maxpage", parseInt(json.maxPage));
+                        $("#ListPageHtml .dataTablePagText").html("共" + parseInt(json.rowCount) + "条   " + "<span class='m-l-10' id='summary'></span>");
+                    }
+                    var pageHtml = $.listPageHtml(pageIndex, $("#ListPageHtml").attr("maxpage"), "GetFeedbackList", 5);
+                    $("#ListPageHtml .dataTables_paginate").html(pageHtml);
+
+                    ShowMsgListTips();
+                }
+            }, true);
+        }
+
+        function orderInfoShow(oid) {
+            $("#ListTable tbody tr.row-details").hide().filter("[name='orderinfo_" + oid + "']").show();
+        }
+
+        function ShowVisitInfo(id) {
+            $("#myModal table tbody").html("<tr><td>正在加载信息</td></tr>");
+            var url = "/PlatformVisit/GetVisitInfo/" + id;
+            $.doAjax(url, null, function(msg) {
+                if (msg != "" && msg != "null") {
+                    var json = $.parseJSON(msg);
+                    var table = template("visitScript", json);
+                    $("#myModal table tbody").html(table);
+                }
+
+            }, true);
+        }
+
+        function GetNewList() {
+            GetFeedbackList($("#pageNo").val());
+            GetSummary();
+        }
+
+        function GetSummary() {
+            var url = "/PlatformVisit/GetFeedbackSummary";
+
+            var postJson = {};
+
+            var statTime = $(".feedbackWhere input[name='start']").val();
+            var endTime = $(".feedbackWhere input[name='end']").val();
+
+            var stDate = new Date();
+            var edDate = new Date();
+            if (statTime.length === 0 && endTime.length === 0) {
+                postJson["stDate"] = stDate.toLocaleDateString();
+                postJson["edDate"] = edDate.toLocaleDateString();
+            } else {
+                if (statTime.length > 0) {
+                    postJson["stDate"] = statTime;
+                } else {
+                    postJson["stDate"] = stDate.toLocaleDateString();
+                }
+                if (endTime.length > 0) {
+                    postJson["edDate"] = endTime;
+                } else {
+                    postJson["edDate"] = edDate.toLocaleDateString();
+                }
+            }
+
+            $.doAjax(url, postJson, function(msg) {
+                if (msg != "" && msg != null) {
+                    var json = jQuery.parseJSON(msg);
+                    if (json == null) {
+                        return false;
+                    }
+
+                    var html = "";
+
+                    html += "<span class='fs-12 hint-text m-r-10'>IOS:" + json.IOS + "(" + json.IOS比例 + ")</span>";
+                    html += "<span class='fs-12 hint-text m-r-10'>安卓:" + json.安卓 + "(" + json.安卓比例 + ")</span>";
+                    html += "<span class='fs-12 hint-text m-r-10'>系统:" + json.系统 + "(" + json.系统比例 + ")</span>";
+                    html += "<span class='fs-12 hint-text m-r-10'>前台反馈:" + json.前台反馈 + "(" + json.前台反馈比例 + ")</span>";
+                    //if (n.FormerData !== 0) {
+                    //    var minusAnd = n.AfterData - n.FormerData;
+                    //    var perAnd = (minusAnd / n.FormerData) * 100;
+                    //    if (perAnd<0) {
+                    //        html += "<span class='text-success fs-12 m-r-10'>" + changeTwoDecimal(perAnd) + "%</span> ";
+                    //    } else {
+                    //        html += "<span class='text-danger fs-14 m-r-10'>" + changeTwoDecimal(perAnd) + "%</span> ";
+                    //    }
+                    //} else {
+                    //html += "<span class='text-warning fs-12 m-r-10 bold'>-</span>";
+                    //}
+                    //html += "<span class='text-success fs-12 m-r-14'>" + n.AfterData + "</span> ";
+
+                    $("#summary").html(html);
+
+                }
+            }, true);
+        }
+
+
+        function GetPage() {
+            $(".ct").addClass("hidden");
+            $("#urlFeedBack").val("");
+            $("#urlFeedBackRemark").val("");
+
+            dialog({
+                id: "ShowDivdialog",
+                title: "论坛URL",
+                lock: true,
+                background: '#fff', // 背景色
+                opacity: 0.5, // 透明度
+                content: document.getElementById("addShowDiv"),
+                ok: function() {
+                    var ur = "/PlatformVisit/GetForumFeedBack";
+
+                    var postJson = {};
+
+
+                    if ($("#urlFeedBack").val() == "") {
+                        alert("地址不能为空!");
+                        return false;
+                    } else {
+                        postJson["url"] = $("#urlFeedBack").val();
+                    }
+                    postJson["remark"] = $("#urlFeedBackRemark").val();
+
+                    $.doAjax(ur, postJson, function(msg) {
+                        if (msg != "") {
+                            dialog({
+                                content: msg,
+                                quickClose: true // 点击空白处快速关闭
+                            }).show();
+                            GetFeedbackList($("#pageNo").val());
+                            $("#urlFeedBack").val("");
+                            $("#urlFeedBackRemark").val("");
+                        } else {
+                            alert("处理失败，请联系技术人员");
+                        }
+                    }, true);
+                }
+            }).showModal();
+        }
+
+        function GetContent() {
+            var ur = "/PlatformVisit/GetForumContent";
+
+            var postJson = {};
+
+
+            if ($("#urlFeedBack").val() == "") {
+                alert("地址不能为空!");
+                return false;
+            } else {
+                postJson["url"] = $("#urlFeedBack").val();
+            }
+
+            $.doAjax(ur, postJson, function(msg) {
+                if (msg != "" && msg != null) {
+                    var json = jQuery.parseJSON(msg);
+                    $("#urlContent").val(json.title);
+                    $("#urlUser").val(json.user);
+
+                    $(".ct").removeClass("hidden");
+                } else {
+                    alert("不合法的地址！");
+                }
+            }, true);
+        }
+
+        function AddReq(accId, taskId, originDesc) {
+            $("#reqDesc").val("");
+            $("#reqType").val("1");
+
+            GetCate();
+
+            dialog({
+                id: "addFestivalSmsContext",
+                title: "记录信息",
+                lock: true,
+                opacity: 0.57, // 透明度
+                content: document.getElementById("reqDiv"),
+                ok: function() {
+                    var ur = "/RequirementManage/AddNewReq";
+
+                    var postJson = {};
+
+                    postJson["accId"] = accId;
+                    postJson["refId"] = taskId;
+                    postJson["desc"] = $("#reqDesc").val();
+                    postJson["reqType"] = $("#reqType").val();
+                    postJson["cateId"] = $("#reqCate").val();
+                    postJson["originDesc"] = originDesc;
+
+                    postJson["device"] = $("#deviceType").val();
+
+                    postJson["val"] = $("#userVal input:radio:checked").val();
+                    postJson["diff"] = $("#diff input:radio:checked").val();
+
+                    $.doAjax(ur, postJson, function(msg) {
+                        //alert(msg);
+                        if (msg != "") {
+                            alert(msg);
+                            GetNewList();
+                        } else {
+                            alert("新增需求失败！");
+                        }
+                    }, true);
+                },
+                cancel: true
+            }).show();
+            //art.dialog.open(ur, { title: '新增短信', lock: true, opacity: 0.3, width: "500px", height: "300px" });
+        }
+
+        function GetCate() {
+            $("#reqCate option").remove();
+
+            //var maxCate = $("#smsCate").find("option:selected").text();
+            var postJson = {};
+            //postJson["maxCate"] = maxCate;
+
+            var url = "/RequirementManage/GetReqType";
+
+            $.doAjax(url, postJson, function(msg) {
+                if (msg != "") {
+                    var json = $.parseJSON(msg);
+                    $.each(json, function(i, n) {
+                        $("#reqCate").append("<option value='" + n.Id + "'>" + n.CategoryName + "</option>");
+                    });
+                } else {
+                    $("#reqCate").append("<option value='0'>暂无分类</option>");
+                }
+
+                GetReq();
+            }, true);
+        }
+
+        function GetReq() {
+            $("#reqDesc option").remove();
+            
+            var postJson = {}; 
+            postJson["device"] = $("#deviceType").val();
+            postJson["cate"] = $("#reqType").val();
+            postJson["module"] = $("#reqCate").val();
+            postJson["val"] = $("#userVal input:radio:checked").val();
+            postJson["diff"] = $("#diff input:radio:checked").val();
+
+            console.log(postJson);
+
+            var url = "/RequirementManage/GetDesc";
+
+            $.doAjax(url, postJson, function (msg) {
+                if (msg != "") {
+                    var json = $.parseJSON(msg);
+                    $.each(json, function (i, n) {
+                        $("#reqDesc").append("<option value='" + n + "'>" + n + "</option>");
+                    });
+                } else {
+                    $("#reqDesc").append("<option value='0'>暂无分类</option>");
+                }
+            }, true);
+        }
+
+        function AddType() {
+            if ($("#cateText").is(":hidden")) {
+                $("#cateText").show();
+            } else {
+                if ($("#cateText").val() == "") {
+                    $("#cateText").hide();
+                } else {
+                    var classmin = $("#cateText");
+
+                    if (classmin.val().length > 0) {
+
+                        var postJson = {};
+                        postJson["cateName"] = classmin.val();
+
+                        var url = "/RequirementManage/AddNewCategory";
+
+                        $.doAjax(url, postJson, function(msg) {
+                            if (msg != "") {
+                                var json = $.parseJSON(msg);
+                                var content = "<option  selected='true' value='" + json.Id + "'>" + json.CategoryName + "</option>";
+                                classmin.prepend(content);
+                                classmin.get(0).selectedIndex = 0;
+                                classmin.val("");
+                                GetCate();
+
+                                $("#reqCate").val(json.Id);
+                            } else {
+                                alert("添加需求分类出错！");
+                                return false;
+                                //$("#reqType").append("<option value='0'>暂无分类</option>");
+                            }
+                        }, true);
+
+
+                    }
+
+                    $("#cateText").hide();
+                }
+            }
+        }
+
+        function AddDesc() {
+            if ($("#descText").is(":hidden")) {
+                $("#descText").show();
+            } else {
+                if ($("#descText").val() == "") {
+                    $("#descText").hide();
+                } else {
+                    var desc = $("#descText");
+
+                    if (desc.val().length > 0) {
+
+                        var content = "<option  selected='true' value='" + desc.val() + "'>" + desc.val() + "</option>";
+                        $("#reqDesc").prepend(content);
+                        $("#reqDesc").get(0).selectedIndex = 0;
+                        desc.val("");
+                    }
+
+                    $("#descText").hide();
+                }
+            }
+        }
+
+        function ShowMsgListTips() {
+            $(".msg").qtip({
+                content: {
+                    attr: 'title'
+                },
+                position: {
+                    my: 'right center',
+                    at: 'left center'
+                },
+                show: {
+                    solo: true
+                },
+                style: {
+                    classes: 'ui-tooltip-shadow ui-tooltip-left'
+                }
+
+            });
+        }
+    </script>
+
+}

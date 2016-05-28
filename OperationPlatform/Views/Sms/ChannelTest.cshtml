@@ -1,0 +1,273 @@
+﻿@{
+    ViewBag.Title = "通道测试";
+}
+
+@section Style{
+    @Styles.Render("~/style/form")
+}
+
+
+<div class="panel panel-transparent">
+    <div class="col-md-12">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-default" style="border-width: 0px;">
+                    <div class="panel-heading separator">
+                        <div class="panel-title" style="font-size: 20px; color: #ccc;">选择测试号码 <span id="smsUserCount" style="font-size:12px; color:red"></span> </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="UserList" style="float: left;">
+                            <div class=" checkbox check-default">
+                                <input type="checkbox" id="checkbox1" onchange="GetSmsUserCnt()" count="1" value="13817959595">
+                                <label class="checkbox check-default" for="checkbox1">
+                                    <span style="color: #468847;">[移动]</span> 郭锐(13817959595)-上海
+                                </label>
+                            </div>
+                            <div class=" checkbox check-default">
+                                <input type="checkbox" id="checkbox2" onchange="GetSmsUserCnt()" count="1" value="13482429939">
+                                <label class="checkbox" for="checkbox2">
+                                    <span style="color: #468847;">[移动]</span> 李紫娟(13482429939)-上海
+                                </label>
+                            </div>
+                            <div class=" checkbox check-default">
+                                <input type="checkbox" id="checkbox_2" onchange="GetSmsUserCnt()" count="1" value="13564817562">
+                                <label class="checkbox" for="checkbox_2">
+                                    <span style="color: #468847;">[移动]</span> 安传亮(13564817562)-上海
+                                </label>
+                            </div>
+                            <div class=" checkbox check-default">
+                                <input type="checkbox" id="checkbox_3" onchange="GetSmsUserCnt()" count="1" value="13651633647">
+                                <label class="checkbox" for="checkbox_3">
+                                    <span style="color: #468847;">[移动]</span> 陈媚佳(13651633647)-上海
+                                </label>
+                            </div>
+                            <div class=" checkbox check-default">
+                                <input type="checkbox" id="checkbox_4" onchange="GetSmsUserCnt()" count="1" value="13899955235">
+                                <label class="checkbox" for="checkbox_4">
+                                    <span style="color: #468847;">[移动]</span> 刘霞(13899955235)-乌鲁木齐
+                                </label>
+                            </div>
+                            <div class=" checkbox check-default">
+                                <input type="checkbox" id="checkbox_5" onchange="GetSmsUserCnt()" count="1" value="18221991058">
+                                <label class="checkbox" for="checkbox_5">
+                                    <span style="color: #468847;">[移动]</span> 马兰兰(18221991058)-上海
+                                </label>
+                            </div>
+                        </div>
+                        <div class="UserList" style="float: left;margin-left: 50px;">
+                            <div class=" checkbox check-default">
+                                <input type="checkbox" id="checkbox_lt_1" onchange="GetSmsUserCnt()" count="1" value="18509915988">
+                                <label class="checkbox" for="checkbox_lt_1">
+                                    <span style="color: #468847;">[联通]</span> 郭锐(18509915988)-乌鲁木齐
+                                </label>
+                            </div>
+                            <div class=" checkbox check-default">
+                                <input type="checkbox" id="checkbox_lt_2" onchange="GetSmsUserCnt()" count="1" value="18509915185">
+                                <label class="checkbox" for="checkbox_lt_2">
+                                    <span style="color: #468847;">[联通]</span> 马强(18509915185)-乌鲁木齐
+                                </label>
+                            </div>
+                            <div class=" checkbox check-default">
+                                <input type="checkbox" id="checkbox_lt_3" onchange="GetSmsUserCnt()" count="1" value="18637386609">
+                                <label class="checkbox" for="checkbox_lt_3">
+                                    <span style="color: #468847;">[联通]</span> 李海彪(18637386609)-河南
+                                </label>
+                            </div>
+                            <div class=" checkbox check-default">
+                                <input type="checkbox" id="checkbox_lt_4" onchange="GetSmsUserCnt()" count="1" value="18699196123">
+                                <label class="checkbox" for="checkbox_lt_4">
+                                    <span style="color: #468847;">[联通]</span> 刘霞(18699196123)-乌鲁木齐
+                                </label>
+                            </div>
+                            <div class=" checkbox check-default">
+                                <input type="checkbox" id="checkbox_lt_5" onchange=" GetSmsUserCnt() " count="1" value="17091258823">
+                                <label class="checkbox" for="checkbox_lt_5">
+                                    <span style="color: #468847;">[联通]</span> 安传亮(17091258823)-上海
+                                </label>
+                            </div>
+                            <div class=" checkbox check-default">
+                                <input type="checkbox" id="checkbox_dx_1" onchange="GetSmsUserCnt()" count="1" value="18949942801">
+                                <label class="checkbox" for="checkbox_dx_1">
+                                    <span style="color: #468847;">[电信]</span> 崔继伟(18949942801)-安徽
+                                </label>
+                            </div>
+                        </div>
+                        <div class="UserList" style="float: left;margin-left: 50px;">
+                            
+                            <div class=" checkbox check-default">
+                                <input type="checkbox" id="checkbox_dx_2" onchange="GetSmsUserCnt()" count="1" value="18918323899">
+                                <label class="checkbox" for="checkbox_dx_2">
+                                    <span style="color: #468847;">[电信]</span> 王晓玉(18918323899)-上海
+                                </label>
+                            </div>
+                            <div class=" checkbox check-default" style=" padding-top:10px;">
+                                <input type="checkbox" id="checkbox_dx_3" onchange="GetSmsUserCnt()" count="1" value="">
+                                <label class="checkbox" for="checkbox_dx_3" style="margin-top: -3px;">
+                                    <span style="color: #c09853;">[其他]</span>
+                                </label><input class="form-control width200" maxlength="11" type="text" value="" style="margin-bottom: 0px; display:inline-block;" onkeyup="changeNumber(this)" />
+                            </div>
+                            <div class=" checkbox check-default" style=" padding-top:10px;">
+                                <input type="checkbox" id="checkbox_dx_4" onchange="GetSmsUserCnt()" count="1" value="">
+                                <label class="checkbox" for="checkbox_dx_4" style="margin-top: -3px;">
+                                    <span style="color: #c09853;">[其他]</span>
+                                </label><input class="form-control width200" maxlength="11" type="text" value="" style="margin-bottom: 0px; display: inline-block;" onkeyup="changeNumber(this)" />
+                            </div>
+                            <div class=" checkbox check-default" style=" padding-top:10px;">
+                                <input type="checkbox" id="checkbox_dx_5" onchange="GetSmsUserCnt()" count="1" value="">
+                                <label class="checkbox" for="checkbox_dx_5" style="margin-top: -3px;">
+                                    <span style="color: #c09853;">[其他]</span>
+                                </label>
+                                <input class="form-control width200" maxlength="11" type="text" value="" style="margin-bottom: 0px; display: inline-block;" onkeyup="changeNumber(this)" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-12">
+                <div class="panel-heading separator">
+                    <div class="panel-title" style="font-size: 20px; color: #ccc;">编辑短信内容 </div>
+                </div>
+                <div class="panel-body">
+                    <div class="row m-t-10 m-b-10" style="height:35px;" id="channelTestList">
+                        <!--  ChannelList  -->
+                        正在加载通道列表...
+                    </div>
+                    <div class="row">
+                        <textarea id="smscon" oninput="txt_length()" onpropertychange="txt_length()" onkeyup=" txt_length() " onchange=" txt_length() " rows="5" cols="100%" style="width: 297px; height: 103px;" class="b-grey m-b-10" name="context"> </textarea>
+                    </div>
+                    <div class="row">
+                        <div class="input-group transparent" style="width:300px;">
+                            <span class="input-group-addon" style="border-width: 0px;">
+                                字数：<span id="wordcnt" style="color: #16960e; font-weight: bold; margin-right:35px;">124</span>
+                                短信签名
+                            </span>
+                            <input type="text" placeholder="短信签名" name="signTxt" id="smsSignTxt" value="生意专家" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row">
+                        @*短信计数*@
+                        <input type="hidden" id="smsCnt" value="" name="smsCnt" />
+                        @*短信号码列表*@
+                        <input type="hidden" id="smsAccList" value="" name="smsAccList" />
+                        <input type="hidden" id="flag" value="0" />
+                        <div class=" checkbox check-default">
+                            <input type="checkbox" id="sendFlag" name="sendFlag" onchange="setFlag()">
+                            <label class="checkbox" for="sendFlag" style="color: #468847;">添加时间和通道ID</label>
+                            <input type="button" onclick="AddChannelTest()" class="btn btn-success" style="margin-left:58px;" value="发送短信" />
+                        </div>
+                    </div>
+                </div>  
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/html" id="ChannelList_Tpl">
+    <span>选择发送通道：</span>
+    <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" style="margin-bottom: 10px; margin-right: 10px" id="channelId" name="channelId">
+        {{each Channel}}
+            <option value="{{$value.ChannelId}}">{{$value.ChannelName}}[{{$value.ChannelId}}]</option>
+        {{/each}}
+    </select>
+</script>
+
+<script src="~/Scripts/plugins/artTemplate/template.js"></script>
+
+@Scripts.Render("~/js/begin/form")
+<script type="text/javascript">
+    $(document).ready(function () {
+        GetChannel();
+    });
+
+    function GetChannel() {
+        var url = "/sms/GetSmsChannel";
+        $.doAjax(url, null, function (data) {
+            if (data != "error") {
+                var json = $.parseJSON(data);
+                var strHtml = template("ChannelList_Tpl", json);
+                $("#channelTestList").html(strHtml);
+            }
+        }, false);
+    }
+
+    function setFlag() {
+        if ($("#sendFlag").checked == "checked") {
+            $("#flag").val("1");
+        } else {
+            $("#flag").val("0");
+        }
+    }
+
+    function GetSmsUserCnt() {
+
+        var userCnt = 0;
+        $(".UserList input[type='checkbox']:checked").each(function () {
+            userCnt = userCnt + 1;
+        });
+        $("#smsUserCount").html("[ 全部 " + userCnt + " 个号码 ]").attr("count", userCnt).show();
+        $("#smsCnt").val(userCnt);
+    }
+
+    function changeNumber(obj) {
+        var dom = $(obj);
+        if (dom.val().length == 11) {
+            dom.parent().find("input[type='checkbox']").val(dom.val()).prop("checked", "checked");
+        }
+    }
+
+    function txt_length() {
+        var txtLength = parseInt($("#smscon").val().length);
+        var signLength = parseInt($("#smsSignTxt").val().length);
+        var lastWord = 130 - 2 - signLength - txtLength;
+        if (lastWord < 0) {
+            lastWord = 0;
+        }
+        if (lastWord > 65 && lastWord <= 130) {
+            $("#wordcnt").html(lastWord).css("color", "#16960e");
+        }
+        if (lastWord <= 65) {
+            $("#wordcnt").html(lastWord).css("color", "red");
+        }
+        if (lastWord <= 0) {
+            $("#smscon").val($("#smscon").val().substring(0, 130 - 2 - signLength));
+        }
+    }
+
+
+    function AddChannelTest() {
+
+        var accList = "";
+        $(".UserList input[type='checkbox']:checked").each(function () {
+            accList = accList + $(this).attr("value") + ",";
+        });
+
+
+        var url = "/sms/SetChannelTest";
+        var postJson = {};
+        postJson["context"] = $("#smscon").val();
+        postJson["signTxt"] = $("#smsSignTxt").val();
+        postJson["flag"] = $("#flag").val();
+        postJson["smsCnt"] = $("#smsCnt").val();
+        postJson["smsAccList"] = accList;
+        postJson["channelId"] = $("#channelId").val();
+
+        $.doAjax(url, postJson, function (msg) {
+
+            if (msg == "nocontext") {
+                alert("请输入短信内容");
+            } else if (msg == "ok") {
+                dialog({
+                    content: '发送成功',
+                    quickClose: true// 点击空白处快速关闭
+                }).show();
+                $("#smscon").val("");
+            } else {
+                alert("发送失败");
+            }
+
+        },true);
+
+    }
+
+</script>

@@ -1,0 +1,297 @@
+﻿@{
+    ViewBag.Title = "需要处理信息";
+}
+@section Style{
+    @Styles.Render("~/style/form")
+<style type="text/css">
+    #SelectVisitTagDiv .nav-tabs > li > a {
+        padding: 5px;
+        text-align: center;
+    }
+
+    #SelectVisitTagDiv .TagList {
+        margin-bottom: 0px;
+    }
+
+    #SelectVisitTagDiv {
+        margin: 0px;
+        padding: 0px;
+        display: none;
+    }
+
+    .label {
+        cursor: pointer;
+    }
+
+    #SelectVisitTagList {
+        border-width: 0px;
+        margin-bottom: 0px;
+    }
+
+        #SelectVisitTagList .tag {
+            margin-right: 10px;
+        }
+
+    .bootstrap-tagsinput .tag [data-role="remove"] {
+        margin-left: 8px;
+        cursor: pointer;
+    }
+
+    .visitReplyItem {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+        .visitReplyItem .itemName {
+            padding-right: 10px;
+            color: #000080;
+        }
+
+        .visitReplyItem .itemContent {
+            padding: 10px;
+            color: #000;
+        }
+
+    .reasonType {
+        height: 35px;
+        padding: 6px 5px 6px 5px;
+        line-height: 23px;
+        border-color: rgba(0,0,0,.07);
+        border-radius: 3px;
+    }
+
+    .reasonArea {
+        display:none;
+    }
+</style>
+
+}
+<div class="page-where CaseListWhere" style="margin-top:10px;">
+    <div class="pull-left btn-group margin-right-10">
+        <button type="button" class="btn btn-default btn-select" value="1" onclick="whereTimeButtonClick(this)">1天内未关闭</button>
+        <button type="button" class="btn btn-default" value="2" onclick="whereTimeButtonClick(this)">超过1天未关闭</button>
+        <button type="button" class="btn btn-default" value="3" onclick="whereTimeButtonClick(this)">已完成事件</button>
+    </div>
+
+    <div class="pull-left  whereitem reasonArea margin-right-10" id="insertTime">
+        <div class="input-daterange input-group">
+            <input type="text" placeholder="注册时间" id="beginDate" class="input-sm form-control minHeight37" name="start" value="@ViewBag.BgDate" />
+            <span class="input-group-addon">to</span>
+            <input type="text" placeholder="注册时间" id="endDate" class="input-sm form-control minHeight37" name="end" value="@ViewBag.EdDate" />
+        </div>
+    </div>
+
+    <div class="pull-left form-group reasonArea whereitem margin-right-10">
+        <select class="cs-select cs-skin-slide reasonType" id="TowReasonType" onchange="GetThreeClass(this)" style="width:139px;">
+            <option value="-1">所有二级概要</option>
+        </select>
+    </div>
+    <div class="pull-left form-group reasonArea whereitem margin-right-10">
+        <select class="cs-select cs-skin-slide reasonType" id="ThreeReasonType" onchange="GetCaseList(1)" style="width:139px;">
+            <option value="-1">所有三级概要</option>
+        </select>
+    </div>
+
+    <div class="pull-left whereitem reasonArea margin-right-10">
+        <input type="text" placeholder="回访人员" class="form-control width120" id="revisitName" onkeyup="SearchOnKeyUp(event)">
+    </div>
+</div>
+<div>
+    <table class="table table-hover no-footer table-border-right" id="caseTableList">
+        <thead>
+            <tr>
+                <th>店铺名称</th>
+                <th>三级概要</th>
+                <th>超时天数</th>
+                <th>当前状态</th>
+                <th>回访人</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <div class="dataTables_wrapper" id="ListPageHtml">
+        <div class="dataTables_paginate pagination">
+            <ul><li class="prev disabled"><a href="javascript:void(0)"><i class="pg-arrow_left"></i></a></li><li class="active"><a href="javascript:void(0)">1</a></li><li class="next disabled"><a href="javascript:void(0)"><i class="pg-arrow_right"></i></a></li></ul>
+        </div>
+        <div class="dataTablePagText"></div>
+    </div>
+</div>
+<input type="hidden" value="@ViewBag.DataType" id="loadingDataType" />
+<script type="text/html" id="caseTableListScript">
+    {{each listData}} 
+    <tr>
+        <td><a href="/shopinfo/index/{{$value.accid}}" target="_blank">{{$value.CompanyName}}</a>【{{$value.accid}}】</td>
+        <td>{{$value.visitReasonThree}}</td>
+        <td>{{$value.insertTime}}</td>
+        <td>{{$value.handleStatName}}</td>
+        <td>{{$value.insertName}}</td>
+        <td>
+            <a href="javascript:void(0)" onclick="ShowVisitInfo({{$value.id}})" data-toggle="modal" data-target="#modalSlideLeft">查看详情</a>
+            <a href="/shopinfo/index/{{$value.accid}}?vd={{$value.id}}" target="_blank" class="m-l-20">继续回访</a>
+        </td>
+    </tr> 
+    {{/each}}
+</script>
+
+
+<div class="modal fade slide-right" id="modalSlideLeft" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog ">
+        <div class="modal-content-wrapper">
+            <div class="modal-content table-block" style=" padding-left:10px; padding-right:10px;">
+                <table class="table no-footer table-border-right">
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<script type="text/html" id="VisitInfoScript">
+    <tr>
+        <td class="text-right" style="width:110px;"><b>店铺名称：</b></td>
+        <td colspan="3">{{CompanyName}}【{{accid}}】</td>
+    </tr>
+    <tr>
+        <td class="text-right"><b>事件概要</b></td>
+        <td colspan="3">{{visitReasonOne}} - {{visitReasonTwo}} - {{visitReasonThree}}</td>
+    </tr>
+    <tr>
+        <td class="text-right"><b>类别：</b></td>
+        <td>{{recordType}}</td>
+        <td class="text-right" style="width:110px;"><b>状态：</b></td>
+        <td>{{handleStatName}}</td>
+    </tr>
+    <tr>
+        <td class="text-right"><b>回访人：</b></td>
+        <td>{{insertName}}</td>
+        <td class="text-right"><b>回访时间：</b></td>
+        <td>{{insertTime}}</td>
+    </tr>
+    <tr>
+        <td colspan="4"><b>回访内容：</b></td>
+    </tr>
+    <tr>
+        <td colspan="4">
+            <div class="visitReplyItem">
+                <div class="itemContent">
+                    {{#vi_Content}}
+                </div>
+            </div>
+            {{each replyList}}
+            <div class="visitReplyItem">
+                <div style="background: #f5f5f5;"><span class="itemName">{{$value.vr_Name}}</span><span class="itemTime">{{$value.vr_Time}}</span></div>
+                <div class="itemContent">
+                    {{#$value.vr_Content}}
+                </div>
+            </div>
+            {{/each}}
+        </td>
+    </tr>
+    <tr>
+        <td colspan="4">
+            <span><b>标签：</b></span>
+            {{each tagList}}
+            <span class="tag label label-info" tagid="{{$value.id}}">{{$value.tagName}}</span>
+            {{/each}}
+        </td>
+    </tr>
+</script>
+
+@section Scripts{
+    @Scripts.Render("~/js/begin/form")
+<script src="~/Scripts/plugins/artTemplate/template.js"></script>
+<script src="~/Scripts/PlatformVisit/index.js?20150508"></script>
+
+    <script type="text/javascript">
+        $(function () {
+            var dataType = $("#loadingDataType").val();
+            $(".CaseListWhere button[value='" + dataType + "']").click();
+            GetTwoClass();
+            BindDatepicker();
+        });
+
+
+        function BindDatepicker(){
+            $('.input-daterange').datepicker({ orientation: "top auto" }).on({
+                'hide': function (ev) {
+                    GetCaseList(1);
+                }, 'show': function (ev) {
+
+                }
+            });
+        }
+
+        function whereTimeButtonClick(obj) {
+            var value = obj.value;
+            if (value == "return") {
+                $(".btn-group").show().filter(".page-where-othertime").hide();
+            } else {
+                $(obj).parent().find(".btn-select").removeClass("btn-select");
+                $(obj).addClass("btn-select");
+            }
+            GetCaseList(1);
+            var typeVal=$(".CaseListWhere .btn-group button.btn-select").attr("value");
+            if(typeVal=="3"){
+                $(".reasonArea").show();
+            }else{
+                $(".reasonArea").hide();
+            }
+        }
+
+        function GetTwoClass(){
+            GetReasonClass(-2,function(msg){
+                var json = $.parseJSON(msg);
+                var html="";
+                html+='<option value="-1">所有二级概要</option>';
+                if(json){
+                    for(var k in json){
+                        html += "<option value=" + json[k].id + ">" + json[k].vr_name + "</option>";
+                    }
+                }
+                $("#TowReasonType").html(html).change();
+            });
+        }
+
+        function GetThreeClass(item){
+            var maxId = $(item).val();
+            if(maxId&&maxId!="-1"){
+                GetReasonClass(maxId,function(msg){
+                    var json = $.parseJSON(msg);
+                    var html="";
+                    if(json){
+                        for(var k in json){
+                            html += "<option value=" + json[k].id + ">" + json[k].vr_name + "</option>";
+                        }
+                    }
+                    $("#ThreeReasonType").html(html);
+                });
+            }else if (maxId&&maxId=="-1"){
+                $("#ThreeReasonType").html('<option value="-1">所有三级概要</option>');
+                GetCaseList(1);
+            }
+        }
+
+        function SearchOnKeyUp(evt) {
+            evt = (evt) ? evt : ((window.event) ? window.event : "");
+            var currKey = 0;
+            currKey = evt.keyCode || evt.which || evt.charCode;
+            if (currKey == 13) {
+                GetCaseList(1);
+            }
+        }
+
+
+        function GetReasonClass(classId,callback){
+
+            var url = "/ShopInfo/VisitReason/" + classId;
+
+            $.doAjax(url, null, function (msg) {
+                if (msg != null && msg != "") {
+                    callback(msg);
+                }
+            }, true);
+        }
+    </script>
+}

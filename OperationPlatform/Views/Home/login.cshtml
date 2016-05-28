@@ -1,0 +1,96 @@
+﻿<!-- 临时存放！！ -->
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+    <meta charset="utf-8" />
+    <title>生意专家后台 - 登录页</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-touch-fullscreen" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta content="" name="description" />
+    <meta content="" name="author" />
+    <link href="/css/plugins/boostrapv3/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="/css/core/pages.min.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body class="fixed-header">
+    <!-- START PAGE-CONTAINER -->
+    <div class="login-wrapper">
+      <!-- START Login Background Pic Wrapper-->
+      <div class="bg-pic">
+        <!-- START Background Pic-->
+        <img src="/img/new-york-city-buildings-sunrise-morning-hd-wallpaper.jpg" data-src="/img/new-york-city-buildings-sunrise-morning-hd-wallpaper.jpg" data-src-retina="/img/new-york-city-buildings-sunrise-morning-hd-wallpaper.jpg" alt="" class="lazy">
+        <!-- END Background Pic-->
+        <!-- START Background Caption-->
+        <div class="bg-caption pull-bottom sm-pull-bottom text-white p-l-20 m-b-20">
+          <h2 class="semi-bold text-white">
+					生意专家后台登录页</h2>
+          <p class="small">
+            images Displayed are solely for representation purposes only, All work copyright of respective owner, otherwise © 2014-2015 Business Master.
+          </p>
+        </div>
+        <!-- END Background Caption-->
+      </div>
+      <!-- END Login Background Pic Wrapper-->
+      <!-- START Login Right Container-->
+      <div class="login-container bg-white">
+        <div class="p-l-50 m-l-20 p-r-50 m-r-20 p-t-50 m-t-30 sm-p-l-15 sm-p-r-15 sm-p-t-40">
+          <img src="/img/logoPro-b.png" alt="logo" data-src="/img/logoPro-b.png" data-src-retina="/img/logoPro-b.png" width="120" height="30">
+          <p class="p-t-35">Sign into your account</p>
+          <!-- START Login Form -->
+          <form id="form-login" class="p-t-15" role="form" action="index.html">
+            <!-- START Form Control-->
+            <div class="form-group form-group-default">
+              <label>Login</label>
+              <div class="controls">
+                <input type="text" name="username" placeholder="User Name" class="form-control" required>
+              </div>
+            </div>
+            <div class="form-group form-group-default">
+              <label>Password</label>
+              <div class="controls">
+                <input type="password" class="form-control" name="password" placeholder="Credentials" required>
+              </div>
+            </div>
+            <div class="form-group form-group-default">
+              <label>Identifying code</label>
+              <div class="controls">
+                <input type="text" class="form-control" name="validate" required>
+                <img id="valiCode" style="cursor: pointer;" src="" onclick="" alt="验证码" /> 
+              </div>
+            </div>
+            <button class="btn btn-primary btn-cons m-t-10" type="submit">Sign in</button>
+            <!-- END Form Control-->
+          </form>
+          <!--END Login Form-->
+        </div>
+      </div>
+      <!-- END Login Right Container-->
+    </div>
+    <!-- END PAGE CONTAINER -->
+    <!-- BEGIN VENDOR JS -->
+
+    <script src="/Scripts/plugins/jquery/jquery.js"></script>
+    <script src="/Scripts/plugins/boostrapv3/bootstrap.min.js"></script>
+    <script src="/Scripts/plugins/jquery/jquery-easy.js"></script>
+    <script src="/Scripts/plugins/jquery-ui/jquery-ui.min.js"></script>
+    <script src="/Scripts/plugins/jquery-ui/jquery.validate.min.js"></script>
+    <script src="/Scripts/plugins/modernizr.custom.js"></script>
+    <!-- END VENDOR JS -->
+    <!-- BEGIN CORE TEMPLATE JS -->
+    <script src="/Scripts/core/pages.min.js"></script>
+    <!-- END CORE TEMPLATE JS -->
+    <script>
+    $(function()
+    {
+      $('#form-login').validate()
+    })
+    </script>
+  </body>
+</html>

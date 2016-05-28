@@ -1,0 +1,575 @@
+﻿@{
+    ViewBag.Title = "用户申请支付宝管理";
+}
+@section Style{
+    @Styles.Render("~/style/form")
+}
+<style>
+    a.preview {
+        cursor: -webkit-zoom-in;
+        display: block;
+        margin: 0;
+        padding: 0;
+        border: 0;
+    }
+
+    #preview {
+        position: absolute;
+        display: none;
+        border: 5px solid #e4e4e4;
+        background-color: #ececec;
+        z-index: 9999999;
+    }
+
+        #preview img {
+            margin: 0 auto;
+            position: relative;
+        }
+
+    img.preview {
+        vertical-align: middle;
+    }
+</style>
+<div class="panel">
+    <div class="panel-heading page-where orderWhere">
+        <div class="panel-title">
+
+            <div class="cs-wrapper pull-left m-r-10">
+                <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" name="userType" id="userType">
+                    <option value="-99">客户类型</option>
+                    <option value="1">公司</option>
+                    <option value="2">个人</option>
+                </select>
+            </div>
+
+            <input type="hidden" id="timeType" value="" name="timePeriod" />
+            <div class="btn-group page-where-othertime" style="float: left; margin-right: 10px">
+                <div class="page-where-time-input">
+                    <div class="input-daterange input-group">
+                        <input type="text" class="input-sm form-control" placeholder="申请时间" name="start">
+                        <span class="input-group-addon">to</span>
+                        <input type="text" class="input-sm form-control" placeholder="申请时间" name="end">
+                    </div>
+                </div>
+            </div>
+
+            <div class="cs-wrapper pull-left m-r-10">
+                <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" name="displayType" id="displayType">
+                    <option value="-99">申请状态</option>
+                    <option value="0">上传文字信息编辑</option>
+                    <option value="1">上传图片信息编辑</option>
+                    <option value="2" selected="selected">等待审核基础信息</option>
+                    <option value="3">确认条码收单订单</option>
+                    <option value="4">等待审核点击确认</option>
+                    <option value="5">等待支付宝审核</option>
+                    <option value="6">用户输入Key和Pid码</option>
+                    <option value="7">等待客服审核KeyPid</option>
+                    <option value="8">开通成功</option>
+                    <option value="-10">重新上传文字信息编辑</option>
+                    <option value="-1">重新上传图片信息编辑</option>
+                    <option value="-3">重新确认条码收单订单</option>
+                    <option value="-6">重新用户输入Key和Pid码</option>
+                </select>
+            </div>
+            <div style="float: left; margin-right: 10px; width: 80px">
+                <input class="form-control" type="text" placeholder="店铺ID" style="ime-mode:disabled" onkeyup="this.value=this.value.replace(/\D/gi,'')" name="accId" id="accId">
+            </div>
+            <button type="button" value="select" class="btn btn-default btn-inquire" onclick=" GetAlipayRecordList(1) ">查询</button>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+
+    <div class="panel-body no-padding">
+        <div class="table-responsive">
+            <table class="table table-hover table-detailed dataTable" id="ListTable">
+                <thead>
+                    <tr>
+                        <th class="text-center width60">申请编号 </th>
+                        <th class="text-center width80">商铺名称</th>
+                        <th class="text-center width80">客户类型</th>
+                        <th class="text-center width80">申请状态</th>
+                        <th class="text-center width80">法人姓名</th>
+                        <th class="text-center width60">手机</th>
+                        <th class="text-center width60">支付宝账号</th>
+                        <th class="text-center width80">PID</th>
+                        <th class="text-center width80">KEY</th>
+                        <th class="text-center width60">操作</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <div class="dataTables_wrapper m-t-10" id="ListPageHtml">
+                <div class="dataTables_paginate pagination no-padding">
+                    <ul>
+                        <li class="prev disabled">
+                            <a href="javascript:void(0)">
+                                <i class="pg-arrow_left"></i>
+                            </a>
+                        </li>
+                        <li class="active">
+                            <a href="javascript:void(0)">1</a>
+                        </li>
+                        <li class="next disabled">
+                            <a href="javascript:void(0)">
+                                <i class="pg-arrow_right">
+                                </i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="dataTablePagText p-l-20"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div style="max-height:600px;height:600px;width:600px; overflow-y:auto;overflow-x:hidden; display:none;" id="AlipayInfoModelDig">
+    <div class="panel-body">
+        <table class="table table-detailed dataTable" id="ListItemTable"></table>
+    </div>
+</div>
+
+
+<div style="width:0px; height:0px; overflow:hidden;">
+    <div id="aeroClipDiv" style=" overflow:hidden;position:relative; width:100px; height:18px;">
+        <div id="aeroClipModel-button" style=" width:100px; height:18px; text-align:center;">复制具体内容</div>
+        <div id="aeroClipContext-Text" style=" display:none;"></div>
+    </div>
+</div>
+<script type="text/html" id="ListItemTableScript">
+    <thead>
+        <tr>
+            <th class="text-center ">店铺名称:<span>{{item.accountName}}</span> </th>
+            <th class="text-center ">当前状态:<span>{{item.statusDes}}</span></th>
+        </tr>
+    </thead>
+    <tbody id="getListDefaultInfo" astatus="{{item.status}}" aid="{{item.id}}" accid="{{item.accId}}">
+        <tr>
+            <td colspan="2" style="white-space: initial; ">
+                <div>
+                    <div style="display:table-cell"><span style="display:block; width:65px;">操作：</span></div>
+                    <div style="display:table-cell">
+                        <div style="width:100px;">
+                            <select id="stepsForSelect" onchange="IsShowInputForRemark(this.value)">
+                                <option value="-99">审核结果</option>
+                                <option value="1">成功</option>
+                                <option value="2">失败</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr id="inputForRemark" class="">
+            <td style="white-space: initial; " colspan="2">
+                <div style="display:table-cell"><span style="display:block; width:65px;">原因：</span></div>
+                <div style="display:table-cell">
+                    <input type="text" style="width:500px;" class="input-sm form-control" placeholder="输入审核失败原因" name="remark">
+                </div>
+            </td>
+        </tr>
+        <tr id="returnStatusForAlipay" class="">
+            <td style="white-space: initial; " colspan="2">
+                <div style="display:table-cell"><span style="display:block; width:75px;">返回步骤：</span></div>
+                <div style="display:table-cell">
+                    <div style="width:100px;">
+                        <select id="returnStatusSelect">
+                            <option value="-99">返回步骤</option>
+                            <option value="-10">上传文字信息编辑</option>
+                            <option value="-1">上传图片信息编辑</option>
+                            <option value="-3">确认条码收单订单</option>
+                            <option value="-6">用户输入Key和Pid码</option>
+                        </select>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td style="white-space: initial; ">客户类型：<span style="font-weight:600;">{{$UserType(item.companyType)}}</span></td>
+            <td style="white-space: initial;">法人姓名：<span style="font-weight:600;">{{item.artificialPerson}}</span></td>
+        </tr>
+        <tr>
+            <td style="white-space: initial;">手机号码：<span style="font-weight:600;">{{item.phone}}</span></td>
+            <td style="white-space: initial;">支付宝账号：<span style="font-weight:600;">{{item.alipayAccount}}</span></td>
+        </tr>
+        <tr>
+            <td style="white-space: initial;">所属行业：<span style="font-weight:600;">{{item.industryClassification}}</span></td>
+            <td style="white-space: initial;">营业面积：<span style="font-weight:600;">{{item.businessArea}}</span></td>
+        </tr>
+        <tr>
+            <td colspan="2" style="white-space: initial;">商户名称：<span style="font-weight:600;">{{item.companyName}}</span></td>
+        </tr>
+        <tr>
+            <td colspan="2" style="white-space: initial;">商户地址：<span style="font-weight:600;">{{item.companyAddress}}</span></td>
+        </tr>
+        <tr>
+            <td colspan="2" style="white-space: initial;">PID：<span style="font-weight:600;">{{item.PID}}</span></td>
+        </tr>
+        <tr>
+            <td colspan="2" style="white-space: initial;">KEY：<span style="font-weight:600;">{{item.Key}}</span></td>
+        </tr>
+
+        <tr>
+            <td>
+                <div style="display:table-cell">店外全景：</div>
+                <div style="display:table-cell">
+                    <a href="{{$alipayPic(item.shopOutPhotoURL)}}" download="店外全景">
+                        <img src="{{$alipayPic(item.shopOutPhotoURL)}}" rel="{{$alipayPic(item.shopOutPhotoURL)}}" class="preview" width="125px;" />
+                    </a>
+                </div>
+            </td>
+            <td>
+                <div style="display:table-cell">店内照片：</div>
+                <div style="display:table-cell">
+                    <a href="{{$alipayPic(item.shopInPhotoURL)}}" download="店外全景">
+                        <img src="{{$alipayPic(item.shopInPhotoURL)}}" rel="{{$alipayPic(item.shopInPhotoURL)}}" class="preview" width="125px;" />
+                    </a>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div style="display:table-cell">营业执照：</div>
+                <div style="display:table-cell">
+                    <a href="{{$alipayPic(item.businessLicensePhotoURL)}}" download="店外全景">
+                        <img src="{{$alipayPic(item.businessLicensePhotoURL)}}" rel="{{$alipayPic(item.businessLicensePhotoURL)}}" class="preview" width="125px;" />
+                    </a>
+                </div>
+            </td>
+            <td>
+                <div style="display:table-cell">工作照片1：</div>
+                <div style="display:table-cell">
+                    <a href="{{$alipayPic(item.firstShopWorkPhotoURL)}}" download="店外全景">
+                        <img src="{{$alipayPic(item.firstShopWorkPhotoURL)}}" rel="{{$alipayPic(item.firstShopWorkPhotoURL)}}" class="preview" width="125px;" />
+                    </a>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div style="display:table-cell">工作照片2：</div>
+                <div style="display:table-cell">
+                    <a href="{{$alipayPic(item.secondShopWorkPhotoURL)}}" download="店外全景">
+                        <img src="{{$alipayPic(item.secondShopWorkPhotoURL)}}" rel="{{$alipayPic(item.secondShopWorkPhotoURL)}}" class="preview" width="125px;" />
+                    </a>
+                </div>
+            </td>
+            <td>
+                <div style="display:table-cell">工作照片3：</div>
+                <div style="display:table-cell">
+                    <a href="{{$alipayPic(item.thirdShopWorkPhotoURL)}}" download="店外全景">
+                        <img src="{{$alipayPic(item.thirdShopWorkPhotoURL)}}" rel="{{$alipayPic(item.thirdShopWorkPhotoURL)}}" class="preview" width="125px;" />
+                    </a>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div style="display:table-cell">门牌号照片：</div>
+                <div style="display:table-cell">
+                    <a href="{{$alipayPic(item.doorPhotoURL)}}" download="店外全景">
+                        <img src="{{$alipayPic(item.doorPhotoURL)}}" rel="{{$alipayPic(item.doorPhotoURL)}}" class="preview" width="125px;" />
+                    </a>
+                </div>
+            </td>
+        </tr>
+    </tbody>
+</script>
+<script type="text/html" id="ListTableScript">
+    {{each list}}
+    <tr class="odd" role="row">
+        <td class="v-align-middle text-center">
+            {{$value.id}}
+        </td>
+        <td class="v-align-middle text-center">
+            <a href="/shopinfo/index/{{$value.accId}}" target="_blank" title="{{$value.accountName}}">{{$value.accountName}}</a>
+        </td>
+        {{if $value.companyType=="1"}}
+        <td class="v-align-middle text-center">公司</td>
+        {{else if $value.companyType=="2"}}
+        <td class="v-align-middle text-center">个人</td>
+        {{/if}}
+        <td class="v-align-middle text-center">{{$value.statusDes}}</td>
+        <td class="v-align-middle text-center">{{$value.artificialPerson}}</td>
+        <td class="v-align-middle text-center">{{$value.phone}}</td>
+        <td class="v-align-middle">{{$value.alipayAccount}}</td>
+        <td class="v-align-middle text-center">{{$value.PID}}</td>
+        <td class="v-align-middle text-center">{{$value.Key}}</td>
+        <td class="v-align-middle text-center">
+            <button id="btn_isDisplay" class="btn btn-success btn-sm m-l-10" name="{{$value.id}}" onclick="GetAlipayModel({{$value.id}})">
+                查看详情
+            </button>
+        </td>
+    </tr>
+    {{/each}}
+</script>
+
+@section Scripts{
+    @Scripts.Render("~/js/begin/form")
+    <script src="~/Scripts/plugins/artTemplate/template.js"></script>
+    <script src="~/Scripts/plugins/ZeroClipboard/jquery.zclip.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $('.orderWhere .input-daterange').datepicker({ format: 'yyyy-mm-dd' });
+            //AlipayListContentTdHover();
+            //$("#displayType option[value='2']").attr("selected", true);
+            GetAlipayRecordList(1);
+            template.helper('$UserType', function (value) {
+
+                if (value == 1) {
+                    return "公司";
+                } else if (value == 2) {
+                    return "个人";
+                }
+            });
+            template.helper('$alipayPic', function (value) {
+
+                if (value != null && value.length > 0) {
+                    return "http://img.i200.cn" + value + "";
+                } else {
+                    return "http://placehold.it/150x150";
+                }
+            });
+        });
+
+
+        function GetAlipayRecordList(pageIndex) {
+            var postJson = {};
+            var userType = $("#userType").val();
+            var displayType = $("#displayType").val();
+            var accId = $("#accId").val();
+
+            var statTime = $(".orderWhere input[name='start']").val();
+            var endTime = $(".orderWhere input[name='end']").val();
+            var stDate = new Date();
+            var edDate = new Date();
+            if (statTime.length === 0 && endTime.length === 0) {
+                postJson["start"] = stDate.toLocaleDateString();
+                postJson["end"] = edDate.toLocaleDateString(-1);
+            } else {
+                if (statTime.length > 0) {
+                    postJson["start"] = statTime;
+                } else {
+                    postJson["start"] = stDate.toLocaleDateString();
+                }
+                if (endTime.length > 0) {
+                    postJson["end"] = endTime;
+                } else {
+                    postJson["end"] = edDate.toLocaleDateString();
+                }
+            }
+
+            postJson["pageIndex"] = pageIndex;
+            postJson["userType"] = userType;
+            postJson["displayType"] = displayType;
+            postJson["accId"] = accId;
+            //console.log(postJson);
+            var url = "/AlipayInfo/getAlipayInfoRecord";
+            $.doAjax(url, postJson, function (msg) {
+                //console.log(msg);
+                if (msg != ""&&msg!="error") {
+                    var json = jQuery.parseJSON(msg);
+                    //console.log(json);
+                    $("#ListTable tbody").html(template("ListTableScript", { "list": jQuery.parseJSON(json.list) }));
+
+                    if (pageIndex == 1) {
+                        $("#ListPageHtml").attr("rowcount", parseInt(json.RowCount)).attr("maxpage", parseInt(json.PageCount));
+                        $("#ListPageHtml .dataTablePagText").html("共" + parseInt(json.RowCount) + "条");
+                    }
+                    var pageHtml = $.listPageHtml(pageIndex, $("#ListPageHtml").attr("maxpage"), "GetAlipayRecordList", 5);
+                    $("#ListPageHtml .dataTables_paginate").html(pageHtml);
+                }
+            }, true);
+        }
+
+        function GetAlipayModel(alipayId) {
+            var postJson = {};
+            postJson["alipayId"] = alipayId;
+            var url = "/AlipayInfo/getAlipayInfoModel";
+            $.doAjax(url, postJson, function (msg) {
+                if (msg != "" && msg != "error") {
+                    var json = jQuery.parseJSON(msg);
+                    $("#ListItemTable").html(template("ListItemTableScript", { "item":json}));
+                    goodsPicHover();
+                    $("#inputForRemark").addClass("hide");
+                    $("#returnStatusForAlipay").addClass("hide");                    
+                    var status=$("#getListDefaultInfo").attr("astatus");
+                    if (status==-10||status==-1||status==-3||status==-6||status==0||status==1||status==3||status==6) {
+                        $("#stepsForSelect").attr("disabled","disabled");
+                    }
+                }
+            }, true);
+
+            dialog({
+                id: "getAlipayInfoModel",
+                title: "支付宝详细信息",
+                lock: true,
+                opacity: 0.57, // 透明度
+                content: document.getElementById("AlipayInfoModelDig"),
+                ok: function() {
+                    var isGoNextStep=false;
+                    var remark="";
+                    var ur = "/AlipayInfo/updateStatus";
+                    var postJson = {};
+                    var isSuccess = $("#stepsForSelect").val();
+                    if (isSuccess!=-99) {
+                        if (isSuccess==2) {
+                            var returnStatus = $("#returnStatusSelect").val();
+                            if (returnStatus==-99) {
+                                alert("请选择返回步骤");
+                                return false;
+                            }
+                            remark=$("#inputForRemark input[name='remark']").val();
+                            postJson["status"] = returnStatus;
+                        }
+                        else  if (isSuccess==1) {
+                            //id="getListDefaultInfo" astatus="{{item.status}}" aid="{{item.id}}">
+
+                            var status=$("#getListDefaultInfo").attr("astatus");
+                            status=status*1+1*1;
+                            postJson["status"] = status;
+                            isGoNextStep=true;
+                        }
+                        var alipayId=$("#getListDefaultInfo").attr("aid");
+                        postJson["accid"] =$("#getListDefaultInfo").attr("accid");
+                        postJson["oldstatus"] = $("#getListDefaultInfo").attr("astatus");
+                        postJson["isGoNextStep"] = isGoNextStep;
+                        postJson["remark"] = remark;
+                        postJson["alipayId"] = alipayId;
+                       // console.log(postJson);
+                        $.doAjax(ur, postJson, function(msg) {
+                           // console.log(msg);
+                            if (msg != ""&&msg!="error"&&msg!=null) {
+                                alert("修改成功！");
+                                GetAlipayRecordList(1);
+                            } else {
+                                alert("修改失败！");
+                            }
+                        }, true);
+                    }
+                    else {
+                        alert("无有效操作");
+                        return false;
+                    }
+                },
+                cancel: true
+            }).showModal();
+        }
+
+        function IsShowInputForRemark(value) {
+            if (value == 2) {
+                $("#inputForRemark").removeClass("hide");
+                $("#returnStatusForAlipay").removeClass("hide");
+            }
+            if (value == 1) {
+                $("#inputForRemark").addClass("hide");
+                $("#returnStatusForAlipay").addClass("hide");
+            }
+        }
+
+
+
+        var CopyDiaForAlipay = null;
+        function ZeroClipClick(t) {
+            $("#aeroClipContext-Text").html($.trim($(t).html()));
+            CopyDiaForAlipay = dialog({
+                id: 'CopyDiaForAlipay',
+                content: document.getElementById("aeroClipDiv"),
+                zIndex: 90
+            });
+            CopyDiaForAlipay.show();
+        }
+        function AlipayListContentTdHover() {
+            $("#ListTable tbody td.AlipayInfoContent").hover(
+                function () {
+                    var AlipayCont = $.trim($(this).html());
+                    var length = AlipayCont.length;
+                    var d = dialog({
+                        id: "AlipayInfoContentDialog",
+                        align: 'top',
+                        content: '内容长度：' + length + "，内容类型：" + $(this).attr("Alipaytype") + "，点击直接复制"
+                    });
+                    d.show(this);
+                },
+                function () {
+                    dialog.get('AlipayInfoContentDialog').close().remove();
+                });
+        }
+        var clip = null;
+        clip = new ZeroClipboard.Client();
+        clip.setHandCursor(true);
+        ZeroClipboard.setMoviePath("/Scripts/plugins/ZeroClipboard/ZeroClipboard.swf");
+        //clip.addEventListener('mouseOver', my_mouse_over);
+        clip.addEventListener('complete', my_complete);
+
+        clip.glue('aeroClipModel-button', "aeroClipDiv");
+        clip.addEventListener("load", function (client) {
+            var val = $("#aeroClipContext-Text").html();
+            clip.setText(val); clip.reposition();
+        });
+        function my_mouse_over(client) {
+
+        }
+        function my_complete(client, text) {
+            CopyDiaForAlipay.close().remove();
+        }
+        function goodsPicHover() {
+            var yOffset = 30,
+                layerhover = function (pos) {
+                    var winW = $(window).width();
+                    var winH = $(window).height();
+                    var PHeight = $("#preview").height();
+                    var PWidth = $("#preview").width();
+                    var imgMaxHeight = winH * 0.8;
+                    if (PHeight > imgMaxHeight) {
+                        $("#preview img").height(imgMaxHeight);
+                        PHeight = $("#preview").height();
+                        PWidth = $("#preview").width();
+                    }
+                    var imgMaxWidth = winW * 0.5;
+                    if (PWidth > imgMaxWidth) {
+                        $("#preview img").width(imgMaxWidth).height("");
+                        PHeight = $("#preview").height();
+                        PWidth = $("#preview").width();
+                    }
+                    var bottomY = pos.clientY + PHeight / 2;
+                    if (bottomY > (winH - 50)) {
+                        bottomY = bottomY - winH + 50;//PTop / 2 - (winH - pos.pageY) + 50;
+                    } else {
+                        bottomY = 0;
+                    }
+                    var pTop = (pos.pageY - PHeight / 2 - bottomY);
+                    var pLeft = (pos.pageX + yOffset);
+
+                    var WSTop = $(window).scrollTop();
+                    if (pTop < WSTop) {
+                        pTop = WSTop + 10;
+                    }
+                    $("#preview").css({
+                        "top": pTop + "px",
+                        "left": pLeft + "px"
+                    }).fadeIn("fast");
+                };
+            // $picAttr = $(".singleItem img").attr("alt");
+            $(".preview").hover(function (pos) {
+
+                var src = $(this).attr("rel");
+                if (src.indexOf("img.i200.cn") > -1) {
+                    var pSrc = $(this).attr("rel");
+                    if (pSrc.indexOf("!") > 0) {
+                        pSrc = pSrc.substring(0, pSrc.indexOf("!"));
+                    }
+                    $("body").append("<div id='preview' class='imgAdapt'><img src='" + pSrc + "' alt='Image preview' />" + "<p class='previewBreif'></p></div>");
+                    layerhover(pos);
+                }
+                // var $text = $(this).find("img").attr("alt");
+                // $(".previewBreif").text($text);
+            },
+                function () {
+                    $("#preview").remove();
+                });
+            $(".preview").on("mousemove", function (pos) {
+                layerhover(pos);
+            });
+        }
+    </script>
+}

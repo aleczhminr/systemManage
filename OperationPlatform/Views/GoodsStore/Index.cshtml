@@ -1,0 +1,299 @@
+﻿
+@{
+    ViewBag.Title = "商品O2O列表";
+}
+ 
+
+@section Style{
+
+    @Styles.Render("~/style/form")
+<link rel="stylesheet" href="~/Scripts/FancyBox/jquery.fancybox.css" type="text/css" media="screen" />
+<style type="text/css">
+    .gPicPanel {
+        display: inline-block;
+        width: 40px;
+        height: 20px;
+        vertical-align: middle;
+        margin-right: 5px;
+    }
+
+        .gPicPanel img {
+            border: none;
+            width: 40px;
+            height: 40px;
+            -webkit-border-radius: 3px;
+            -moz-border-radius: 3px;
+            border-radius: 3px;
+            margin-top: -10px;
+        }
+    .ui-popup-backdrop {
+        opacity: 0.7 !important;
+    }
+    </style>
+}
+<div class="container-fixed-lg bg-white" style="min-width: 915px;">
+    <div class="panel panel-transparent no-border">
+        <div class="panel-heading">
+            <div class="page-where visitWhere">
+                <div class="pull-left">
+                    <div class=" whereitem">
+                        <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" id="IsPicList" style="width:100px" onchange="GetGoodsList(1)">
+                            <option value="1">显示有图片</option>
+                            <option value="-1">显示全部</option>
+                        </select>
+                    </div>
+
+                    <div class=" whereitem">
+                        <input type="text" placeholder="商品名称" class="form-control width120" id="goodsName" onkeyup="InputOnKeyUp(event)">
+                    </div>
+
+                    <div class="checkbox check-success " style="display: inline" >
+                        <input type="checkbox" value="isToday" id="isToday" onchange="GetGoodsList(1);">
+                        <label for="isToday">当日交易</label>
+                    </div>
+
+                    <div class="btn-group m-l-15 ">
+                        <input type="button" class="btn btn-success" onclick="OpenMap()" value="查看商品地图" />
+                    </div>
+                    @*<div>
+                        <input type="button" value="查看商品地图" class="btn btn-success form-control width120" id="" onkeyup="" onclick=" OpenMap() ">
+                    </div>*@
+
+                    <div class="clear"></div>
+                </div>
+                <div class="clear"></div>
+            </div>
+        </div>
+        <div class="panel-body no-padding">
+            <div class="row">
+                <table class="table table-hover" id="ListTable">
+                    <thead>
+                        <tr>
+                            @*<th>分类</th>*@
+                            <th>商品名称</th> 
+                            <th class="text-center">库存数量</th>
+                            <th class="text-center">平均价格</th>
+                            <th class="text-center">平均进价</th>
+                            <th class="text-center">销售数量</th>
+                            <th class="text-center">销售金额</th>
+                            <th class="text-center">店铺数</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <div class="dataTables_wrapper" id="ListPageHtml">
+                    <div class="dataTables_paginate pagination">
+                        <ul><li class="prev disabled"><a href="javascript:void(0)"><i class="pg-arrow_left"></i></a></li><li class="active"><a href="javascript:void(0)">1</a></li><li class="next disabled"><a href="javascript:void(0)"><i class="pg-arrow_right"></i></a></li></ul>
+                    </div>
+                    <div class="dataTablePagText fs-12 m-l-20"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+ 
+<script type="text/html" id="GoodsInfoListScript">
+    <table class="table table-hover" id="GoodsInfoListTable" style="width:890px;">
+        <thead>
+            <tr>
+                <th>店铺名称</th>
+                <th>原分类</th>
+                <th class="text-center">库存数量</th>
+                <th class="text-center">价格</th>
+                <th class="text-center">进价</th>
+                <th class="text-center">最后售价</th>
+                <th class="text-center">销售数量</th>
+                <th class="text-center">销售金额</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{each listData}}
+            <tr role="row">
+                <td>
+                    {{$value.accountName}}
+
+                </td>
+                <td picgid="{{$value.ygid}}">
+                    {{$value.maxClass | classShow:$value.minClass}}
+                </td>
+                <td class="text-center">
+                    {{$value.goodsNum}}件
+                </td>
+                <td class="text-center">￥{{$value.price}}</td>
+                <td class="text-center">￥{{$value.cosPrice }}</td>
+                <td class="text-center">￥{{$value.lastSalePrice }}</td>
+                <td class="text-center">{{$value.saleNum}}</td>
+                <td class="text-center">￥{{$value.saleMoney}}</td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</script>
+ 
+<script type="text/html" id="ShopListScript">
+    {{each listData}}
+    <tr role="row">
+        @*<td>
+        {{$value.cMaxName | classShow:$value.cMinName}}</td>*@
+        <td picgid="{{$value.id}}">
+            <a href="javascript:void(0)" onclick="GetGoodsInfo({{$value.id}},'{{$value.gName}}')">{{$value.gName}}</a>
+        </td>
+        <td class="text-center">
+            {{$value.gQuantity}}件
+        </td>
+        <td class="text-center">￥{{$value.averagePrice}}</td>
+        <td class="text-center">￥{{$value.averageCosPrice }}</td>
+        <td class="text-center">{{$value.saleNum}}</td>
+        <td class="text-center">￥{{$value.saleMoney}}</td>
+        <td class="text-center">{{$value.accountNum}}个</td> 
+    </tr>
+    {{/each}}
+</script>
+@section Scripts{
+    @Scripts.Render("~/js/begin/form")
+    <script src="~/Scripts/plugins/artTemplate/template.js"></script>
+
+<script type="text/javascript" src="~/Scripts/FancyBox/jquery.fancybox.pack.js"></script>
+    <script src="~/Scripts/ShopList/ShopList.js"></script>
+    <script type="text/javascript">
+
+        var timeOut = 0;
+        $(function() {
+
+            GetGoodsList(1);
+            $(".fancybox").fancybox({
+                nextClick  : false
+            });
+        })
+
+        function GetGoodsList(page) {
+            if (page == null || page < 1) {
+                page = 1;
+            }
+            var postData = {};
+            if ($("#isToday").is(':checked')) {
+                postData["isToday"] = "1";
+            } else {
+                postData["isToday"] = "0";
+            }
+
+            postData["isPic"] = $("#IsPicList").val();
+            postData["pageIndex"] = page;
+            var smsStatus = $("#goodsName").val();
+            if (smsStatus != "") {
+                postData["gname"] = smsStatus;
+            }
+
+            var url = "/GoodsStore/GetList";
+            $.doAjax(url, postData, function(msg) {
+                if (msg != "null" && msg != "") {
+                    var json = $.parseJSON(msg);
+                    $("#ListTable tbody").html(template("ShopListScript", json));
+                    GetGoodsPic($("#ListTable"), "gid");
+                    if (page == 1) {
+                        $("#ListPageHtml").attr("rowcount", json.rowCount).attr("maxpage", json.maxPage);
+                        $("#ListPageHtml .dataTablePagText").html("共" + json.rowCount + "条");
+                    }
+                    var pageHtml = $.listPageHtml(page, $("#ListPageHtml").attr("maxpage"), "GetGoodsList", 5);
+                    $("#ListPageHtml .dataTables_paginate").html(pageHtml);
+                }
+            }, true);
+        }
+
+        template.helper('classShow', function(max, min) {
+            if (min == "默认" || min == "" || min == null) {
+                return max;
+            } else {
+                return max + " - " + min;
+            }
+
+        });
+
+        function InputOnKeyUp(evt) {
+            evt = (evt) ? evt : ((window.event) ? window.event : "");
+            var currKey = 0;
+            currKey = evt.keyCode || evt.which || evt.charCode;
+            if (currKey == 13) {
+                GetGoodsList(1);
+            }
+        }
+
+        function GetGoodsPic(tableDom, type) {
+            var list = tableDom.find("tr td[picgid]");
+            var gidList = new Array();
+            $.each(list, function(i, n) {
+                gidList.push($(n).attr("picgid"));
+            });
+
+            var postData = {};
+            postData["gid"] = "";
+            postData["ygid"] = "";
+
+            postData[type] = gidList.join(",");
+
+
+            if (gidList.length > 0) {
+                var url = "/GoodsStore/GetPicList";
+                $.doAjax(url, postData, function(msg) {
+                    if (msg != "[]") {
+                        var json = $.parseJSON(msg);
+
+                        $.each(json, function(i, n) {
+                            var gid = n[type];
+                            //判断是否已经有图片 
+                            if (tableDom.find(" tr td[picgid=" + gid + "] a.gPicPanel").size() < 1) {
+                                var html = '<a  class="gPicPanel fancybox" href="http://img.i200.cn' + n.picUrl + '" rel="http://img.i200.cn' + n.picUrl + '!small" data-hasqtip="2" aria-describedby="qtip-2"><img src="http://img.i200.cn' + n.picUrl + '!mini" picOrder="' + n.picOrder + '" ></a>';
+
+                                tableDom.find("tr td[picgid=" + gid + "]").prepend(html);
+                            }
+                        });
+                    }
+                }, false);
+            }
+        }
+
+
+        function GetGoodsInfo(gid, name) {
+            var url = "/GoodsStore/GetGoodsInfo";
+            $.doAjax(url, { "gid": gid }, function(msg) {
+                if (msg != "null" && msg != "") {
+                    var json = $.parseJSON(msg);
+                    var html = template("GoodsInfoListScript", { "listData": json });
+
+                    dialog({
+                        title: name,
+                        content: html,
+                        quickClose: true
+                    }).showModal();
+                    GetGoodsPic($("#GoodsInfoListTable"), "ygid");
+                }
+            }, true);
+        }
+
+        //function ShowGoodsPic(obj) {
+        //    dialog({
+        //        title: name,
+        //        content: obj,
+        //        quickClose: true
+        //    }).showModal();
+        //}
+    
+        
+
+        function OpenMap() {
+
+            var q = "";
+            
+            if ($("#goodsName").val() != "") {
+                var gname = $("#goodsName").val();
+                window.open('http://yunying.yuanbei.biz/AreaMap/GoodsMap?gName=' + gname);
+            } else {
+                window.open('http://yunying.yuanbei.biz/AreaMap/GoodsMap');
+            }
+            
+        }
+    </script>
+}
+
+

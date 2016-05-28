@@ -1,0 +1,642 @@
+﻿@{
+    ViewBag.Title = "消息系统管理";
+}
+
+@section Style{
+    @Styles.Render("~/style/form")
+    <link href="~/Scripts/plugins/qtip/jquery.qtip.min.css" rel="stylesheet" />
+    <link href="~/css/MsgCenter/MsgCenter.css" rel="stylesheet" />
+    <link href="~/css/plugins/summernote/summernote.css" rel="stylesheet" />
+    <link href="~/Scripts/plugins/qtip/jquery.qtip.min.css" rel="stylesheet" />
+    <link href="~/Scripts/plugins/datetimepicker/bootstrap-datetimepicker.min.css" rel="stylesheet"/>
+    <link href="~/css/plugins/boostrapv3/bootstrap.min.css" rel="stylesheet"/>
+    <link href="~/css/plugins/datatables-responsive/css/datatables.responsive.css" rel="stylesheet" />
+
+    <style type="text/css">
+        .form-group .f-wInitial label {
+            font-weight: normal;
+        }
+
+        .form-inline {
+            display: inline;
+            width: 80%;
+        }
+
+        .icon-multiple {
+            background-color: #959595;
+        }
+
+        .icon-font {
+            display: inline-block;
+            color: #fff;
+            font-style: normal;
+            font-size: 12px;
+            line-height: 16px;
+            text-align: center;
+            border-radius: 1px;
+            margin-right: 3px;
+            padding: 0px 1px 0px 2px;
+            background-color: green;
+            margin-top: 2px;
+        }
+    </style>
+
+}
+<div class="panel panel-default" id="messageCenter">
+    <div class="panel-body no-scroll ">
+        <div class="form-group">
+            <label>消息发送说明：</label>
+            <span class="help">本次消息推送的目的、摘要等</span>
+            <input type="text" class="form-control" id="Remark" />
+        </div>
+
+        <div class="form-group">
+            <label>店铺ID集合：</label>
+            <span class="help">多个店铺用“,”分开</span>
+            <div>
+                <div style="display: inline">
+                    <input type="text" id="AccIdSet" class="form-control form-inline" />
+                </div>
+                <div style="display: inline">
+                    <button class="btn btn-success" id="ConfirmAccId" onclick="GetAccIdSummary()">确定</button>
+                    <div style="display: inline">
+                        <button class="btn btn-success hidden" id="ConfirmAccIdAgain" onclick="Reconfirm()">重新选择</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group hidden" id="filterCondition">
+            <label>用户条件集合：</label>
+            @*<span class="help">来自于筛选器的预设条件</span>*@
+            <div id="conditionList" class="help">
+
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>发送类型</label>
+            <div class="radio radio-success" id="sendType">
+                <input id="sendType_1" type="radio" name="repeatType" value="1" onclick="SelectSendingType(1)" checked="checked">
+                <label for="sendType_1">普通发送</label>
+                <input id="sendType_2" type="radio" name="repeatType" value="2" onclick="SelectSendingType(2)">
+                <label for="sendType_2">单次定时发送</label>
+                <input id="sendType_3" type="radio" name="repeatType" value="3" onclick="SelectSendingType(3)" disabled>
+                <label for="sendType_3">循环发送</label>
+            </div>
+        </div>
+
+        <div class="form-group hidden m-t-20 row" id="setSpecTime">
+
+            @*<label class="col-sm-3 control-label">短信</label>*@
+            <div class="">
+                <div class="specDate input-append date" data-date-format="yyyy-mm-dd hh:ii">
+                    <input type="text" placeholder="定时时间" id="specTimeSet" class="" name=""/>
+                    <span class="add-on"><i class="icon-th"></i></span>
+                </div>
+            </div>
+
+        </div>
+
+        @*<div class="" id="setCronTime">
+
+            <label class="">设置定时循环条件</label>
+            <div class="" id="">
+                <input id="cron" />
+            </div>
+
+        </div>*@
+
+        <div class="container m-l-0" id="setCronTime">
+            <form role="form" class="form-inline">
+                <div class="form-group">
+                    <label for="cron">循环条件</label>
+                    <input id="cron" class="form-control" />
+                </div>
+            </form>
+        </div>
+        <div class="form-group hidden" id="sendMark">
+            <div class="check-success">
+                <input type="checkbox" name="" value="confirmThis" id="confirmThis" onchange="">
+                <label for="confirmThis">设定完成后是否要发送本批筛选用户？</label>
+            </div>
+        </div>
+
+    <input type="hidden" name="cronExp" value="" id="cronExp" />
+    @*<div id="diffSet" class="hidden">
+
+            </div>*@
+
+        <div class="form-group hidden">
+            <div class="check-success">
+                <input type="checkbox" name="" value="trace" id="traceMark" onchange="changeTrace();">
+                <label for="traceMark">跟踪结果选项</label>
+            </div>
+        </div>
+        <div class="form-group hidden m-t-20 row" id="traceSetting">
+
+            @*<label class="col-sm-3 control-label">短信</label>*@
+            <div class="">
+                <div class="m-l-20 note-fontsize-10">
+                    结果条件: <input type="text" class="" id="traceDayCount" />
+                    天之后
+                    <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" name="" id="traceItem">
+                        <option value="-99">移动端登录</option>
+                        <option value="0">有登录</option>
+                        <option value="2">购买套餐</option>
+                        <option value="-2">完成新手任务</option>
+                    </select>
+                </div>
+            </div>
+
+        </div>
+
+
+
+        <div class="form-group hidden" id="SendingSummary">
+            <label>已选择：</label>
+            <span class="text-warning-dark" id="AccIdSum"></span>
+            <span class="icon-font icon-multiple" title="" id="AccIdDetail">详情</span>
+        </div>
+
+        @*<div class="form-group">*@
+        <label>发送方式：</label>
+        @*<div class="checkbox check-success">*@
+
+        <div class="row checkbox check-success">
+            <input type="checkbox" name="datatyle" value="Sms" id="checkbox1" rel="1">
+            <label for="checkbox1">短信</label>
+        </div>
+
+        <div class="form-group hidden m-t-20 row" id="Sms">
+
+            @*<label class="col-sm-3 control-label">短信</label>*@
+            <div class="col-sm-9">
+                <label>内容</label>
+                <div class="row">
+                    <input type="text" class="form-control" id="SmsContent" />
+                </div>
+            </div>
+
+        </div>
+        <hr class="SmsHr hidden" />
+        <div class="row checkbox check-success">
+            <input type="checkbox" value="Pub" name="datatyle" id="checkbox2" rel="2">
+            <label for="checkbox2">站内消息</label>
+        </div>
+
+        <div class="form-group hidden m-t-20 row" id="Pub">
+
+            @*<label class="col-sm-3 control-label">站内消息</label>*@
+            <div class="col-sm-9">
+                <label>标题</label>
+                <div class="row">
+                    <input type="text" class="form-control" id="PubTitle" />
+                </div>
+                <label>内容</label>
+                <div class="row">
+                    <div id="PubContent"></div>
+                </div>
+            </div>
+        </div>
+        <hr class="PubHr hidden" />
+        <div class="row checkbox check-success">
+            <input type="checkbox" value="Mobile" name="datatyle" id="checkbox3" rel="3">
+            <label for="checkbox3">移动端推送</label>
+        </div>
+
+        <div class="form-group hidden m-t-20 row" id="Mobile">
+
+            @*<label class="col-sm-3 control-label">移动端推送</label>*@
+            <div class="col-sm-9">
+                <label>标题</label>
+                <div class="row">
+                    <input type="text" class="form-control" id="MobileTitle"/>
+                </div>
+
+                <label>内容类型</label>
+                <div class="row">                    
+                    <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" name="" id="ContentType" onchange="ChangeMobileType()">
+                        <option value="text" selected="true">纯文本</option>
+                        <option value="web">网页地址</option>
+                        <option value="view">功能页面</option>
+                        <option value="bbs">论坛</option>                       
+                    </select>
+                </div>
+
+                <div id="MobileStr" class="hidden">
+                    <label>URL地址</label>
+                    <div class="row">
+                        <input type="text" class="form-control" id="ContentUrlStr" />
+                    </div>
+                </div>
+
+                <div id="MobileView" class="hidden">
+                    <label>链接内容</label>
+                    <div class="row">                        
+                        <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" name="" id="ContentUrlView">
+                            <option value="GoodsAdd">新增商品</option>
+                            <option value="GoodsManage">商品管理</option>
+                            <option value="MemberAdd">新增会员</option>
+                            <option value="MemberManage">会员管理</option>
+                            <option value="SaleAdd">收银记账</option>
+                            <option value="SaleQuery">查询销售</option>
+                            <option value="ExpenditureManage">支出管理</option>
+                            <option value="AnalysisManage">智能分析</option>
+                            <option value="InAppPurchase">购买套餐</option>
+                            <option value="dailyReport">经营分析日报</option>
+                            <option value="appShare">转介绍推送</option>
+                        </select>
+                    </div>
+                </div>
+                
+
+                <label>内容</label>
+                <div class="row">
+                    @*<input type="text" class="form-control" id="MobileContent" />*@
+                    <div id="MobileContent"></div>
+                </div>
+            </div>
+
+        </div>
+        <hr class="MobileHr hidden" />
+        <div class="row checkbox check-success">
+            <input type="checkbox" value="Email" name="datatyle" id="checkbox4" rel="4">
+            <label for="checkbox4">电子邮件</label>
+        </div>
+
+        <div class="form-group hidden m-t-20 row" id="Email">
+
+            @*<label class="col-sm-3 control-label">电子邮件</label>*@
+            <div class="col-sm-9">
+                <label>邮件标题</label>
+                <div class="row">
+                    <input type="text" class="form-control" id="EmailTitle" />
+                </div>
+                <label>邮件内容</label>
+                <div class="row">
+                    <div id="EmailContent"></div>
+                </div>
+            </div>
+
+        </div>
+
+        @*</div>*@
+        @*</div>*@
+
+
+        @*<div class="form-group">
+                <label>消息标题：</label>
+                <input type="text" class="form-control" id="msgTitle" />
+            </div>
+            <div class="form-group">
+                <label>推送内容：</label>
+                <div id="VisitContent"></div>
+            </div>*@
+
+        <div>
+            <button class="btn btn-success btn-cons msgBaseBtn" onclick="SubmitSendingRequest()">提交推送请求</button>
+        </div>
+    </div>
+    <input type="hidden" name="" value="@ViewBag.List" id="list" />
+    <input type="hidden" name="" value="" id="count" />
+    <input type="hidden" name="" value="@ViewBag.Verification" id="verif" />
+</div>
+
+
+@section Scripts{
+    @Scripts.Render("~/js/begin/form")
+    @*<script src="~/Scripts/MsgCenter/MsgCenter.js"></script>*@
+    <script src="~/Scripts/plugins/summernote/js/summernote.min.js"></script>
+    <script src="~/Scripts/plugins/qtip/jquery.qtip.min.js"></script>
+    <script src="~/Scripts/MessageSending/SendingRule.js"></script>
+    <script src="~/Scripts/plugins/datetimepicker/bootstrap-datetimepicker.min.js"></script>
+    <script src="~/Scripts/plugins/datetimepicker/bootstrap-datetimepicker.zh-CN.js"></script>
+    <script src="~/Scripts/plugins/cronGen.js"></script>
+    @*<script src="~/Scripts/MsgCenter/SendMessage.js"></script>*@
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            //test
+            //var url = "/MessageSending/SendingMsgByService/1";
+
+            //$.doAjax(url, null, function (msg) {
+            //    if (msg != "" && msg.indexOf("没有找到有关") < 0) {                   
+            //    } else {
+            //        alert(msg);
+            //    }
+            //}, true);
+            //test
+
+            $("#sendType_1").attr('checked', 'checked');
+            SelectSendingType();
+
+            //$("#cron").cronGen();
+
+            if ($("#list").val() != "" && $("#list").val() != null) {
+                var tmp = $("#list").val();
+
+                if (tmp.indexOf('[') < 0) {
+                    $("#AccIdSet").val($("#list").val());
+                    $("#sendType_3").removeAttr('disabled');
+                    GetShowCondition();
+                    //GetAccIdSummary();
+                } else {
+                    $("#AccIdSet").val("");
+                    $("#verif").val("");
+                    $("#list").val("");
+                    $("#count").val("");
+                }
+
+            }
+
+            $("#AccIdSet").removeAttr('disabled');
+            $("#ConfirmAccId").removeClass("hidden");
+            $("#ConfirmAccIdAgain").addClass("hidden");
+
+            $("input:checkbox").each(function() {
+                $(this).prop('checked', false);
+            });
+            $("#Sms").addClass('hidden');
+            $("#Pub").addClass('hidden');
+            $("#Mobile").addClass('hidden');
+            $("#Email").addClass('hidden');
+
+            $(".SmsHr").addClass('hidden');
+            $(".PubHr").addClass('hidden');
+            $(".MobileHr").addClass('hidden');
+
+            $("input:checkbox").click(function() {
+                $("#Sms").addClass('hidden');
+                $("#Pub").addClass('hidden');
+                $("#Mobile").addClass('hidden');
+                $("#Email").addClass('hidden');
+
+                $(".SmsHr").addClass('hidden');
+                $(".PubHr").addClass('hidden');
+                $(".MobileHr").addClass('hidden');
+
+                var columnList = $("input:checkbox:checked");
+
+                $.each(columnList, function(i, n) {
+                    $("#" + n.value).removeClass('hidden');
+                    if (n.value != 'Email') {
+                        $("." + n.value + "Hr").removeClass('hidden');
+                    }
+
+                    if (n.value != 'Sms') {
+                        if (n.value == 'Mobile') {
+                            $("#" + n.value + "Content").summernote({
+                                height: 150,
+                                oninit: function() {
+                                    $("#Mobile div.note-editor button[data-event='codeview']").click();
+                                },
+                                onfocus: function (e) {
+                                    $('body').addClass('overlay-disabled');
+                                },
+                                onblur: function (e) {
+                                    $('body').removeClass('overlay-disabled');
+                                }
+                            });
+                        } else {
+                            $("#" + n.value + "Content").summernote({
+                                height: 150,
+                                onfocus: function (e) {
+                                    $('body').addClass('overlay-disabled');
+                                },
+                                onblur: function (e) {
+                                    $('body').removeClass('overlay-disabled');
+                                }
+                            });
+                        }
+                        
+                    }
+
+                });
+            });
+            //$('#expireTime .input-group.date').datepicker();
+
+        });
+
+        function ChangeMobileType() {
+            if ($("#ContentType").val() == "web" || $("#ContentType").val() == "bbs") {
+                $("#MobileStr").removeClass("hidden");
+                $("#MobileView").addClass("hidden");
+            } else if ($("#ContentType").val() == "view") {
+                $("#MobileView").removeClass("hidden");
+                $("#MobileStr").addClass("hidden");
+            } else {
+                $("#MobileView").addClass("hidden");
+                $("#MobileStr").addClass("hidden");
+            }
+        }
+
+        function GetAccIdSummary() {
+
+            var AccIdList = $("#AccIdSet").val();
+
+            if (AccIdList == "") {
+                alert("请先输入店铺ID！");
+                return false;
+            } else {
+                var postJson = {};
+                var url = "/MessageSending/GetShopSummary";
+
+                postJson["originList"] = AccIdList;
+
+                $.doAjax(url, postJson, function(msg) {
+                    if (msg != "" && msg.indexOf("没有找到有关") < 0) {
+
+                        var json = jQuery.parseJSON(msg);
+
+                        $("#list").val(json.list);
+                        $("#count").val(json.count);
+                        $("#AccIdSum").html("共 " + json.strsum + " 等" + json.count + "家店铺");
+                        $("#AccIdDetail").attr("title", json.detail);
+                        ShowMsgListTips();
+                        $("#SendingSummary").removeClass("hidden");
+
+                        $("#AccIdSet").val("");
+                        $("#AccIdSet").attr('disabled', 'true');
+                        $("#ConfirmAccId").addClass("hidden");
+                        $("#ConfirmAccIdAgain").removeClass("hidden");
+
+                    } else {
+                        alert(msg);
+                    }
+                }, true);
+            }
+        }
+
+        function Reconfirm() {
+            $("#SendingSummary").addClass("hidden");
+            $("#AccIdSet").removeAttr('disabled');
+            $("#ConfirmAccId").removeClass("hidden");
+            $("#ConfirmAccIdAgain").addClass("hidden");
+        }
+
+        function SubmitSendingRequest() {
+            var postJson = {};
+            var url = "";
+
+            //普通发送处理
+            if ($("#sendType_1").prop('checked')) {
+                url = "/MessageSending/SubmitPushingRequest";
+            }
+            //定时发送处理
+            else if ($("#sendType_2").prop('checked')) {
+                url = "/MessageSending/AddSpecTimeSendingTask";
+
+                var specTime = $("#specTimeSet").val();
+                //var nowDate = new Date();
+
+                if (specTime == '') {
+                    alert("请填写定时发送的时间！");
+                    return false;
+                } else {
+                    postJson["date"] = specTime;
+                }
+
+            }
+            //循环发送处理
+            else {
+                url = "/MessageSending/AddRecurringTask";
+
+                //设置本次是否需要发送的标记
+                if ($("#confirmThis").prop('checked')) {
+                    postJson["sendMark"] = "1";
+                } else {
+                    postJson["sendMark"] = "";
+                }
+
+
+                //设置循环Cron表达式
+                var cron = $("#cronExp").val();
+                if (cron == '') {
+                    alert("请先选择循环发送条件");
+                    return false;
+                }
+                postJson["cronExp"] = $("#cronExp").val();
+
+                //提醒时间条件需要修改
+                if ($(".ConditionGroup .ConditionItem[type='TimePair'][diffVal='']").length > 0) {
+                    //console.log($(".ConditionGroup .ConditionItem[type='TimePair'][diffVal='']"));
+                    alert("带有特定时间的条件需要修改！");
+                    return false;
+                }
+
+                //条件拼装逻辑
+                postJson["modelStr"] = SetConditionStr();
+
+            }
+
+
+// string SmsTitle = "", string MobileTitle = "", string PubTitle = "", string EmailTitle = "",
+            //string SmsContent = "", string MobileContent = "", string PubContent = "", string EmailContent = "", string remark = "", string verif = ""
+            if ($("#list").val() == "") {
+                alert("请先填写店铺ID!");
+                return false;
+            } else {
+                postJson["accidSet"] = $("#list").val();
+            }
+
+            postJson["verif"] = $("#verif").val();
+            postJson["accIdCount"] = $("#count").val();
+
+            if ($("#Remark").val() == "") {
+                alert("请先填写发送说明!");
+                return false;
+            } else {
+                postJson["remark"] = $("#Remark").val();
+            }
+
+            var columnList = $("input:checkbox:checked");
+            if (columnList.length == 0) {
+                alert("请选择发送方式！");
+                return false;
+            } else {
+                $.each(columnList, function(i, n) {
+                    if (n.value == "Sms") {
+                        postJson[n.value + "Content"] = $("#SmsContent").val();
+                    } else if (n.value == "Mobile") {   //移动端消息类型处理
+                        postJson[n.value + "Title"] = $("#" + n.value + "Title").val();
+                        postJson[n.value + "Content"] = escape($("#" + n.value + "Content").code());
+                        postJson["contentType"] = $("#ContentType").val();
+
+                        switch ($("#ContentType").val()) {
+                            case "web":
+                            case "bbs":
+                                postJson["contentUrl"] = $("#ContentUrlStr").val();
+                                break;
+                            case "view":
+                                postJson["contentUrl"] = $("#ContentUrlView").val();
+                                break;
+                            case "text":
+                                break;                                                    
+                        }                        
+
+                    } else {
+                        if (n.value != "on") {
+                            postJson[n.value + "Title"] = $("#" + n.value + "Title").val();
+                            postJson[n.value + "Content"] = escape($("#" + n.value + "Content").code());
+                        }
+                    }
+
+                });
+            }
+
+            $.doAjax(url, postJson, function(msg) {
+                if (msg != "") {
+                    if (msg == "0") {
+                        alert("定时发送的时间不能早于当前时间！");
+                        return false;
+                    } else if (msg == "-1") {
+                        alert("添加后台发送任务出错！");
+                        return false;
+                    } else if (msg == "1") {
+                        alert("消息提交成功！");
+                        location.reload();
+                    } else {
+                        alert(msg);
+                        location.reload();
+                    }
+
+
+                    //var json = jQuery.parseJSON(msg);
+
+                    //$("#list").val(json.list);
+                    //$("#AccIdSum").html("共" + json.strsum + "等" + json.count + "家店铺");
+                    //$("#AccIdDetail").attr("title", json.detail);
+                    //$("#SendingSummary").removeClass("hidden");
+
+                    //$("#AccIdSet").val("");
+                    //$("#AccIdSet").attr('disabled', 'true');
+                    //$("#ConfirmAccId").addClass("hidden");
+                    //$("#ConfirmAccIdAgain").removeClass("hidden");
+
+                }
+            }, true);
+        }
+
+        function ShowMsgListTips() {
+            $("#AccIdDetail").qtip({
+                content: {
+                    attr: 'title'
+                },
+                position: {
+                    my: 'left center',
+                    at: 'right center'
+                },
+                show: {
+                    solo: true
+                },
+                style: {
+                    classes: 'ui-tooltip-shadow ui-tooltip-light'
+                }
+
+            });
+        }
+    </script>
+}
+
+

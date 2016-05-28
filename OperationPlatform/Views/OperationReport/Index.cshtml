@@ -1,0 +1,143 @@
+﻿
+@{
+    ViewBag.Title = "运营分析报表";
+}
+
+@section Style{
+
+    @Styles.Render("~/style/form")
+    <link href="~/css/ShopInfo/ShopInfo.css" rel="stylesheet" />
+    <link href="~/css/plugins/summernote/summernote.css" rel="stylesheet" />
+}
+
+<div class="panel panel-transparent report">
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs nav-tabs-fillup">
+        <li class="active">
+            <a data-toggle="tab" href="#slide1" onclick="PageLoad(0)"><span>拉新</span></a>
+        </li>
+        <li>
+            <a data-toggle="tab" href="#slide2" onclick="PageLoad(1)"><span>转化</span></a>
+        </li>
+        <li>
+            <a data-toggle="tab" href="#slide3" onclick="PageLoad(2)"><span>留存</span></a>
+        </li>
+        <li>
+            <a data-toggle="tab" href="#slide4" onclick="PageLoad(3)"><span>促活</span></a>
+        </li>
+        <li>
+            <a data-toggle="tab" href="#slide5" onclick="PageLoad(4)"><span>收入</span></a>
+        </li>
+    </ul>
+
+    <div class="page-where reportWhere" style="margin-top: 10px;">
+
+        <div class="page-where-time-input">
+            <div class="input-daterange input-group">
+                <input type="text" placeholder="本周期起始" class="input-sm form-control" name="tstart" />
+                <span class="input-group-addon">to</span>
+                <input type="text" placeholder="本周期结束" class="input-sm form-control" name="tend" />
+            </div>
+        </div>
+
+        <div class="page-where-time-input">
+            <div class="input-daterange input-group">
+                <input type="text" placeholder="上周期起始" class="input-sm form-control" name="lstart" />
+                <span class="input-group-addon">to</span>
+                <input type="text" placeholder="上周期结束" class="input-sm form-control" name="lend" />
+            </div>
+        </div>
+
+        <button type="button" value="select" class="btn btn-default btn-inquire" onclick="GetReport()">查询</button>
+    </div>
+
+    <!-- Tab panes -->
+    <div class="tab-content no-padding ">
+        <div class="tab-pane slide-left active pageIndex" id="slide1">
+
+        </div>
+        <div class="tab-pane slide-left pageIndex" id="slide2">
+
+        </div>
+        <div class="tab-pane slide-left pageIndex" id="slide3">
+
+        </div>
+        <div class="tab-pane slide-left pageIndex" id="slide4">
+
+        </div>
+        <div class="tab-pane slide-left pageIndex" id="slide5">
+
+        </div>
+    </div>
+</div>
+
+<input type="hidden" value="@ViewBag.AccId " id="ShopInfo"/>
+
+<input type="hidden" name="tStart" id="tStart" value=""/>
+<input type="hidden" name="lStart" id="lStart" value=""/>
+<input type="hidden" name="tEnd" id="tEnd" value=""/>
+<input type="hidden" name="lEnd" id="lEnd" value="" />
+
+@section Scripts{
+    @Scripts.Render("~/js/begin/form")
+    <script src="~/Scripts/Report/report.js"></script>
+<script src="~/Scripts/plugins/artTemplate/template.js"></script>
+
+    <script type="text/javascript">
+        $(function () {
+            $('.reportWhere .input-daterange').datepicker({ format: 'yyyy-mm-dd' });
+            PageLoad(0);
+            PageLoad(1);
+            PageLoad(2);
+            PageLoad(3);
+            PageLoad(4);
+        });
+
+        function PageLoad(e, postData) {
+            var url = "";
+            var html = $.trim($(".report .tab-content .tab-pane.pageIndex").eq(e).html());
+            if (html != "") {
+                return false;
+            }
+            switch (e) {
+            case 0: //拉新
+                url = "/OperationReport/NewAccount";
+                break;
+            case 1: //转化
+                url = "/OperationReport/Conversion";
+                break;
+            case 2: //留存
+                url = "/OperationReport/Retention";
+                break;
+            case 3: //促活
+                url = "/OperationReport/Active";
+                break;
+            case 4: //收入
+                url = "/OperationReport/Income";
+                break;
+            default:
+                url = "/OperationReport/NewAccount";
+                break;
+            }
+
+            $.doAjax(url, postData, function(msg) {
+                $(".report .tab-content .tab-pane.pageIndex").eq(e).html(msg);
+            });
+        }
+
+        function GetReport() {
+            //GetNewAccountReport();
+            //GetConversionReport();
+            //GetRetentionReport();
+            GetActiveReport();
+            //GetIncomeReport();
+            //$("#tStart").val($(".reportWhere input[name='tstart']").val());
+            //$("#lStart").val($(".reportWhere input[name='lstart']").val());
+            //$("#tEnd").val($(".reportWhere input[name='tend']").val());
+            //$("#lend").val($(".reportWhere input[name='lend']").val());
+
+            PageLoad(0);
+        }
+    </script>
+}
+

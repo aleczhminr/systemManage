@@ -1,0 +1,59 @@
+﻿@{
+    ViewBag.Title = "付费";
+    Layout = null;
+}
+
+
+<table id="income" class="table table-bordered" style="width: 800px">
+    <thead>
+        <tr>
+            <th>付费</th>
+            <th>定义</th>
+            <th>本周期</th>
+            <th>上周期</th>
+            <th>增长</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+
+<script type="text/html" id="incomeScript">
+    {{each list}}
+    {{each $value.DataList as dt}}
+    <tr>
+        <td rowspan='{{dt.RowSpan}}' colspan='{{dt.ColSpan}}'>{{dt.GroupName}}</td>
+        {{each dt.DataList as data i}}
+        {{if i==0}}
+        {{if dt.ColSpan>1}}
+        {{else}}
+        <td>{{data.SourceName}}</td>
+        {{/if}}
+        <td>{{data.ThisWeekVal}}</td>
+        <td>{{data.LastWeekVal}}</td>
+        <td>{{data.Percent}}</td>
+        {{/if}}
+        {{/each}}
+    </tr>
+    {{each dt.DataList as data i}}
+    {{if i>0}}
+    <tr>
+        <td>{{data.SourceName}}</td>
+        <td>{{data.ThisWeekVal}}</td>
+        <td>{{data.LastWeekVal}}</td>
+        <td>{{data.Percent}}</td>
+    </tr>
+    {{/if}}
+    {{/each}}
+    {{/each}}
+    {{/each}}
+</script>
+
+<script src="~/Scripts/plugins/artTemplate/template.js"></script>
+<script type="text/javascript">
+    $(function () {
+        //GetNewAccountReport();
+    });
+
+
+</script>

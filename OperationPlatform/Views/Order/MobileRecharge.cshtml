@@ -1,0 +1,167 @@
+﻿@{
+    ViewBag.Title = "第三方充值状态查询";
+}
+@section Style{
+    @Styles.Render("~/style/form")
+}
+<div class="container-fixed-lg bg-white" style="min-width: 915px;">
+    <div class="panel panel-transparent no-border">
+        <div class="panel-heading">
+            <div class="page-where visitWhere">
+                <div class="pull-left">
+                    <div class=" whereitem">
+                        <input type="text" placeholder="手机号" class="form-control width120" id="phoneNum" onblur="GetRechargeOrderList(1)">
+                    </div>
+
+                    <div class=" whereitem">
+                        <input type="text" placeholder="订单号" class="form-control width120" id="orderNo" onblur="GetRechargeOrderList(1)">
+                    </div>
+
+                    <div class="clear"></div>
+                </div>
+                <div class="clear"></div>
+            </div>
+        </div>
+        <div id="summaryTendency" class="col-md-12 col-sm-12 col-xs-12" style="margin: 10px">
+
+        </div>
+        <div class="panel-body no-padding">
+            <div class="row">
+                <table class="table table-hover" id="ListTable">
+                    <thead>
+                        <tr>
+                            <th class="text-center">店铺名称</th>
+                            <!-- <th class="text-center">注册来源</th> -->
+                            <th>订单号</th>
+                            <th class="text-center">电话号码</th>
+                            <th class="text-center">充值说明</th>
+                            <th class="text-center">运营商价格</th>
+                            <th class="text-center">充值状态</th>
+                            <th class="text-center">添加时间</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <div class="dataTables_wrapper" id="ListPageHtml">
+                    <div class="dataTables_paginate pagination">
+                        <ul><li class="prev disabled"><a href="javascript:void(0)"><i class="pg-arrow_left"></i></a></li><li class="active"><a href="javascript:void(0)">1</a></li><li class="next disabled"><a href="javascript:void(0)"><i class="pg-arrow_right"></i></a></li></ul>
+                    </div>
+                    <div class="dataTablePagText fs-12 m-l-20"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@*<input type="hidden" value="@ViewBag.Column" id="indexSeachSelectValue" />
+<input type="hidden" value="@ViewBag.Value" id="indexSeachInputValue" />*@
+
+<script type="text/html" id="reOrderListScript">
+    {{each listData}}
+    <tr role="row">
+        <td>
+            <a href="/shopinfo/index/{{$value.accModel.ID}}" target="_blank" data-toggle="tooltip" data-placement="left" title="{{$value.accModel.CompanyName}} 【{{$value.accModel.UserRealName}}】">
+                <img src="/img/Shop/{{$value.accModel.aotjb | $aotjbImg}}" style="margin-right: 10px;" alt="{{$value.accModel.aotjb}}" />
+                <span style='{{$value.accModel.LoginTimeLast | $logLength}}'>{{$value.accModel.CompanyName}}</span>
+            </a>
+        </td>
+        <td title="{{$value.uorderid}}">{{$value.uorderid}}</td>
+
+        <td class="text-center" title="{{$value.game_userid}}">{{$value.game_userid}}</td>
+        <td class="text-center" title="{{$value.cardname}}">{{$value.cardname}}</td>
+        <td class="text-center" title="{{$value.uordercash}}">{{$value.uordercash}}</td>
+        <td class="text-center">
+            {{if $value.game_state==1}}
+            <span style="color: green">充值成功</span>
+            {{else if $value.game_state==0}}
+            <span style="color: orange">充值中</span>
+            {{else if $value.game_state==9}}
+            <span style="color: red">充值失败</span>
+            {{/if}}
+        </td>
+        
+        <td class="text-center">{{$value.addtime }}</td>
+        
+    </tr>
+    {{/each}}
+</script>
+@section Scripts{
+    @Scripts.Render("~/js/begin/form")
+    <script src="~/Scripts/plugins/artTemplate/template.js"></script>
+    <script src="~/Scripts/ShopList/ShopList.js"></script>
+    <script type="text/javascript">
+
+        //var timeOut = 0;
+        $(function() {
+
+
+            GetRechargeOrderList(1);
+
+            // $(".loginTimeLast").html($(".loginTimeLast").html().substr(0, 10));
+        });
+
+        function GetRechargeOrderList(pageIndex) {
+            var phoneNum = $("#phoneNum").val();
+            var orderNo = $("#orderNo").val();
+
+            var jsonPost = {};
+            jsonPost["page"] = pageIndex;
+            jsonPost["phoneNum"] = phoneNum;
+            jsonPost["orderNo"] = orderNo;
+
+            var url = "/Order/GetRechargeList";
+            $.doAjax(url, jsonPost, function(msg) {
+                if (msg != "null" && msg != "") {
+                    var json = $.parseJSON(msg);
+                    
+                    $("#ListTable tbody").html(template("reOrderListScript", { "listData": json.result.data }));
+
+                    $("#ListPageHtml").attr("rowcount", json.result.totalcount).attr("maxpage", json.result.totalpage);
+                    $("#ListPageHtml .dataTablePagText").html("共" + json.result.totalcount + "条(" + json.result.Summary.AccidCount + "个用户), 用户支出:<span style='color:green'>" + json.result.Summary.UsrPaid + "</span>, 账户支出:<span style='color:red'>" + json.result.Summary.WePaid + "</span>, 补贴:<span style='color:red'>" + json.result.Summary.GapSum + "</span>");
+
+                    var pageHtml = $.listPageHtml(pageIndex, $("#ListPageHtml").attr("maxpage"), "GetRechargeOrderList", 5);
+                    $("#ListPageHtml .dataTables_paginate").html(pageHtml);
+                }
+
+            }, true);
+        }
+
+        template.helper('$logLength', function(log) {
+            if (log < 1) {
+                return "color:#ff7f00";
+            } else if (log < 4) {
+                return "color:#01B43A";
+            } else if (log < 7) {
+                return "color:#992200";
+            } else {
+                return "color:#000000";
+            }
+        });
+
+        template.helper('$aotjbImg', function(aotjb) {
+            if (aotjb == 2) {
+                return "edi1.png";
+            } else if (aotjb == 3) {
+                return "edi3.png";
+            } else if (aotjb == 5) {
+                return "edi5.png";
+            } else {
+                return "edi1.png";
+            }
+        });
+
+        template.helper('dateFormat', function(data) {
+            if (data == "" || data == undefined || data == null) {
+                return "-";
+            };
+            if (data == "1900-01-01 00:00:00") {
+                return "从未登录";
+            } else {
+                return data.toString().substr(0, 10);
+            };
+        });
+
+
+    </script>
+}

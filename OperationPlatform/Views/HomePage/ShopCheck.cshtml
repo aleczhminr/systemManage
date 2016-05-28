@@ -1,0 +1,155 @@
+﻿ 
+
+@{
+    ViewBag.Title = "店铺审核";
+}
+@section Style{
+
+    @Styles.Render("~/style/form")
+
+}
+
+    <div class="container-fixed-lg bg-white" style="min-width: 915px;">
+        <div class="panel panel-transparent no-border p-t-10 p-l-10 p-r-10 p-b-10">
+            <div class="panel-heading">
+                <div class="page-where shopCheckWhere">
+                    <div>
+                        <div class="pull-left"> 
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-default btn-select" value="0" onclick="whereTimeButtonClick(this)">今天</button>
+                                <button type="button" class="btn btn-default" value="1" onclick="whereTimeButtonClick(this)">昨天</button>
+                                <button type="button" class="btn btn-default" value="3" onclick="whereTimeButtonClick(this)">其他时间</button>
+                            </div>
+                            <div class="btn-group page-where-othertime" style="display:none;">
+                                <button type="button" value="return" class="btn btn-default border-right0" onclick="whereTimeButtonClick(this)">返回</button>
+                                <div class="page-where-time-input">
+                                    <div id="myDatepicker" class="input-group date" style="width:200px">
+                                        <span class="input-group-addon">
+                                            <i class="fa fa-calendar"></i>
+                                        </span>
+                                        <input type="text" class="form-control">
+                                    </div>
+                                </div>
+                                <button type="button" value="select" class="btn btn-default btn-inquire" onclick="GetShopCheckList()">查询</button>
+                            </div>
+                            <div class="clear"></div>
+                        </div> 
+                        <div class="clear"></div>
+                    </div> 
+                </div>
+            </div>
+
+            <div class="panel-body no-padding">
+                <table class="table" id="shopCheckTable">
+                    <thead>
+                        <tr>
+                            <th>店铺名称</th>
+                            <th>手机号码</th>
+                            <th>邮件</th>
+                            <th>注册时间</th>
+                            <th>验证码</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+<script type="text/html" id="shopCheckScript">
+    {{each list}}
+    <tr>
+        <td>{{$value.CompanyName}}【{{$value.UserRealName}}】{{$value.regOk | regOkText }}</td>
+        <td>{{$value.PhoneNumber}}</td>
+        <td>{{$value.UserEmail | dateFormat}}</td>
+        <td>{{$value.RegTime}}</td>
+        <td>{{$value.Reg_Code | dateFormat}}</td>
+        <td><a href="javascript:void(0)" onclick="ShopCheckClick('{{$value.Id}}','{{$value.PhoneNumber}}')">审核通过</a></td>
+    </tr>
+    {{/each}}
+</script>
+
+
+@section Scripts{
+    @Scripts.Render("~/js/begin/form")
+<script src="~/Scripts/plugins/artTemplate/template.js"></script>
+
+<script type="text/javascript">
+
+    $(function () {
+        GetShopCheckList();
+        $('#myDatepicker').datepicker();
+    });
+
+    function GetShopCheckList() {
+        var type = $(".shopCheckWhere .pull-left button.btn-select").val();
+        var inpuTime = $("#myDatepicker input").val();
+
+        var postJosn = {};
+        postJosn["timeType"] = type;
+        postJosn["regTime"] = inpuTime;
+
+        var url = "/HomePage/GetShopCheck";
+
+        $.doAjax(url, postJosn, function (msg) {
+            if (msg != "" && msg!=null) {
+                var json = $.parseJSON(msg);
+                var html = template("shopCheckScript", { "list": json });
+                $("#shopCheckTable tbody").html(html);
+            }
+        });
+
+    }
+
+    function whereTimeButtonClick(obj) {
+        var value = obj.value;
+        if (value == "return") {
+            $(".shopCheckWhere .btn-group").show().filter(".page-where-othertime").hide();
+        } else {
+            $(obj).parent().find(".btn-select").removeClass("btn-select");
+            $(obj).addClass("btn-select");
+            if (value == "3") {
+                $(".shopCheckWhere .btn-group").hide().filter(".page-where-othertime").show();
+            } else {
+                GetShopCheckList();
+            }
+        }
+    }
+
+    template.helper('regOkText', function(c) {
+        if (c == 1) {
+            return "【注册成功】";
+        } else {
+            return "";
+        }
+    });
+
+    template.helper('dateFormat', function(data) {
+        if (data == "" || data == undefined || data == null) {
+            return "-";
+        };
+        if (data == "1900-01-01 00:00:00") {
+            return "从未登录";
+        } else {
+            return data.substr(0, 10);
+        };
+    });
+
+    function ShopCheckClick(accid, phone) {
+        var url = "/HomePage/CheckShopInfo";
+        $.doAjax(url, { "id": accid, "phone": phone }, function (msg) {
+            if (msg == "1") {
+                dialog({
+                    content: '审核成功，密码为 1234 ',
+                    quickClose: true// 点击空白处快速关闭
+                }).show();
+            } else {
+                alert("审核失败");
+            }
+        }, true);
+    }
+
+</script>
+}

@@ -1,0 +1,196 @@
+﻿@{
+    ViewBag.Title = "Venn集合分析";
+}
+@section Style{
+    @*@Styles.Render("~/style/nvd3")*@
+    @Styles.Render("~/style/form")
+    <style>
+        .page-container .page-content-wrapper {
+            background-color: #f5f5f5;
+        }
+
+
+        .venntooltip {
+            /*position: absolute;*/
+            text-align: center;
+            width: 128px;
+            height: 25px;
+            background: #333;
+            color: #ddd;
+            padding: 2px;
+            border: 0px;
+            border-radius: 8px;
+            opacity: 0;
+        }
+    </style>
+
+    <script src="/Scripts/plugins/jquery-metrojs/MetroJs.min.js"></script>
+    <script src="~/Scripts/plugins/d3/d3.min.js"></script>
+    <script src="/Scripts/venn.js"></script>
+    <link href="/css/plugins/jquery-metrojs/MetroJs.css" rel="stylesheet">
+    <link href="/css/plugins/jquery-dynatree/ui.dynatree.css" rel="stylesheet" />
+}
+
+@*<div class="panel panel-default">
+        <div class="panel-heading">
+            <div class="panel-title">
+                Drag n Drop
+            </div>
+        </div>
+        <div class="panel-body">
+            <p>
+                You can drag n drop and move sub items to the desired place you want, Please refer the documentation for more details or dynatree documentation
+            </p>
+            <div id="drag-tree" class="ui-draggable-handle">
+
+                <ul class="dynatree-container">
+                    <li class="">
+                        <span class="dynatree-node dynatree-exp-c dynatree-ico-c"><span class="dynatree-connector"></span><span class="dynatree-icon"></span><a href="#" class="dynatree-title" title="Look, a tool tip!">item1 with key and tooltip</a></span></li><li class="">
+                        <span class="dynatree-node dynatree-exp-c dynatree-ico-c"><span class="dynatree-connector"></span><span class="dynatree-icon"></span><a href="#" class="dynatree-title">item2</a></span></li><li class="">
+                        <span class="dynatree-node dynatree-folder dynatree-has-children dynatree-exp-c dynatree-ico-cf"><span class="dynatree-expander"></span><span class="dynatree-icon"></span><a href="#" class="dynatree-title">Folder with some children</a></span></li><li class="dynatree-lastsib">
+                        <span class="dynatree-node dynatree-expanded dynatree-has-children dynatree-lastsib dynatree-exp-el dynatree-ico-e"><span class="dynatree-expander"></span><span class="dynatree-icon"></span><a href="#" class="dynatree-title">Document with some children (expanded on init)</a></span><ul>
+                            <li class="">
+                                <span class="dynatree-node dynatree-expanded dynatree-has-children dynatree-exp-e dynatree-ico-e"><span class="dynatree-expander"></span><span class="dynatree-icon"></span><a href="#" class="dynatree-title">Sub-item 4.1 (active and focus on init)</a></span><ul style="display: block;">
+                                    <li class="">
+                                        <span class="dynatree-node dynatree-exp-c dynatree-ico-c"><span class="dynatree-connector"></span><span class="dynatree-icon"></span><a href="#" class="dynatree-title">Sub-item 4.1.1</a></span></li><li class="dynatree-lastsib">
+                                        <span class="dynatree-node dynatree-lastsib dynatree-exp-cl dynatree-ico-c dynatree-active"><span class="dynatree-connector"></span><span class="dynatree-icon"></span><a href="#" class="dynatree-title">Sub-item 4.1.2</a></span></li>
+                                </ul>
+                            </li><li class="dynatree-lastsib">
+                                <span class="dynatree-node dynatree-expanded dynatree-has-children dynatree-lastsib dynatree-exp-el dynatree-ico-e"><span class="dynatree-expander"></span><span class="dynatree-icon"></span><a href="#" class="dynatree-title">Sub-item 4.2</a></span><ul style="display: block;">
+                                    <li class="">
+                                        <span class="dynatree-node dynatree-exp-c dynatree-ico-c"><span class="dynatree-connector"></span><span class="dynatree-icon"></span><a href="#" class="dynatree-title">Sub-item 4.2.1</a></span></li><li class="dynatree-lastsib">
+                                        <span class="dynatree-node dynatree-lastsib dynatree-exp-cl dynatree-ico-c"><span class="dynatree-connector"></span><span class="dynatree-icon"></span><a href="#" class="dynatree-title">Sub-item 4.2.2</a></span></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>*@
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <div class="panel-title">
+            集合分析目录
+        </div>
+    </div>
+    <div class="panel-body">
+        <div class="panel row">
+            <div class="m-b-20 col-md-4" id="default-tree">
+                <ul id="treeData" style="display: none;">
+                    <li class="vennSetClick" id="dailyLogin" title="login" rel="login">
+                        每日登录用户集合
+                    </li>
+                    <li id="weeklyActive" title="active" rel="active">
+                        周活跃用户集合
+                    </li>
+
+                    <li class="expanded" id="usrDataVenn">
+                        用户数据相关
+                        <ul>
+                            <li class="active focused" id="weeklySale" title="sale" rel="sale">
+                                周产生销售行为的用户
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-md-8" id="vennContent"></div>
+        </div>
+    </div>
+</div>
+
+
+        @section Scripts{
+            @Scripts.Render("~/js/begin/form")
+            <script src="~/Scripts/plugins/summernote/js/summernote.min.js"></script>
+            <script src="~/Scripts/plugins/jquery-ui/jquery.dynatree.min.js"></script>
+            <script type="text/javascript">
+                $(function () {
+                    $("#default-tree").dynatree({
+                        fx: { height: "toggle", duration: 200 }, //Slide down animation
+                        onActivate: function (node) {
+                            // A DynaTreeNode object is passed to the activation handler
+                            // Note: we also get this event, if persistence is on, and the page is reloaded.
+                            GetVennSets(node.data.key);
+                        },
+                        children: [
+                            { title: "周活跃用户集合", key: "active" },
+                            { title: "周产生销售行为的用户", key: "sale" }
+                        ]
+                    });
+                });
+
+                function GetVennSets(type) {
+                    var ur = "/DataAnalyze/GetVennData";
+
+                    var postJson = {};
+                    postJson["type"] = type;
+
+                    $.doAjax(ur, postJson, function (msg) {
+                        var json = jQuery.parseJSON(msg);
+
+                        var activeSets = new Array();
+                        var Set = new Array();
+
+                        $.each(json.SetsList, function (i, n) {
+
+                            $.each(n.SetsElements, function (k, m) {
+                                Set.push(m);
+                            });
+
+                            activeSets.push({
+                                sets: Set,
+                                size: n.SetsCount
+                            });
+
+                            Set = new Array();
+                            //console.log(activeSets);
+                        });
+
+                        //var sets = [{ sets: ['移动端'], size: mobileData },
+                        //             { sets: ['桌面端'], size: webData },
+                        //             { sets: ['移动端', '桌面端'], size: crossData }];
+
+                        var actChart = venn.VennDiagram();
+                        var actDiv = d3.select("#vennContent");
+                        d3.select("#vennContent").datum(activeSets).call(actChart);
+
+                        // add a tooltip
+                        var tooltip = d3.select("#vennContent").append("div")
+                            .attr("class", "venntooltip");
+
+                        // add listeners to all the groups to display tooltip on mousover
+                        actDiv.selectAll("g")
+                            .on("mouseover", function (d, i) {
+                                // sort all the areas relative to the current item
+                                venn.sortAreas(actDiv, d);
+
+                                // Display a tooltip with the current size
+                                tooltip.transition().duration(400).style("opacity", .9);
+                                tooltip.text(d.size + " 个用户");
+
+                                // highlight the current path
+                                var selection = d3.select(this).transition("tooltip").duration(400);
+                                selection.select("path")
+                                    .style("stroke-width", 3)
+                                    .style("fill-opacity", d.sets.length == 1 ? .4 : .1)
+                                    .style("stroke-opacity", 1);
+                            })
+                            .on("mousemove", function () {
+                                tooltip.style("left", (d3.event.pageX) + "px")
+                                    .style("top", (d3.event.pageY - 28) + "px");
+                            })
+                            .on("mouseout", function (d, i) {
+                                tooltip.transition().duration(400).style("opacity", 0);
+                                var selection = d3.select(this).transition("tooltip").duration(400);
+                                selection.select("path")
+                                    .style("stroke-width", 0)
+                                    .style("fill-opacity", d.sets.length == 1 ? .25 : .0)
+                                    .style("stroke-opacity", 0);
+                            });
+                    }, true);
+                }
+            </script>
+        }

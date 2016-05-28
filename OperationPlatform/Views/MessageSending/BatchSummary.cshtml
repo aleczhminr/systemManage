@@ -1,0 +1,259 @@
+﻿@{
+    ViewBag.Title = "消息发送批次列表";
+}
+
+<div class="panel">
+    <div class="panel-heading page-where batch">
+        <div class="panel-title">
+
+            <div class="cs-wrapper pull-left m-r-10">
+
+                <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" name="channel" id="channel">
+                    <option value="-99">发送渠道</option>
+                    <option value="1">短信</option>
+                    <option value="2">站内消息</option>
+                    <option value="3">移动端</option>
+                    <option value="4">邮件</option>
+                </select>
+
+            </div>
+
+            <div class="cs-wrapper pull-left m-r-10">
+
+                <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" name="sourceType" id="sourceType">
+                    <option value="-99">发送类型</option>
+                    @*<option value="0">平台订单</option>*@
+                    <option value="1">手填</option>
+                    <option value="2">筛选器</option>
+                    @*<option value="3">财付通</option>*@
+                    @*<option value="4">快钱</option>*@
+                    <option value="3">系统自动</option>
+                </select>
+
+            </div>
+
+            <input type="hidden" id="timeType" value="" name="timePeriod" />
+            <div class="btn-group page-where-othertime" style="float: left; margin-right: 10px">
+                <div class="page-where-time-input">
+                    <div class="input-daterange input-group">
+                        <input type="text" class="input-sm form-control" placeholder="开始时间" name="start">
+                        <span class="input-group-addon">to</span>
+                        <input type="text" class="input-sm form-control" placeholder="结束时间" name="end">
+                    </div>
+                </div>
+            </div>
+            <div style="float: left; margin-right: 10px; width: 120px">
+                <input class="form-control" type="text" placeholder="批次Id" name="batchId" id="batchId">
+
+            </div>
+            <div style="float: left; margin-right: 10px; width: 80px">
+                <input class="form-control" type="text" placeholder="发送说明" name="remark" id="remark">
+            </div>
+            @*<div style="float: left; margin-right: 10px; width: 120px">
+                <input class="form-control" type="text" placeholder="发送内容" name="content" id="content">
+            </div>*@
+
+            <button type="button" value="select" class="btn btn-default btn-inquire" onclick=" GetBatchList(1) ">查询</button>
+
+            <div class="clearfix"></div>
+        </div>
+    </div>
+
+    <div class="panel-body no-padding">
+        <div class="table-responsive" id="batchList">
+            <table class="table table-hover table-condensed  no-footer">
+                <thead>
+                    <tr>
+                        @*<th class="text-center">批次编号</th>*@
+                        <th class="text-center">渠道</th>
+                        <th class="text-center">发送说明</th>
+                        <th class="text-center" style="width: 100px">用户数</th>
+                        <th class="text-center" style="width: 140px">短信</th>
+                        <th class="text-center" style="width: 140px">邮件</th>
+                        <th class="text-center" style="width: 140px">站内</th>
+                        <th class="text-center" style="width: 140px">移动端</th>
+                        <th class="text-center" style="width: 120px">创建时间</th>
+                        @*<th class="text-center" style="width: 120px">发送状态</th>*@
+                        @*<th class="text-center">标题</th>
+    <th class="text-center">内容摘要</th>*@
+                        
+                        <th class="text-center" style="width: 120px">操作</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <div class="dataTables_wrapper" id="ListPageHtml">
+                <div class="dataTables_paginate pagination pull-right">
+                    <ul><li class="prev disabled"><a href="javascript:void(0)"><i class="pg-arrow_left"></i></a></li><li class="active"><a href="javascript:void(0)">1</a></li><li class="next disabled"><a href="javascript:void(0)"><i class="pg-arrow_right"></i></a></li></ul>
+                </div>
+                <div class="dataTablePagText m-l-30"></div>
+            </div>
+            <input type="hidden" id="pageIndex" value="" />
+        </div>
+    </div>
+</div>
+
+<script type="text/html" id="BatchListScript">
+    {{if data.length < 1 }}
+    <tr><td colspan="11" class="DataNull">没有找到消息发送数据</td></tr>
+    {{/if}}
+    {{each data}}
+    <tr>
+        @*<td align="center">
+            <span title="{{$value.BatchId}}">{{$value.BatchId | batchIdFormat}}</span>
+        </td>*@
+
+        <td align="center">
+            {{if $value.SmsSend>0}}
+            <span>短信 </span>
+            {{/if}}
+            {{if $value.EmailSend>0}}
+            <span>邮件 </span>
+            {{/if}}
+            {{if $value.WebSend>0}}
+            <span>站内 </span>
+            {{/if}}
+            {{if $value.MobSend>0}}
+            <span>移动端 </span>
+            {{/if}}
+
+        </td>
+        <td align="center">
+            <span title="{{$value.SendRemark}}">{{$value.SendRemark}}</span>
+        </td>
+        <td align="center">
+            <span>{{$value.AccIdCount}}</span>
+        </td>
+
+        <td align="center">
+            {{if $value.SmsSend>0}}
+            <span style="width: 100px; color: orangered">{{$value.SmsSend}}</span>/<span style="color: green">{{$value.SmsOpen}}  <span style="color: purple;font-size: 12px">({{$value.SmsPartition}})</span></span>
+            {{else}}
+            <span style="width: 100px; color: gray">未发送</span>
+            {{/if}}
+        </td>
+
+        <td align="center">
+            {{if $value.EmailSend>0}}
+            <span style="width: 100px; color: orangered">{{$value.EmailSend}}</span>/<span style="color: green">{{$value.EmailOpen}}  <span style="color: purple;font-size: 12px">({{$value.EmailPartition}})</span></span>
+            {{else}}
+            <span style="width: 100px; color: gray">未发送</span>
+            {{/if}}
+        </td>
+
+        <td align="center">
+            {{if $value.WebSend>0}}
+            <span style="width: 100px; color: orangered">{{$value.WebSend}}</span>/<span style="color: green">{{$value.WebOpen}}  <span style="color: purple;font-size: 12px">({{$value.WebPartition}})</span></span>
+            {{else}}
+            <span style="width: 100px; color: gray">未发送</span>
+            {{/if}}
+        </td>
+
+        <td align="center">
+            {{if $value.MobSend>0}}
+            <span style="width: 100px; color: orangered">{{$value.MobSend}}</span>/<span style="color: green">{{$value.MobOpen}}  <span style="color: purple;font-size: 12px">({{$value.MobPartition}})</span></span>
+            {{else}}
+            <span style="width: 100px; color: gray">未发送</span>
+            {{/if}}
+        </td>
+        
+        <td align="center">
+            <span title="{{$value.CreateTime}}" style="width: 120px">{{$value.CreateTime | dateFormat}}</span>
+        </td>
+        
+        
+
+        
+        <td align="center">
+            <span style="color: green; cursor: pointer" onclick="ShowBatch('{{$value.BatchId}}')">详情</span>
+            @*<span> | </span>
+            <span style="color: green; cursor: pointer" onclick="RefreshStatus('{{$value.BatchId}}', '{{$value.ChannelId}}')">刷新</span>*@
+        </td>
+        
+    </tr>
+    {{/each}}
+</script>
+
+
+@section Scripts{
+    @Scripts.Render("~/js/begin/form")
+    <script src="~/Scripts/plugins/artTemplate/template.js"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function() {
+            $('.batch .input-daterange').datepicker({ format: 'yyyy-mm-dd' });
+            GetBatchList(1);
+        });
+
+        function GetBatchList(page) {
+            var url = "/MessageSending/GetBatchSummaryInfo";
+            var postJson = {};
+
+            postJson["pageIndex"] = page;
+            var channel = $("#channel").val();
+            var sourceType = $("#sourceType").val();
+
+            var statTime = $(".batch input[name='start']").val();
+            var endTime = $(".batch input[name='end']").val();
+
+            var stDate = new Date();
+            var edDate = new Date();
+            if (statTime.length === 0 && endTime.length === 0) {
+                postJson["stDate"] = stDate.toLocaleDateString();
+                postJson["edDate"] = edDate.toLocaleDateString(-1);
+            } else {
+                if (statTime.length > 0) {
+                    postJson["stDate"] = statTime;
+                } else {
+                    postJson["stDate"] = stDate.toLocaleDateString();
+                }
+                if (endTime.length > 0) {
+                    postJson["edDate"] = endTime;
+                } else {
+                    postJson["edDate"] = edDate.toLocaleDateString();
+                }
+            }
+
+            var batchId = $("#batchId").val();
+            var remark = $("#remark").val();
+            //var content = $("#content").val();
+
+            //, stDate, edDate, batchId, remark, content,
+            //postJson["transactionStatus"] = transactionStatus;
+            postJson["batchId"] = batchId;
+            postJson["remark"] = remark;
+            //postJson["content"] = content;
+            postJson["channel"] = channel;
+            postJson["sourceType"] = 0;
+
+            $.doAjax(url, postJson, function(msg) {
+                if (msg != "null" && msg != "") {
+                    var json = $.parseJSON(msg);
+
+                    $("#batchList table tbody").html(template("BatchListScript", { "data": json.data }));
+
+                    if (page == 1) {
+                        $("#ListPageHtml").attr("rowcount", json.count).attr("maxpage", json.maxPage);
+                        $("#ListPageHtml .dataTablePagText").html("共" + json.count + "条");
+                    }
+                    var pageHtml = $.listPageHtml(page, $("#ListPageHtml").attr("maxpage"), "GetBatchList", 5);
+                    $("#pageIndex").val(page);
+                    $("#ListPageHtml .dataTables_paginate").html(pageHtml);
+                }
+            }, true);
+        }
+
+        function ShowBatch(batchId) {
+            window.open("/messagesending/BatchList?batchId=" + batchId);
+        }        
+
+        template.helper('batchIdFormat', function(data) {
+            return data.toString().substr(0, 8);
+        });
+
+        template.helper('dateFormat', function (data) {
+            return data.toString().substr(0, 10);
+        });
+    </script>
+}
+

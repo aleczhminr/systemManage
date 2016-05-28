@@ -1,0 +1,506 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-touch-fullscreen" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta content="" name="description" />
+    <meta content="" name="author" />
+    <title>@ViewBag.Title</title>
+    @RenderSection("HeadStyle", required: false)
+    @Styles.Render("~/style/begin/plugins")
+    <!-- jQuery -->
+    @Scripts.Render("~/jquery")
+
+
+    <!--[if lte IE 9]>
+        <link href="/css/core/ie9.css" rel="stylesheet" type="text/css" />
+    <![endif]-->
+    <script type="text/javascript">
+        window.onload = function () {
+            // fix for windows 8
+            if (navigator.appVersion.indexOf("Windows NT 6.2") != -1)
+                document.head.innerHTML += '<link rel="stylesheet" type="text/css" href="/css/core/windows.chrome.fix.css" />'
+        }
+    </script>
+    <link href="~/css/plugins/dialog/ui-dialog.css" rel="stylesheet" />
+    <script src="~/Scripts/plugins/dialog/dialog.js"></script>
+    @RenderSection("style", required: false)
+    @Styles.Render("~/style/begin/core")
+    <!-- BEGIN 用户自定义 CSS -->
+    <link href="/css/style.css?20150508" rel="stylesheet" type="text/css" />
+</head>
+<body class="fixed-header mac desktop sidebar-visible menu-pin dashboard">
+    <!-- BEGIN SIDEBAR -->
+    <div class="page-sidebar" data-pages="sidebar">
+        <div id="appMenu" class="sidebar-overlay-slide from-top">
+        </div>
+        <!-- BEGIN SIDEBAR HEADER -->
+        <div class="sidebar-header">
+            <a href="/"><img src="/img/logoPro.png" alt="logo" class="brand" data-src="/img/logoPro.png" data-src-retina="img/logoPro.png" width="120" height="30"></a>
+            <div class="sidebar-header-controls">
+                <button data-toggle-pin="sidebar" class="btn btn-link" type="button">
+                    <i class="fa fs-12"></i>
+                </button>
+            </div>
+        </div>
+        <!-- END SIDEBAR HEADER -->
+        <!-- BEGIN SIDEBAR MENU -->
+        <div class="sidebar-menu">
+            <ul class="menu-items">
+                <li class="m-t-30">
+                    <a href="javascript:;">
+                        <span class="title">店铺管理</span>
+                        <span class=" arrow"></span>
+                    </a>
+                    <span class="icon-thumbnail">
+                        <i class="fs-14 fa pg-home"></i>
+                    </span>
+                    <ul class="sub-menu">
+                        <li class="">
+                            <a href="/ShopList/">店铺列表</a>
+                        </li>
+                        <li class="">
+                            <a href="/HomePage/ShopCheck">店铺审核</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="">
+                    <a href="javascript:;">
+                        <span>今日待完成事项</span>
+                        <span class="arrow"></span>
+                    </a>
+                    <span class="icon-thumbnail">
+                        <i class="fs-14 fa fa-file-text"></i>
+                    </span>
+                    <ul class="sub-menu">
+                        <li class="">
+                            <a href="/PlatformVisit">回访信息</a>
+                            <span class="icon-thumbnail">0</span>
+                        </li>
+                        <li class="">
+                            <a href="/PlatformVisit/VisitFigureOut">1天内未关闭</a>
+                        </li>
+                        <li class="">
+                            <a href="/PlatformVisit/VisitFigureOut?type=2">超1天内未关闭</a>
+                        </li>
+                        <li class="">
+                            <a href="/PlatformVisit/VisitFigureOut?type=3">已关闭事件</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="">
+                    <a href="javascript:;">
+                        <span class="title">订单管理</span>
+                        <span class="arrow"></span>
+                    </a>
+                    <span class="icon-thumbnail">
+                        <i class="fs-14 fa fa-file-text"></i>
+                    </span>
+                    <ul class="sub-menu">
+                        <li class="">
+                            <a href="/Order/Index">订单信息</a>
+                        </li>
+                        <li class="">
+                            <a href="/Order/InvoiceList">发票信息</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="">
+                    <a href="javascript:;">
+                        <span class="title">短信</span>
+                        <span class=" arrow"></span>
+                    </a>
+                    <span class="icon-thumbnail ">
+                        <i class="fs-14 fa pg-social"></i>
+                    </span>
+                    <ul class="sub-menu">
+                        <li class="">
+                            <a href="/sms">短信列表</a>
+                        </li>
+                        <li class="">
+                            <a href="/sms/smsreview">短信审核</a>
+                            <span class="icon-thumbnail">0</span>
+                        </li>
+                        <li class="">
+                            <a href="/sms/channelOption">通道设置</a>
+                        </li>
+                        <li class="">
+                            <a href="/sms/channeltest">通道测试</a>
+                        </li>
+                        <li class="">
+                            <a href="/sms/NoticeText">短信预告</a>
+                        </li>
+                        <li class="">
+                            <a href="/sms/SmsContentMaster">短信内容管理</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="">
+                    <a href="javascript:;">
+                        <span class="title">平台回访</span>
+                        <span class="arrow"></span>
+                    </a>
+                    <span class="icon-thumbnail ">
+                        <i class="fs-14 fa fa-phone"></i>
+                    </span>
+                    <ul class="sub-menu">
+                        <li class="">
+                            <a href="/PlatformVisit">回访信息</a>
+                            <span class="icon-thumbnail">0</span>
+                        </li>
+                        <li class="">
+                            <a href="/PlatformVisit/VisitList">历史回访</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="">
+                    <a href="javascript:;">
+                        <span class="title">消息中心</span>
+                        <span class=" arrow"></span>
+                    </a>
+                    <span class="icon-thumbnail ">
+                        <i class="fs-14 fa fa-info"></i>
+                    </span>
+                    <ul class="sub-menu">
+                        <li class="">
+                            <a href="/MsgCenter/PCMessageList">PC消息管理</a>
+                        </li>
+                        <li class="">
+                            <a href="/MsgCenter/MobileMessageList">移动端消息管理</a>
+                        </li>
+                        <li class="">
+                            <a href="/MsgCenter/SendMessage">推送消息</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="">
+                    <a href="javascript:;">
+                        <span class="title">优惠券</span>
+                        <span class="arrow"></span>
+                    </a>
+                    <span class="icon-thumbnail ">
+                        <i class="fs-14 fa fa-ticket"></i>
+                    </span>
+                    <ul class="sub-menu">
+                        <li class="">
+                            <a href="/OrderCoupon">优惠券</a>
+                        </li>
+                        <li class="">
+                            <a href="/OrderCoupon/CouponAdd">新增优惠券</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="">
+                    <a href="javascript:;">
+                        <span class="title">数据筛选</span>
+                        <span class="arrow"></span>
+                    </a>
+                    <span class="icon-thumbnail">
+                        <i class="fs-14 fa fa-filter"></i>
+                    </span>
+                    <ul class="sub-menu">
+                        <li class="">
+                            <a href="/FiltrateData/AccountFiltrate">筛选器</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="">
+                    <a href="javascript:;">
+                        <span class="title">日检</span>
+                        <span class=" arrow"></span>
+                    </a>
+                    <span class="icon-thumbnail ">
+                        <i class="fa pg-calender"></i>
+                    </span>
+                    <ul class="sub-menu">
+                        <li class="">
+                            <a href="/DailyCheck">当日任务</a>
+                        </li>
+                        <li class="">
+                            <a href="/DailyCheck/CheckTaskList">历史任务列表</a>
+                        </li>
+                        <li class="">
+                            <a href="/DailyCheck/AddCheckItem">新增日检任务</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="">
+                    <a href="javascript:;">
+                        <span>积分商城管理</span>
+                        <span class="arrow"></span>
+                    </a>
+                    <span class="icon-thumbnail ">
+                        <i class="fs-14 fa fa-ticket"></i>
+                    </span>
+                    <ul class="sub-menu">
+                        <li class="">
+                            <a href="/IntegralManage/IntegralStore">兑换管理</a>
+                        </li>
+                        <li class="">
+                            <a href="/IntegralManage/TaskControls">任务审核</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="">
+                    <a href="javascript:;">
+                        <span>知识管理系统</span>
+                        <span class="arrow"></span>
+                    </a>
+                    <span class="icon-thumbnail ">
+                        <i class="fs-14 fa fa-phone"></i>
+                    </span>
+                    <ul class="sub-menu">
+                        <li class="">
+                            <a href="/QuestionLibrary/QuestionList">知识库</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="">
+                    <a href="javascript:;">
+                        <span>回访事件分析</span>
+                        <span class="arrow"></span>
+                    </a>
+                    <span class="icon-thumbnail ">
+                        <i class="fs-14 fa fa-phone"></i>
+                    </span>
+                    <ul class="sub-menu">
+                        <li class="">
+                            <a href="/PlatformVisit/CaseAnalyze">回访事件分析</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            <div class="clearfix"></div>
+        </div>
+        <!-- END SIDEBAR MENU -->
+    </div>
+    <!-- END SIDEBAR -->
+    <!-- START PAGE-CONTAINER -->
+    <div class="page-container">
+        <!-- START PAGE HEADER WRAPPER -->
+        <!-- START HEADER -->
+        <div class="header ">
+            <!-- START MOBILE CONTROLS -->
+            <!-- LEFT SIDE -->
+            <div class="pull-left full-height visible-sm visible-xs">
+                <!-- START ACTION BAR -->
+                <div class="sm-action-bar">
+                    <a href="#" class="btn-link toggle-sidebar" data-toggle="sidebar">
+                        <span class="icon-set menu-hambuger"></span>
+                    </a>
+                </div>
+                <!-- END ACTION BAR -->
+            </div>
+            <!-- RIGHT SIDE -->
+            <div class="pull-right full-height visible-sm visible-xs">
+                <!-- START ACTION BAR -->
+                <div class="sm-action-bar">
+                    <div class="dropdown pull-right">
+                        <button class="profile-dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <div class="pull-left p-r-10 p-t-10 fs-16 font-heading">
+                                <i class="icon-set menu-hambuger-plus"></i>
+                            </div>
+                        </button>
+                        <ul class="dropdown-menu profile-dropdown" role="menu">
+                            <li>
+                                <a href="#"><i class="pg-settings_small"></i> 设置</a>
+                            </li>
+                            <li>
+                                <a href="https://www.teambition.com/project/552df97c206f9c1e6e70a947/tasks/scrum/5552ed7a4fd644712b3c6eae" target="_blank"><i class="pg-outdent"></i> 反馈提交</a>
+                            </li>
+                            <li>
+                                <a href="#"><i class="pg-signals"></i> 关于运营平台</a>
+                            </li>
+                            <li>
+                                <a href="https://yunying.yuanbei.biz/HomePage/NewPwd" target="_blank"><i class="pg-outdent"></i> 修改密码</a>
+                            </li>
+                            <li class="bg-danger">
+                                <a href="#" class="clearfix text-white" onclick=" location.href ='/Home/Exit'">
+                                    <span class="pull-left"><i class="pg-power"></i></span>
+                                    <span class="pull-left m-l-10">安全登出</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- END ACTION BAR -->
+            </div>
+            <!-- END MOBILE CONTROLS -->
+            <div class=" pull-left sm-table">
+                <div class="header-inner">
+                    <div class="brand inline">
+                        <img src="/img/logoPro-b.png" alt="logo" data-src="/img/logoPro-b.png" data-src-retina="img/logoPro-b.png" width="120" height="30">
+                    </div>
+                    <!-- BEGIN NOTIFICATION DROPDOWN -->
+                    <ul class="notification-list no-margin hidden-sm hidden-xs b-grey b-l b-r no-style p-l-30 p-r-20">
+                        <li class="p-r-15 inline">
+                            <div class="dropdown">
+                                <a href="/">
+                                    主页
+                                </a>
+                            </div>
+                        </li>
+                        <!-- <li class="p-r-15 inline">
+                          <a href="#" class="icon-set clip "></a>
+                        </li>
+                        <li class="p-r-15 inline">
+                          <a href="#" class="icon-set grid-box"></a>
+                        </li> -->
+                    </ul>
+                    <!-- END NOTIFICATION DROPDOWN -->
+                    <div class="search-link brand inline" style="width:auto" id="seachCompany">
+
+                        <div class="input-group transparent pull-left">
+                            <span class="input-group-addon" style="width:108px; padding:0px;">
+                                <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" id="seachCompany_SelectColumn" style="width:100px">
+                                    <option value="accid">店铺ID</option>
+                                    <option value="companyName">店铺名称</option>
+                                    <option value="userRealName">店主姓名</option>
+                                    <option value="phoneNumber">电话号码</option>
+                                    <option value="userEmail">电子邮箱</option>
+                                    <option value="bbsUid">论坛ID</option>
+                                </select>
+                            </span>
+                            <input type="text" placeholder="内容" class="form-control" id="seachCompany_selectColmunValue" onkeyup="seachCompany_Click(event,1)" style="min-height:37px;">
+                        </div>
+                        <button class="btn btn-complete btn-cons" onclick="seachCompany_Click(event,2)"><i class="pg-search"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class=" pull-right">
+                <div class="visible-lg visible-md m-t-10">
+                    <!-- <div class="pull-left p-r-10 p-t-10 fs-16 font-heading">
+                <span class="semi-bold">David</span> <span class="text-master">Nest</span>
+            </div> -->
+                    <div class="dropdown pull-right">
+                        <button class="profile-dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <div class="pull-left p-r-10 p-t-10 fs-16 font-heading">
+                                <span class="pull-left p-r-10"><i class="pg-menu"></i></span>
+                                <span class="text-master">控制中心</span>
+                            </div>
+                        </button>
+                        <ul class="dropdown-menu profile-dropdown" role="menu">
+                            <li>
+                                <a href="#"><i class="pg-settings_small"></i> 设置</a>
+                            </li>
+                            <li>
+                                <a href="https://www.teambition.com/project/552df97c206f9c1e6e70a947/tasks/scrum/5552ed7a4fd644712b3c6eae"><i class="pg-outdent"></i> 反馈提交</a>
+                            </li>
+                            <li>
+                                <a href="#"><i class="pg-signals"></i> 关于运营平台</a>
+                            </li>
+                            <li>
+                                <a href="https://yunying.yuanbei.biz/HomePage/NewPwd" target="_blank"><i class="pg-outdent"></i> 修改密码</a>
+                            </li>
+                            <li class="bg-danger">
+                                <a href="#" class="clearfix text-white" onclick=" location.href ='/Home/Exit'">
+                                    <span class="pull-left"><i class="pg-power"></i></span>
+                                    <span class="pull-left m-l-10">安全登出</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- END HEADER -->
+        <!-- END PAGE HEADER WRAPPER -->
+        <!-- START PAGE CONTENT WRAPPER -->
+        <div class="page-content-wrapper">
+            <!-- START PAGE CONTENT -->
+            <div class="content sm-gutter">
+                <div class="container-fluid padding-25">
+                    @RenderBody()
+                </div>
+            </div>
+            <!-- END PAGE CONTENT -->
+            <!-- START COPYRIGHT -->
+            <!-- START CONTAINER FLUID -->
+            <div class="container-fluid footer">
+                <div class="copyright sm-text-center">
+                    <p class="small no-margin pull-left sm-pull-reset">
+                        <span class="hint-text">Copyright © 2013 - 2015</span>
+                        <span class="font-montserrat">生意专家</span>.
+                        <span class="hint-text">All rights reserved. </span>
+                        <span class="sm-block"><a href="#" class="m-l-10 m-r-10">Terms of use</a> | <a href="#" class="m-l-10">Privacy Policy</a></span>
+                    </p>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+            <!-- END COPYRIGHT -->
+        </div>
+        <!-- END PAGE CONTENT WRAPPER -->
+    </div>
+    <!-- END PAGE CONTAINER -->
+    <!-- BEGIN 插件所需 JS -->
+    <!-- Modernizr -->
+    @Scripts.Render("~/js/modernizr")
+
+    @Scripts.Render("~/jquery/ui")
+    <!-- Bootstrap -->
+    @Scripts.Render("~/js/boostrapv")
+
+    <!-- BEGIN 主框架 CORE JS -->
+    @Scripts.Render("~/js/core")
+
+    <!-- BEGIN 用户定制级 JS -->
+    @RenderSection("scripts", required: false)
+
+    <script src="~/Scripts/global.js"></script>
+    <script src="/Scripts/scripts.js"></script>
+
+    <script type="text/javascript">
+        function seachCompany_Click(evt, type) {
+
+
+            if (type == 1) {
+                evt = (evt) ? evt : ((window.event) ? window.event : "");
+                var currKey = 0;
+                currKey = evt.keyCode || evt.which || evt.charCode;
+                if (currKey == 13) {
+                    type = 2;
+                }
+            }
+
+            if (type == 2) {
+
+                var value = $("#seachCompany_selectColmunValue").val();
+                if ($.trim(value).length > 0) {
+
+                    var column = $("#seachCompany_SelectColumn").val();
+
+                    if (column == "accid") {
+                        window.open("/shopinfo/index/" + value);
+                    } else {
+                        var Q = "column=" + column + "&value=" + value;
+                        window.open("/ShopList/index?" + Q);
+                    }
+
+
+                } else {
+                    alert("请输入你要搜索的值");
+                }
+            }
+
+        }
+
+    </script>
+
+</body>
+
+
+
+
+
+
+
+
+
+
+
+
+</html>

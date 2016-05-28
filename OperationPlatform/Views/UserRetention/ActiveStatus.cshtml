@@ -1,0 +1,322 @@
+﻿
+@{
+    ViewBag.Title = "活跃流失状况";
+}
+
+@section Style{
+    @Styles.Render("~/style/form")
+}
+<div class="page-where activeStatus" style=" margin-top:10px;">
+    <div class="btn-group">
+        <button type="button" class="btn btn-default btn-select" value="7" onclick="activeWhereTimeButtonClick(this)">最近7天</button>
+        <button type="button" class="btn btn-default" value="15" onclick="activeWhereTimeButtonClick(this)">最近15天</button>
+        <button type="button" class="btn btn-default" value="30" onclick="activeWhereTimeButtonClick(this)">最近30天</button>
+        <button type="button" class="btn btn-default" value="90" onclick="activeWhereTimeButtonClick(this)">最近三个月</button>
+        <button type="button" class="btn btn-default" value="other" onclick="activeWhereTimeButtonClick(this)">其他时间</button>
+    </div>
+    <div class="btn-group page-where-othertime" style="display:none;">
+        <button type="button" value="return" class="btn btn-default border-right0" onclick="activeWhereTimeButtonClick(this)">返回</button>
+        <div class="page-where-time-input">
+            <div class="input-daterange input-group">
+                <input type="text" placeholder="开始时间" class="input-sm form-control" name="start" />
+                <span class="input-group-addon">to</span>
+                <input type="text" placeholder="结束时间" class="input-sm form-control" name="end" />
+            </div>
+        </div>
+        <button type="button" value="select" class="btn btn-default btn-inquire" onclick="GetActiveStatusChart()">查询</button>
+    </div>
+</div>
+<div id="ActiveFlashcontenttd" class="chartDiv">
+
+</div>
+
+<div class="row column-seperation m-t-20" id="actvieanalysisTableList">
+    <table class="table table-hover table-condensed  no-footer">
+        <thead>
+            <tr>
+                <th class="text-center">日期</th>
+                <th class="text-center">新增活跃</th>
+                <th class="text-center">流失活跃</th>
+                <th class="text-center">净增长</th>
+                <th class="text-center">净增长比</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    @*<div class="dataTables_wrapper" id="ListPageHtml">
+        <div class="dataTables_paginate pagination">
+            <ul><li class="prev disabled"><a href="javascript:void(0)"><i class="pg-arrow_left"></i></a></li><li class="active"><a href="javascript:void(0)">1</a></li><li class="next disabled"><a href="javascript:void(0)"><i class="pg-arrow_right"></i></a></li></ul>
+        </div>
+        <div class="dataTablePagText"></div>
+    </div>*@
+</div>
+
+<script type="text/html" id="ActiveAnalysisTableTrScript">
+    {{if dataList.length < 1 }}
+    <tr><td colspan="8" class="DataNull">可能这几天没有数据</td></tr>
+    {{/if}}
+    {{each dataList}}
+    <tr>
+        <td align="center">
+            <span>{{$value.Date}}</span>
+        </td>
+        <td align="center">
+            <span style="color: #999; cursor:pointer" onclick="GetDetailPage('ActiveChange','{{$value.NewAccids}}')">{{$value.NewActive }}</span>
+        </td>
+        <td align="center">
+            <span style="color: #999; cursor:pointer" onclick="GetDetailPage('ActiveChange', '{{$value.LostAccids}}')">{{$value.LostActive}}</span>
+        </td>
+        <td align="center">
+            <span style="color: #999; ">{{$value.NetValue}}</span>
+        </td>
+        <td align="center">
+            <span style="color: #999; ">{{$value.Percent}}%</span>
+        </td>
+    </tr>
+    {{/each}}
+</script>
+
+
+@section Scripts{
+    @Scripts.Render("~/js/begin/form")
+    <script src="~/Scripts/plugins/asset/echarts-all.js"></script>
+    @*<script src="~/Scripts/Operation/Operation.js"></script>*@
+    <script src="~/Scripts/plugins/summernote/js/summernote.min.js"></script>
+    <script src="~/Scripts/plugins/artTemplate/template.js"></script>
+    <script type="text/javascript">
+        var jsonData = null;
+
+        $(document).ready(function() {
+            $('.activeStatus .page-where-othertime .input-daterange').datepicker();
+            GetActiveStatusChart();
+        });
+
+        function activeWhereTimeButtonClick(obj) {
+            var value = obj.value;
+            if (value == "return") {
+                $(".activeStatus .btn-group").show().filter(".page-where-othertime").hide();
+            } else {
+                $(obj).parent().find(".btn-select").removeClass("btn-select");
+                $(obj).addClass("btn-select");
+                if (value == "other") {
+                    $(".activeStatus .btn-group").hide().filter(".page-where-othertime").show();
+                } else {
+                    GetActiveStatusChart();
+                }
+            }
+        }
+
+        function GetDetailPage(type, obj) {
+            //$('#accids').val(obj);
+            //$('#type').val(type);
+            var postData = {
+                accids: obj,
+                type: type,
+                pageIndex: 1
+            }
+            //$("#accidForm").submit();
+            //$.post("/ActiveDetail/Test", postData, OpenWindow());
+
+            $.ajax({
+                type: "POST",
+                url: '/ActiveDetail/Index',
+                data: postData,
+                success: function (str_response) {
+                    var obj = window.open("about:blank");
+                    obj.document.write(str_response);
+                }
+            });
+
+            post('/ActiveDetail/Index', postData);
+        }
+
+        function post(URL, PARAMS) {
+            var temp_form = document.createElement("form");
+            temp_form.action = URL;
+            temp_form.target = "_blank";
+            temp_form.method = "post";
+            temp_form.style.display = "none";
+            for (var x in PARAMS) {
+                var opt = document.createElement("textarea");
+                opt.name = x;
+                opt.value = PARAMS[x];
+                temp_form.appendChild(opt);
+            }
+            document.body.appendChild(temp);
+            temp_form.submit();
+        }
+
+        function GetActiveStatusChart() {
+            var url = "/UserRetention/GetActiveStatus";
+            var postJson = {};
+            //postJson["page"] = page;
+            var timeType = $(".activeStatus .btn-group .btn.btn-select").val();
+            if (timeType == "other") {
+                var statTime = $(".activeStatus .page-where-othertime input[name='start']").val();
+                var endTime = $(".activeStatus .page-where-othertime input[name='end']").val();
+                if (statTime.length > 0) {
+                    postJson["stTime"] = statTime;
+                }
+                if (endTime.length > 0) {
+                    postJson["edTime"] = endTime;
+                }
+            } else {
+                var timeValue = $.timePeriod(0 - Number(timeType));
+                postJson["stTime"] = timeValue.start.toLocaleDateString();
+                postJson["edTime"] = timeValue.end.toLocaleDateString();
+            }
+
+            $.doAjax(url, postJson, function(msg) {
+                if (msg != "null" && msg != "") {
+                    var json = $.parseJSON(msg);
+                    jsonData = json;
+
+                    $("#actvieanalysisTableList table tbody").html(template("ActiveAnalysisTableTrScript", json));
+
+                    var XLable = new Array();
+                    var seriesData1 = new Array();
+                    var seriesData2 = new Array();
+
+                    $.each(json.dataList, function(i, n) {
+
+                        XLable.push(n.Date);
+
+                        var dataItemValue = {};
+                        if (n.weekend == "1") {
+                            seriesData1.push({
+                                value: n.NewActive,
+                                symbol: 'emptycircle',
+                                symbolSize: 2,
+                                smooth: true,
+                                itemStyle: {
+                                    normal: {
+                                        color: 'red'
+                                    }
+                                },
+                                showAllSymbol: true
+                            });
+                           
+                            seriesData2.push({
+                                value: n.LostActive,
+                                symbol: 'emptycircle',
+                                symbolSize: 2,
+                                smooth: true,
+                                itemStyle: {
+                                    normal: {
+                                        color: 'red'
+                                    }
+                                },
+                                showAllSymbol: true
+                            });
+                        } else {
+                            seriesData1.push({
+                                value: n.NewActive,
+                                smooth: true
+                            });
+
+                            seriesData2.push({
+                                value: n.LostActive,
+                                smooth: true
+                            });
+                        }
+
+                    });
+
+                    option.xAxis[0].data = XLable.reverse();
+                    option.series[0].data = seriesData1.reverse();
+                    option.series[1].data = seriesData2.reverse();
+                    myChart.clear().setOption(option);
+                    //if (page == 1) {
+                    //    $("#ListPageHtml").attr("rowcount", json.rowCount).attr("maxpage", json.maxPage);
+                    //    $("#ListPageHtml .dataTablePagText").html("共" + json.rowCount + "条");
+                    //}
+                    //var pageHtml = $.listPageHtml(page, $("#ListPageHtml").attr("maxpage"), "GetActiveAnalysisList", 5);
+                    //$("#ListPageHtml .dataTables_paginate").html(pageHtml);
+                }
+            }, true);
+        }
+
+
+        var myChart = echarts.init(document.getElementById('ActiveFlashcontenttd'));
+
+        var option = {
+            color:
+            [
+                '#87cefa', '#ff7f50', '#da70d6', '#32cd32', '#6495ed',
+                '#ff69b4', '#ba55d3', '#cd5c5c', '#ffa500', '#40e0d0',
+                '#1e90ff', '#ff6347', '#7b68ee', '#00fa9a', '#ffd700',
+                '#6b8e23', '#ff00ff', '#3cb371', '#b8860b', '#30e0e0'
+            ],
+            title: {
+                text: '活跃用户变化',
+                textAlign: "center",
+                x: "center"
+            },
+            tooltip: {
+                show: true,
+                trigger: 'axis'
+            },
+            legend: {
+                data: [
+                    '新增活跃', '流失活跃'
+                ],
+                y: "bottom"
+            },
+            toolbox: {
+                show: true,
+                feature: {
+                    mark: { show: true },
+                    dataView: { show: true, readOnly: false },
+                    magicType: { show: true, type: ['line', 'bar'] },
+                    restore: { show: true },
+                    saveAsImage: { show: true }
+                }
+            },
+            dataZoom: { show: true, realtime: true, y: 36, height: 20, start: 0, end: 100 },
+            calculable: false,
+            grid: { y: 60, y2: 70, x2: 20 },
+            xAxis: [
+                {
+                    type: 'category',
+                    boundaryGap: false,
+                    axisLine: { show: true }, //坐标轴线
+                    axisTick: { show: true }, //坐标轴小标记
+                    axisLabel: { show: true }, //坐标轴文本标签
+                    splitArea: { show: false }, //分隔区域
+                    splitLine: { show: true }, //分隔线
+                    data: ['0', '0', '0', '0', '0', '0', '0']
+                }
+            ],
+            yAxis: [
+                {
+                    type: 'value'
+                }
+            ],
+            axis: { scale: true },
+            series: [
+                {
+                    name: '新增活跃',
+                    type: 'line',
+                    symbol: 'Circle',
+                    data: [0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    name: '流失活跃',
+                    type: 'line',
+                    symbol: 'Circle',
+                    data: [0, 0, 0, 0, 0, 0, 0]
+                }
+            ]
+        };
+
+
+        // 为echarts对象加载数据
+        myChart.setOption(option);
+    </script>
+}
+
+
+
+
+
+

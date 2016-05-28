@@ -1,0 +1,192 @@
+﻿@{
+    ViewBag.Title = "PromoteList";
+    Layout = null;
+}
+<div class="panel">
+    <div class="panel-heading page-where promoteWhere">
+        <div class="panel-title">
+            <div class="form-group  whereitem  select-puppet">
+                <select class="cs-select cs-skin-slide" id="promoteTypeMajor" onchange="GetMinorType(this)">
+                    <option value="-1">全部大分类</option>
+                    <option value="1">百度</option>
+                    <option value="2">发帖</option>
+                    <option value="3">博客</option>
+                    <option value="4">官方</option>
+                    <option value="5">其他</option>
+                    <option value="0">360</option>
+                </select>
+            </div>
+            <div id="subClass" class="form-group  whereitem  select-puppet">
+                <select class="cs-select cs-skin-slide" id="promoteTypeMinor">
+                    <option value="-1">全部小分类</option>
+                </select>
+            </div>
+            <div class="pull-left  whereitem" id="insertTime">
+                <div class="input-daterange input-group">
+                    <input type="text" placeholder="开始时间" class="input-sm form-control" name="start" />
+                    <span class="input-group-addon">to</span>
+                    <input type="text" placeholder="结束时间" class="input-sm form-control" name="end" />
+                </div>
+            </div>
+            <div class=" whereitem">
+                <input type="text" placeholder="添加人" class="form-control width120" id="insertName" onkeyup="">
+            </div>
+            <div class=" whereitem">
+                <input type="text" placeholder="名称" class="form-control width120" id="linkName" onkeyup="">
+            </div>
+            <div class="form-group  whereitem  select-puppet">
+                <select class="cs-select cs-skin-slide" id="promoteStatus" onchange="">
+                    <option value="-1">所有状态</option>
+                    <option value="1">有效</option>
+                    <option value="0">无效</option>
+                </select>
+            </div>
+            <button type="button" value="select" class="btn btn-default btn-inquire" onclick="GetPromotionList(1)">查询</button>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+
+    <div class="panel-body no-padding">
+        <div class="row column-seperation">
+            <table class="table table-hover" id="ListTable">
+                <thead>
+                    <tr>
+                        <th>类型 </th>
+                        <th>名称</th>
+                        <th>链接</th>
+                        <th>备注</th>
+                        <th class="text-center">状态</th>
+                        <th class="text-center">添加人</th>
+                        <th class="text-center">时间</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <div id="ListPageHtml" class="dataTables_wrapper m-b-20">
+                <div class="dataTables_paginate pagination no-padding">
+                    <ul><li class="prev disabled"><a href="javascript:void(0)"><i class="pg-arrow_left"></i></a></li><li class="active"><a href="javascript:void(0)">1</a></li><li class="next disabled"><a href="javascript:void(0)"><i class="pg-arrow_right"></i></a></li></ul>
+                </div>
+                <div class="dataTablePagText p-l-20"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/html" id="ListTableScript">
+    {{if list==""}}
+    <tr class="odd" role="row">
+        <td colspan="7" class="v-align-middle">没有找到数据</td>
+    </tr>
+    {{else}}
+    {{each list}}
+    <tr class="odd" role="row">
+        <td class="v-align-middle">{{$value.maxClassName}}-{{$value.minClassName}}</td>
+        <td>{{$value.linkName}}</td>
+        <td>
+            <a href="{{$value.linkUrl}}" target="_blank">{{$value.linkUrl}}</a>
+        </td>
+        <td>{{$value.remark}}</td>
+        {{if $value.state==1}}
+        <td class="v-align-middle text-center text-success cur-p" onclick="ChangeStatus('{{$value.state}}','{{$value.id}}')">有效</td>
+        {{else}}
+        <td class="v-align-middle text-center text-danger cur-p" onclick="ChangeStatus('{{$value.state}}','{{$value.id}}')">无效</td>
+        {{/if}}
+        <td class="v-align-middle text-center">{{$value.manageName}}</td>
+        <td class="v-align-middle text-center">{{$value.createTime}}</td>
+    </tr>
+    {{/each}}
+    {{/if}}
+</script>
+
+<script src="~/Scripts/plugins/artTemplate/template.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.input-daterange').datepicker();
+        $.Pages.initSelectFxPlugin();
+        GetPromotionList(1);
+    });
+
+    function ChangeStatus(status,id) {
+        var postJson = {};
+        postJson["status"] = status;
+        postJson["id"] = id;
+
+        var ur = "/Promote/ChangeStatus";
+
+        $.doAjax(ur, postJson, function (msg) {
+            if (msg != "") {
+                if (msg==1) {
+                    alert("更新成功！");
+                    GetPromotionList(1);
+                } else {
+                    alert("更新状态出错！");
+                }
+            }
+        }, true);
+    }
+
+    function GetMinorType(e) {
+        var ur = "/Promote/GetMinorType";
+
+        var postJson = {};
+        postJson["id"] = e.value;
+
+        $.doAjax(ur, postJson, function (msg) {
+            if (msg != "") {
+                $.Pages.initSelectFxPlugin();
+                $("#promoteTypeMinor").html("").append("<option value='-1'>全部小分类</option>");
+                // $("#subClass .cs-options ul").html("").append("<li data-option data-value='" + -1 + "'>全部小分类</li>");
+                $.each(jQuery.parseJSON(msg), function (i, n) {
+                    $("#promoteTypeMinor").append("<option value='" + n.id + "'>" + n.name + "</option>");
+                    // $("#subClass .cs-options ul").append("<li data-option data-value='" + n.id +"'> <span>" + n.name + "</span></li>");
+                });
+            }
+        }, true);
+    }
+
+    function GetPromotionList(pageIndex) {
+        var postJson = {};
+
+        postJson["pageIndex"] = pageIndex;
+        var majorType = $("#promoteTypeMajor").val();
+        var minorType = $("#promoteTypeMinor").val();
+
+        var statTime = $(".promoteWhere input[name='start']").val();
+        var endTime = $(".promoteWhere input[name='end']").val();
+        if (statTime.length > 0) {
+            postJson["stDate"] = statTime;
+        }
+        if (endTime.length > 0) {
+            postJson["edDate"] = endTime;
+        }
+
+        var adder = $("#insertName").val();
+        var linkName = $("#linkName").val();
+        var status = $("#promoteStatus").val();
+
+        postJson["majorType"] = majorType;
+        postJson["minorType"] = minorType;
+        postJson["adder"] = adder;
+        postJson["linkName"] = linkName;
+        postJson["status"] = status;
+
+        var url = "/Promote/GetPromoteList";
+
+        $.doAjax(url, postJson, function (msg) {
+            if (msg !== "" && msg !== "null") {
+                var json = jQuery.parseJSON(msg);
+                $("#ListTable tbody").html(template("ListTableScript", { "list": jQuery.parseJSON(json.dataList) }));
+
+                if (pageIndex == 1) {
+                    $("#ListPageHtml").attr("rowcount", json.rowCount).attr("maxpage", json.maxPage);
+                    $("#ListPageHtml .dataTablePagText").html("共" + json.rowCount + "条");
+                }
+                var pageHtml = $.listPageHtml(pageIndex, $("#ListPageHtml").attr("maxpage"), "GetPromotionList", 5);
+                $("#ListPageHtml .dataTables_paginate").html(pageHtml);
+            } else {
+                $("#ListTable tbody").html(template("ListTableScript", { "list": "" }));
+            }
+        }, true);
+    }
+</script>
+

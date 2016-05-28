@@ -1,0 +1,118 @@
+﻿@{
+    ViewBag.Title = "日检";
+}
+@section Style{
+
+    @Styles.Render("~/style/form")
+}
+<div class="panel">
+    <!-- 容器标题 -->
+    <div class="panel-heading">
+        <!-- 标题内容 -->
+        <div class="panel-title">
+           <h2>每日日检</h2>
+        </div>
+    </div>
+    <!-- 控件容器 -->
+    <div  class="panel-body" id="TaskList">
+
+    </div>
+</div>
+
+<script type="text/html" id="nowTaskListScript">
+    {{each list}}
+    <div class="row no-margin" taskid="{{$value.Id}}">
+        <h5 class="no-margin pull-left"><span>{{$value.TaskName}}</span>：</h5>
+        <div class="select radio check-success m-t-0 pull-left" style="line-height: 28px;">
+            <input type="radio" onclick="AddTaskRecord({{$value.Id}})" name="taskValue{{$value.Id}}" value="正常" id="radio2_{{$value.Id}}">
+            <label for="radio2_{{$value.Id}}">正常</label>
+            <input type="radio" onclick="AddTaskRecord({{$value.Id}})" name="taskValue{{$value.Id}}" value="异常" id="radio1_{{$value.Id}}">
+            <label for="radio1_{{$value.Id}}">异常</label>
+        </div>
+        <p class="result" style="display:none;"><span style="line-height: 28px;"></span><a href="javascript:void(0)" onclick="Resubmit({{$value.Id}})">重新提交</a></p>
+    </div>
+    {{/each}}
+</script>
+
+
+@section Scripts{
+    @Scripts.Render("~/js/begin/form")
+    <script src="~/Scripts/plugins/artTemplate/template.js"></script>
+    <script src="~/Scripts/AccountListTable.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            GetNowTaskList();
+        });
+
+        function GetNowTaskList() {
+            var url = "/DailyCheck/NowTaskList";
+            $.doAjax(url, null, function (msg) {
+                if (msg != "") {
+                    var josn = $.parseJSON(msg);
+                    $("#TaskList").html(template("nowTaskListScript", { "list": josn }));
+                    GetTaskRecord();
+                }
+            });
+        }
+
+        function AddTaskRecord(tid) {
+
+            var item= $("#TaskList div.row[taskid='" + tid + "']");
+            
+            var postJson = {};
+            postJson["taskVal"] =item.find("input:radio:checked").val();
+            postJson["dcid"]=tid;
+            postJson["taskName"]=item.find("h5 span").html();
+
+            var url="/DailyCheck/AddRecord";
+
+            $.doAjax(url,postJson,function(msg){
+                if(msg!=""){
+                    if(Number(msg)>0){
+                        item.find("div.select").hide();
+                        item.find("p.result").show().find("span").html(postJson["taskVal"] + "&nbsp;，&nbsp;");
+                    }else{
+                        alert("日检信息保存失败");
+                    }
+                }
+
+            },true);
+
+        }
+
+        function GetTaskRecord(){
+            var url="/DailyCheck/GetRecord";
+
+            var list=$("#TaskList div.row[taskid]");
+            var taskid=new Array();
+            $.each(list,function(i,n){
+                taskid.push($(n).attr("taskid"));
+            });
+
+            $.doAjax(url,{"tid":taskid.join(',')},function(msg){
+
+                if(msg!=""){
+                    var json=$.parseJSON(msg);
+
+                    $.each(json,function(i,n){
+                        var item= $("#TaskList div.row[taskid='" + n.dcId + "']");
+                        if(item.size()>0){
+                            item.find("div.select").hide();
+                            item.find("p.result").show().find("span").append("["+ n.Operator  +"] "+ n.OperateTime +" 提交["+ n.TaskValue +"]&nbsp;，&nbsp;");
+                        }
+                    });
+                }
+
+
+            },true);
+
+        }
+
+        function Resubmit(tid){
+            var item= $("#TaskList div.row[taskid='" + tid + "']");
+            item.find("div.select").show();
+            item.find("p.result").hide();
+        }
+
+    </script>
+}

@@ -1,0 +1,528 @@
+﻿
+@{
+    ViewBag.Title = "营销短信";
+    Layout = null;
+}
+
+<div class="row column-seperation" id="marketingListTable">
+    <input type="button" class="btn btn-sm btn-success m-t-10 m-l-10" name="新增短信" value="新增短信" id="addSmsM" onclick="AddSmsM()" />
+    <input type="button" class="btn btn-sm btn-success m-t-10" name="编辑分类" value="编辑分类" id="modifyCateM" onclick="ModifyCateM()" />
+    <table class="table table-hover  no-footer table-border-right">
+        <thead>
+        <tr>
+            <th style="width: 120px">短信大类 </th>
+            <th style="width: 150px;" class="text-center">小类</th>
+            <th style="width: 800px;" class="text-center">短信内容</th>
+            <th style="width: 120px;" class="text-center">添加日期</th>
+            <th style="width: 120px;" class="text-center">操作</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <div class="dataTables_wrapper" id="ListPageHtml">
+        <div class="dataTables_paginate pagination">
+            <ul><li class="prev disabled"><a href="javascript:void(0)"><i class="pg-arrow_left"></i></a></li><li class="active"><a href="javascript:void(0)">1</a></li><li class="next disabled"><a href="javascript:void(0)"><i class="pg-arrow_right"></i></a></li></ul>
+        </div>
+        <div class="dataTablePagText"></div>
+    </div>
+    <input type="hidden" value="" id="subTypeMarket" />
+</div>
+
+<div style=" display:none;" id="addSmsTextM">
+    <div class="panel-body">
+        <div class="row m-t-10 m-b-10" style="height:35px;" id="">
+            <div class="cs-wrapper" style="display: block; margin-bottom: 10px;">
+                <div tabindex="0">
+                    短信分类:
+                    <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" name="smsCateM" onchange="GetCateM()" id="smsCateM">
+                        <option value="节日祝福">节日祝福</option>
+                        <option value="营销模板">营销模板</option>
+                        <option value="短信秘笈">短信秘笈</option>
+                    </select>
+                </div>
+            </div>
+            <div class="cs-wrapper" style="display: block; margin-bottom: 10px">
+                <div tabindex="0">
+                    短信小类:
+                    <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" name="smsCateMinM" id="smsCateMinM">
+                        <option value="0">正在加载</option>
+                    </select>
+                    <span style="cursor:pointer" class="btn-xs btn-success" id="addCateM" onclick="AddCateM()">添加</span>
+                    <input type="text" name="cateM" value="" placeholder="分类名称" id="cateTextM" style="display:none" />
+                </div>
+            </div>
+        </div>
+        <div class="row m-t-40">
+            短信内容:
+            <textarea id="smsconM" oninput="txt_lengthM()" onpropertychange="    txt_lengthM()" onkeyup="    txt_lengthM()" onchange="    txt_lengthM() " rows="5" cols="100%" style="width: 297px; height: 103px;" class="b-grey m-b-10" name="context"> </textarea>
+        </div>
+        <div class="row left">
+            <div class="input-group transparent" style="width:300px;">
+                <span class="input-group-addon" style="border-width: 0px;">
+                    字数：<span id="wordcntM" style="color: #16960e; font-weight: bold; margin-right: 35px;">0</span>
+                </span>
+
+                <input type="hidden" id="smsCnt" value="" name="smsCnt" />
+            </div>
+
+            @*短信计数*@
+
+        </div>
+    </div>
+</div>
+
+<div style=" display:none; width:600px;" id="cateTableM">
+    <table class="table table-hover table-condensed  no-footer">
+        <thead>
+            <tr>
+                <th class="text-center">分类名称</th>
+                <th class="text-center">排序</th>
+                <th class="text-center">操作</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<div style=" display:none;" id="updateNameM">
+    新分类名称:
+    <input type="text" name="newCateM" value="" placeholder="分类名称" id="newCateM" />
+</div>
+
+<div style=" display:none;" id="changeRankM">
+    新排序号:
+    <input type="text" name="newRankM" value="" placeholder="排序号" id="newRankM" />
+</div>
+
+<script type="text/html" id="cateTableScriptM">
+    {{each data}}
+    <tr>
+        {{if $value.HiddenType==0}}
+        <td class="text-center">{{$value.sms_class}}</td>
+        {{else}}
+        <td class="text-center" style="color:grey"><s>{{$value.sms_class}}</s></td>
+        {{/if}}
+
+        <td class="text-center" style="cursor: pointer" onclick="ChangeRankingM('{{$value.sms_class}}')">{{$value.sms_ranking}}</td>
+
+        <td class="text-center">
+            <a href="javascript:void(0)" onclick="UpdateCateNameM('{{$value.sms_class}}')">修改名称</a> |
+            <a href="javascript:void(0)" onclick="DeleteCateM('{{$value.sms_class}}')">删除</a> |
+            {{if $value.HiddenType==0}}
+            <a href="javascript:void(0)" style="color:red" onclick="ChangeStatusM('{{$value.sms_class}}')">隐藏</a>
+            {{else}}
+            <a href="javascript:void(0)" style="color:green" onclick="ChangeStatusM('{{$value.sms_class}}')">显示</a>
+            {{/if}}
+        </td>
+    </tr>
+    {{/each}}
+</script>
+
+<script type="text/html" id="marketingListScript">
+    {{each data}}
+    <tr>
+        <td>{{$value.sms_maxclass}}</td>
+        {{if $value.HiddenType==0}}
+<td class="text-center" style="cursor: pointer" onclick="GetMinClassMarket('{{$value.sms_class}}')">{{$value.sms_class}}</td>
+{{else}}
+        <td class="text-center" style="color:grey;cursor: pointer" onclick="GetMinClassMarket('{{$value.sms_class}}')"><s>{{$value.sms_class}}</s></td>
+{{/if}}
+        <td class="text-center" title="{{$value.sms_content}}">{{$value.sms_content}}</td>
+        <td class="text-center">{{$value.sms_time}}</td>
+
+        <td class="text-center">
+            <a href="javascript:void(0)" onclick="EditSmsM('{{$value.id}}','{{$value.sms_maxclass}}','{{$value.sms_class}}','{{$value.sms_content}}')">编辑</a> |
+            <a href="javascript:void(0)" onclick="DeleteSmsM('{{$value.id}}')">删除</a>
+        </td>
+    </tr>
+    {{/each}}
+</script>
+
+@*<input type="hidden" value="@ViewBag.AccId " id="ShopInfo" />
+    <input type="hidden" value="@ViewBag.TaskDailyId" id="taskDailyId" />*@
+
+<script src="~/Scripts/plugins/artTemplate/template.js"></script>
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#subTypeMarket").val("");
+        GetMarketing(1);
+    });
+
+    function GetMarketing(page) {
+        var url = "/Sms/GetContentList";
+
+        var postJson = {};
+        postJson["page"] = page;
+        postJson["type"] = "营销模板";
+        postJson["subType"] = $("#subTypeMarket").val();
+
+        $.doAjax(url, postJson, function (msg) {
+            if (msg != "") {
+                var json = $.parseJSON(msg);
+                var dataList = $.parseJSON(json.list);
+                var html = template("marketingListScript", { "data": dataList });
+                $("#marketingListTable table tbody").html(html);
+                if (page == 1) {
+                    $("#ListPageHtml").attr("rowcount", json.rowCount).attr("maxpage", json.maxRow);
+                    $("#ListPageHtml .dataTablePagText").html("共" + json.rowCount + "条");
+                }
+                var pageHtml = $.listPageHtml(page, $("#ListPageHtml").attr("maxpage"), "GetMarketing", 5);
+                $("#ListPageHtml .dataTables_paginate").html(pageHtml);
+
+                //dialog({
+                //    id: "smsSmsContext",
+                //    title: "信息详情",
+                //    lock: true,
+                //    opacity: 0.57,	// 透明度
+                //    content: document.getElementById("smsInfoDetailsList"),
+                //    cancel: true
+                //}).showModal();
+            }
+        }, true);
+
+    }
+
+    function GetMinClassMarket(str) {
+        $("#subTypeMarket").val(str);
+        GetMarketing(1);
+    }
+
+    function EditSmsM(id, maxCate, minCate, content) {
+        GetCateM();
+
+        //alert(maxCate); alert(minCate);
+        //$("#smsCate").find("option[text=" + maxCate + "]").attr("selected", true);
+        //$("#smsCateMin").find("option[text=" + minCate + "]").attr("selected", true);
+        $("#smsCateM").val(maxCate);
+        $("#smsCateMinM").val(minCate);
+        $("#smsconM").val(content);
+        txt_lengthM();
+
+        dialog({
+            id: "updateFestivalSmsContextM",
+            title: "修改短信内容",
+            lock: true,
+            opacity: 0.57,	// 透明度
+            content: document.getElementById("addSmsTextM"),
+            ok: function () {
+                var ur = "/Sms/UpdateCommonSmsContent";
+
+                var postJson = {};
+                postJson["smsid"] = id;
+                postJson["maxCate"] = $("#smsCateM").val();
+                postJson["minCate"] = $("#smsCateMinM").val();
+                postJson["smscontent"] = $("#smsconM").val();
+
+                $.doAjax(ur, postJson, function (msg) {
+                    //alert(msg);
+                    if (msg == "1") {
+                        alert("修改成功！");
+                        GetMarketing(1);
+                    } else {
+                        alert("修改失败！");
+                    }
+                }, true);
+            },
+            cancel: true
+        }).show();
+    }
+
+    function AddSmsM() {
+        $("#smsCateMinM").val("");
+        $("#smsconM").val("");
+        txt_length();
+
+        GetCate();
+        //var pageVal = $("#cp").val();
+        //alert(pageVal);
+        //var ur = "/Sms/SmsAddModal/" + 1;
+        dialog({
+            id: "addFestivalSmsContextM",
+            title: "记录信息",
+            lock: true,
+            opacity: 0.57,	// 透明度
+            content: document.getElementById("addSmsTextM"),
+            ok: function () {
+                var ur = "/Sms/AddCommonSms";
+
+                var postJson = {};
+
+                postJson["maxCate"] = $("#smsCateM").val();
+                postJson["minCate"] = $("#smsCateMinM").val();
+                postJson["smscontent"] = $("#smsconM").val();
+
+                $.doAjax(ur, postJson, function (msg) {
+                    //alert(msg);
+                    if (msg == "1") {
+                        alert("新增成功！");
+                        GetMarketing(1);
+                    } else {
+                        alert("新增失败！");
+                    }
+                }, true);
+            },
+            cancel: true
+        }).show();
+        //art.dialog.open(ur, { title: '新增短信', lock: true, opacity: 0.3, width: "500px", height: "300px" });
+    }
+
+    //编辑分类
+    function ModifyCateM() {
+        var ur = "/Sms/GetCateList";
+        var postJson = {};
+        postJson["type"] = "营销模板";
+
+        $.doAjax(ur, postJson, function (msg) {
+            //alert(msg);
+            if (msg != "") {
+
+                var json = $.parseJSON(msg);
+
+                $("#cateTableM table tbody").html(template("cateTableScriptM", { "data": json }));
+
+                dialog({
+                    id: "modifyCateM",
+                    title: "编辑分类",
+                    lock: true,
+                    opacity: 0.57,	// 透明度
+                    content: document.getElementById("cateTableM"),
+                    ok: function () {
+                        //var ur = "/Sms/AddCommonSms";
+
+                        //var postJson = {};
+
+                        //postJson["maxCate"] = $("#smsCate").val();
+                        //postJson["minCate"] = $("#smsCateMin").val();
+                        //postJson["smscontent"] = $("#smscon").val();
+
+                        //$.doAjax(ur, postJson, function (msg) {
+                        //    //alert(msg);
+                        //    if (msg == "1") {
+                        //        alert("新增成功！");
+                        //        GetMarketing(1);
+                        //    } else {
+                        //        alert("新增失败！");
+                        //    }
+                        //}, true);
+                    },
+                    cancel: true
+                }).show();
+                //GetMarketing(1);
+            } else {
+                alert("获取分类出错！");
+            }
+        }, true);
+
+
+    }
+
+    //添加新的短信小分类
+    function AddCateM() {
+        if ($("#cateTextM").is(":hidden")) {
+            $("#cateTextM").show();
+        }
+        else {
+            if ($("#cateTextM").val() == "") {
+                $("#cateTextM").hide();
+            } else {
+                var minaddtext = $("#cateTextM");
+                var classmin = $("#smsCateMinM");
+                if (minaddtext.val().length > 0) {
+                    var content = "<option  selected='true' value='" + minaddtext.val() + "'>" + minaddtext.val() + "</option>";
+                    classmin.prepend(content);
+                    classmin.get(0).selectedIndex = 0;
+                    minaddtext.val("");
+                }
+
+                $("#cateTextM").hide();
+            }
+        }
+    }
+
+    function txt_lengthM() {
+        var txtLength = parseInt($("#smsconM").val().length);
+
+        $("#wordcntM").html(txtLength).css("color", "red");
+
+    }
+
+    function GetCateM() {
+        $("#smsCateMinM option").remove();
+
+        var maxCate = $("#smsCateM").find("option:selected").text();
+        var postJson = {};
+        postJson["maxCate"] = maxCate;
+
+        var url = "/Sms/GetMinCate";
+
+        $.doAjax(url, postJson, function (msg) {
+            if (msg != "") {
+                var json = $.parseJSON(msg);
+                $.each(json, function (i, n) {
+                    $("#smsCateMinM").append("<option value='" + n + "'>" + n + "</option>");
+                });
+            }
+        }, true);
+    }
+
+    function DeleteSmsM(id) {
+        dialog({
+            id: "deleteSmsContextM",
+            title: "删除提示",
+            lock: true,
+            opacity: 0.57,	// 透明度
+            content: "你确定要删除该短信吗",
+            ok: function () {
+                //alert("OK");
+                var ur = "/Sms/DeleteCommonSms";
+
+                var postJson = {};
+
+                postJson["id"] = id;
+
+                $.doAjax(ur, postJson, function (msg) {
+                    //alert(msg);
+                    if (msg == "1") {
+                        alert("删除成功！");
+                        GetMarketing(1);
+                    } else {
+                        alert("删除失败！");
+                    }
+                }, true);
+            },
+            cancel: true
+        }).show();
+    }
+
+    //更改分类名称
+    function UpdateCateNameM(name) {
+
+
+        dialog({
+            id: "UpdateCateNameM",
+            title: "新分类名称",
+            lock: true,
+            opacity: 0.57,	// 透明度
+            content: document.getElementById("updateNameM"),
+            ok: function () {
+                //alert("OK");
+                if ($("#newCateM").val() == "") {
+                    alert("请输入新分类名称！");
+                } else {
+                    var ur = "/Sms/UpdateCateName";
+
+                    var postJson = {};
+
+                    postJson["maxName"] = "营销模板";
+                    postJson["minName"] = name;
+                    postJson["updateName"] = $("#newCateM").val();
+
+                    $.doAjax(ur, postJson, function (msg) {
+                        //alert(msg);
+                        if (msg == "1") {
+                            alert("修改成功！");
+                            GetMarketing(1);
+                            ModifyCateM();
+                        } else {
+                            alert("修改失败！");
+                        }
+                    }, true);
+                }
+            },
+            cancel: true
+        }).show();
+    }
+
+    //删除小分类
+    function DeleteCateM(name) {
+        dialog({
+            id: "deleteSmsCateM",
+            title: "删除提示",
+            lock: true,
+            opacity: 0.57,	// 透明度
+            content: "该分类下的所有短信将被删除，确定删除？",
+            ok: function () {
+                //alert("OK");
+                var ur = "/Sms/DeleteCate";
+
+                var postJson = {};
+
+                postJson["maxName"] = "营销模板";
+                postJson["minName"] = name;
+
+                $.doAjax(ur, postJson, function (msg) {
+                    //alert(msg);
+                    if (msg == "1") {
+                        alert("删除成功！");
+                        GetMarketing(1);
+                        ModifyCateM();
+                    } else {
+                        alert("删除失败！");
+                    }
+                }, true);
+            },
+            cancel: true
+        }).show();
+    }
+
+    //更改小分类显示/隐藏状态
+    function ChangeStatusM(name) {
+        var ur = "/Sms/ChangeStatus";
+
+        var postJson = {};
+
+        postJson["maxName"] = "营销模板";
+        postJson["minName"] = name;
+
+        $.doAjax(ur, postJson, function (msg) {
+            //alert(msg);
+            if (msg == "1") {
+                //alert("成功！");
+                GetMarketing(1);
+                ModifyCateM();
+            } else {
+                alert("修改失败！");
+            }
+        }, true);
+    }
+
+    function ChangeRankingM(name) {
+        dialog({
+            id: "ChangeRank",
+            title: "修改排序",
+            lock: true,
+            opacity: 0.57, // 透明度
+            content: document.getElementById("changeRankM"),
+            ok: function () {
+                //alert("OK");
+                if ($("#newRankM").val() == "") {
+                    alert("请输入新排序号！");
+                } else {
+                    var ur = "/Sms/ChangeRanking";
+
+                    var postJson = {};
+
+                    postJson["maxName"] = "营销模板";
+                    postJson["minName"] = name;
+                    postJson["rank"] = $("#newRankM").val();
+
+                    $.doAjax(ur, postJson, function (msg) {
+                        //alert(msg);
+                        if (msg == "1") {
+                            alert("修改成功！");
+                            GetMarketing(1);
+                            ModifyCateM();
+                        } else {
+                            alert("修改失败！");
+                        }
+                    }, true);
+                }
+            },
+            cancel: true
+        }).show();
+    }
+
+</script>
+

@@ -1,0 +1,173 @@
+﻿
+@{
+    ViewBag.Title = "注册来源";
+}
+@section Style{
+    @Styles.Render("~/style/form")
+}
+<div class="page-where registerSourceWhere m-t-10">
+    <div class="btn-group">
+        <button type="button" class="btn btn-default btn-select" value="7" onclick=" growUpwhereTimeButtonClick(this) ">最近7天</button>
+        <button type="button" class="btn btn-default" value="15" onclick=" growUpwhereTimeButtonClick(this) ">最近15天</button>
+        <button type="button" class="btn btn-default" value="30" onclick=" growUpwhereTimeButtonClick(this) ">最近30天</button>
+        <button type="button" class="btn btn-default" value="90" onclick=" growUpwhereTimeButtonClick(this) ">最近三个月</button>
+        <button type="button" class="btn btn-default" value="other" onclick=" growUpwhereTimeButtonClick(this) ">其他时间</button>
+    </div>
+    <div class="btn-group page-where-othertime" style="display: none;">
+        <button type="button" value="return" class="btn btn-default border-right0" onclick=" growUpwhereTimeButtonClick(this) ">返回</button>
+        <div class="page-where-time-input">
+            <div class="input-daterange input-group">
+                <input type="text" placeholder="开始时间" class="input-sm form-control" name="start"/>
+                <span class="input-group-addon">to</span>
+                <input type="text" placeholder="结束时间" class="input-sm form-control" name="end"/>
+            </div>
+        </div>
+        <button type="button" value="select" class="btn btn-default btn-inquire" onclick=" GetRegisterSourceJson() ">查询</button>
+    </div>
+    <div class="page-where-right">
+        <div class="checkbox check-success">
+            <input type="checkbox" checked="checked" name="datatyle" value="10" id="checkbox1">
+            <label for="checkbox1">iPhone注册</label>
+            <input type="checkbox" value="11" name="datatyle" id="checkbox2">
+            <label for="checkbox2">安卓注册</label>
+            <input type="checkbox" value="8" name="datatyle" id="checkbox3">
+            <label for="checkbox3">PC客户端</label>
+            @*<input type="checkbox" value="23" name="datatyle" id="checkbox4">
+            <label for="checkbox4">SEM注册</label>*@
+            <input type="checkbox" value="0" name="datatyle" id="checkbox5">
+            <label for="checkbox5">网站注册</label>
+            <input type="checkbox" value="13" name="datatyle" id="checkbox6">
+            <label for="checkbox6">iPad注册</label>
+        </div>
+    </div>
+</div>
+<div id="registerSummary" style="margin: 10px">
+
+</div>
+<div id="registerflashcontenttd" class="chartDiv">
+
+</div>
+@section Scripts{
+    @Scripts.Render("~/js/begin/form")
+    <script src="~/Scripts/plugins/asset/echarts-all.js"></script>
+    <script src="~/Scripts/Operation/Operation.js"></script>
+    <script src="~/Scripts/plugins/summernote/js/summernote.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.registerSourceWhere .page-where-othertime .input-daterange').datepicker();
+
+            $(".registerSourceWhere .page-where-right input:checkbox").click(function () {
+                GetRegisterSourceJson();
+            });
+            GetRegisterSourceJson();
+        });
+
+        function growUpwhereTimeButtonClick(obj) {
+            var value = obj.value;
+            if (value == "return") {
+                $(".registerSourceWhere .btn-group").show().filter(".page-where-othertime").hide();
+            } else {
+                $(obj).parent().find(".btn-select").removeClass("btn-select");
+                $(obj).addClass("btn-select");
+                if (value == "other") {
+                    $(".registerSourceWhere .btn-group").hide().filter(".page-where-othertime").show();
+                } else {
+                    GetRegisterSourceJson();
+                }
+            }
+        }
+
+
+
+
+
+        var myChart = echarts.init(document.getElementById('registerflashcontenttd'));
+
+        var option = {
+            color:
+                    ['#87cefa', '#ff7f50', '#da70d6', '#32cd32', '#6495ed',
+                     '#ff69b4', '#ba55d3', '#cd5c5c', '#ffa500', '#40e0d0',
+                     '#1e90ff', '#ff6347', '#7b68ee', '#00fa9a', '#ffd700',
+                     '#6b8e23', '#ff00ff', '#3cb371', '#b8860b', '#30e0e0'],
+            title: {
+                text: '用户来源分析',
+                textAlign: "center",
+                x: "center"
+            },
+            tooltip: {
+                show: true,
+                trigger: 'axis',
+                axisPointer: {
+                    show: true,
+                    type: 'cross',
+                    lineStyle: {
+                        type: 'dashed',
+                        width: 1
+                    }
+                }
+            },
+            legend: {
+                data: [
+                    '数量1'
+                ],
+                y: "bottom"
+            },
+            toolbox: {
+                show: true,
+                feature: {
+                    mark: { show: true },
+                    dataView: { show: true, readOnly: false },
+                    magicType: { show: true, type: ['line', 'bar'] },
+                    restore: { show: true },
+                    saveAsImage: { show: true }
+                }
+            },
+            dataZoom: {
+                show: true,
+                realtime: true,
+                //orient: 'vertical',   // 'horizontal'
+                //x: 0,
+                y: 30,
+                //width: 400,
+                height: 20,
+                start: 0,
+                end: 100
+            },
+            calculable: false,
+            grid: { y: 60, y2: 70, x2: 20 },
+            xAxis: [
+                {
+                    type: 'category',
+                    boundaryGap: false,
+                    axisLine: { show: true },//坐标轴线
+                    axisTick: { show: true },//坐标轴小标记
+                    axisLabel: { show: true },//坐标轴文本标签
+                    splitArea: { show: false },//分隔区域
+                    splitLine: { show: true },//分隔线
+                    data: ['0', '0', '0', '0', '0', '0', '0']
+                }
+            ],
+            yAxis: [
+                {
+                    type: 'value',
+                    scale: true
+                    //axisLabel: { formatter: '{value}' }
+                }
+            ],
+            series: [
+                {
+                    name: '数量1',
+                    type: 'line',
+                    symbol: 'Circle',
+                    data: [0, 0, 0, 0, 0, 0, 0]
+                }
+            ]
+        };
+
+
+        // 为echarts对象加载数据 
+        myChart.setOption(option);
+    </script>
+}
+
+

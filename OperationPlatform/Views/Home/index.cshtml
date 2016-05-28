@@ -1,0 +1,2183 @@
+﻿@{
+    ViewBag.Title = "首页";
+}
+@section Style{
+    @*@Styles.Render("~/style/nvd3")*@
+    @Styles.Render("~/style/form")
+    <style>
+        .page-container .page-content-wrapper {
+            background-color: #f5f5f5;
+        }
+
+
+        .venntooltip {
+            /*position: absolute;*/
+            text-align: center;
+            width: 128px;
+            height: 25px;
+            background: #333;
+            color: #ddd;
+            padding: 2px;
+            border: 0px;
+            border-radius: 8px;
+            opacity: 0;
+        }
+    </style>
+
+    <script src="/Scripts/plugins/jquery-metrojs/MetroJs.min.js"></script>
+    <script src="~/Scripts/plugins/d3/d3.min.js"></script>
+    <script src="/Scripts/venn.js"></script>
+    <link href="/css/plugins/jquery-metrojs/MetroJs.css" rel="stylesheet">
+}
+
+
+<div class="m-b-25" style="padding-bottom: 0!important;">
+
+    <div class="alert alert-warning alert-dismissible dailyNoticeText m-b-0" role="alert">
+        <button type="button" class="close m-r-20" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <span class="bold">提示：</span> <span class="textTipsContent">消息读取中...</span> <span class="textTipsDate"></span> <a href="javascript:void(0)" onclick="SetDailyTipsText()" class="textSaveBtn">记录信息</a>
+        <span class="m-l-15">手机话费账户余额:<span class="m-l-5" id="accountBalance"></span></span>
+    </div>
+    <div style="display: none;">
+        <textarea id="DailyMoodContextText" cols="20" rows="2" style="width: 390px; height: 150px;" placeholder="记录最新信息"></textarea>
+    </div>
+
+</div>
+<div class="row">
+    <div class="col-md-12 col-lg-12 col-xlg-12 ">
+        <div class="panel no-border bg-transparent">
+            <ul class="nav nav-tabs nav-tabs-simple no-border" role="tablist">
+                <li class="active bg-success-dark">
+                    <a href="#tab2hellowWorld" class="text-white" data-toggle="tab" role="tab" onclick="TabsToggleClick(1)"><span>当前店铺信息</span></a>
+                </li>
+                <li class=" bg-success">
+                    <a href="#tab2FollowUs" class="text-white" data-toggle="tab" role="tab" onclick="TabsToggleClick(2)"><span>用户操作信息</span></a>
+                </li>
+                <li class=" bg-success-light">
+                    <a href="#tab2Inspire" class="text-white" data-toggle="tab" role="tab" onclick="TabsToggleClick(3)"><span>订单付费信息</span></a>
+                </li>
+            </ul>
+            <div class="tab-content bg-transparent no-padding">
+                <div class="row tab-pane fade in active" id="tab2hellowWorld">
+                    <div class="col-md-4 m-b-10">
+                        <!-- START WIDGET -->
+                        <div class="panel no-border bg-white no-margin widget-loader-bar">
+                            <div class="panel-heading top-left top-right">
+                                <div class="panel-title text-black hint-text">
+                                    <span class="fs-16 all-caps">
+                                        新用户
+                                        <i class="m-l-10 fa fa-tasks cur-p" title="来源分析" data-toggle="modal" data-target="#sourceAnalysis"></i>
+                                    </span>
+                                </div>
+                                <div class="panel-controls">
+                                    <ul>
+                                        <li>
+                                            <a data-toggle="refresh" class="portlet-refresh text-black" href="#"><i class="portlet-icon portlet-icon-refresh"></i></a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="panel-body p-t-50">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <h1 class="data-attachment no-margin p-b-5 text-danger semi-bold" id="newTotal">-</h1>
+                                        <div class="metro live-tile" style="height: 23px;" data-delay="3500" data-mode="carousel">
+                                            <div class="slide-front tiles slide active">
+                                                <div class="container-sm-height full-height">
+                                                    <div class="row-sm-height">
+                                                        <div class="col-sm-height">
+                                                            <p class="hint-text text-black">
+                                                                <span>会员:</span>
+                                                                <span class="no-padding p-l-5 p-r-5 font-montserrat" id="newUsr"> - </span>
+                                                                <span class="p-l-15">商品：</span>
+                                                                <span class="no-padding p-l-5 p-r-5 font-montserrat" id="newGoods"> - </span>
+                                                                <span class="p-l-15">销售：</span>
+                                                                <span class="no-padding p-l-5 p-r-5 font-montserrat" id="newSale"> - </span>
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slide-back tiles">
+                                                <div class="container-sm-height full-height">
+                                                    <div class="row-sm-height">
+                                                        <div class="col-sm-height">
+                                                            <p class="hint-text text-black">
+                                                                <span class="p-l-15">订单：</span>
+                                                                <span class="no-padding p-l-5 p-r-5 font-montserrat" id="newOrder"> - </span>
+                                                                <span class="p-l-15">短信：</span>
+                                                                <span class="no-padding p-l-5 p-r-5 font-montserrat" id="newSms"> - </span>
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <!-- END WIDGET -->
+                    </div>
+                    <div class="col-md-4 m-b-10">
+                        <!-- START WIDGET -->
+                        <div class="panel no-border bg-white no-margin widget-loader-bar">
+                            <div class="panel-heading top-left top-right ">
+                                <div class="panel-title text-black hint-text">
+                                    <span class="fs-16 all-caps">
+                                        当日登录 <!-- <i class="fa fa-chevron-right"></i> -->
+                                        <i class="m-l-10 fa fa-tasks cur-p" title="登录端分析" data-toggle="modal" data-target="#loginAnalysis"></i>
+                                    </span>
+                                </div>
+                                <div class="panel-controls">
+                                    <ul>
+                                        <li>
+                                            <a data-toggle="refresh" class="portlet-refresh text-black" href="#"><i class="portlet-icon portlet-icon-refresh"></i></a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="panel-body p-t-50">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <h1 class="data-attachment no-margin p-b-5 text-danger semi-bold" id="loginTotal">-</h1>
+                                        <div class="pull-left small">
+                                            <span>Act:</span>
+                                            <span class="cur-p btn btn-success no-padding p-l-5 p-r-5 font-montserrat" id="loginActive" onclick="GetDetailPage('LoginUser',1,this)"> - </span>
+                                        </div>
+                                        <div class="pull-left small">
+                                            <span class="p-l-15">Lost：</span>
+                                            <span class="cur-p btn btn-success no-padding p-l-5 p-r-5 font-montserrat" id="loginLost" onclick="GetDetailPage('LoginUser', 2, this)"> - </span>
+                                        </div>
+                                        <div class="pull-left small">
+                                            <span class="p-l-15">New：</span>
+                                            <span class="cur-p btn btn-success no-padding p-l-5 p-r-5 font-montserrat" id="loginNew" onclick="GetDetailPage('LoginUser', 3, this)"> - </span>
+                                        </div>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- END WIDGET -->
+                    </div>
+
+                    <div class="col-md-4 m-b-10">
+                        <!-- START WIDGET -->
+                        <div class="panel no-border bg-white no-margin widget-loader-bar">
+                            <div class="panel-heading top-left top-right ">
+                                <div class="panel-title text-black hint-text">
+                                    <span class="fs-16 all-caps">
+                                        活忠用户 <!-- <i class="fa fa-chevron-right"></i> -->
+                                        <i class="m-l-10 fa fa-tasks cur-p" title="活跃用户分析" data-toggle="modal" data-target="#activeVennAnalysis"></i>
+                                    </span>
+                                </div>
+                                <div class="panel-controls">
+                                    <ul>
+                                        <li>
+                                            <a data-toggle="refresh" class="portlet-refresh text-black" href="#"><i class="portlet-icon portlet-icon-refresh"></i></a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="panel-body p-t-50">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <h1 class="data-attachment no-margin p-b-5 text-danger semi-bold" id="activeTotal">-</h1>
+                                        <div class="pull-left small">
+                                            <span>New：</span>
+                                            <span class="cur-p btn btn-success no-padding p-l-5 p-r-5 font-montserrat" id="activeNew" onclick="GetDetailPage('ActiveUser', 3, this)"> - </span>
+                                        </div>
+                                        <div class="pull-left small">
+                                            <span class="p-l-15">Lost:</span>
+                                            <span class="cur-p btn btn-success no-padding p-l-5 p-r-5 font-montserrat" id="activeNot" onclick="GetDetailPage('ActiveUser',1, this)"> - </span>
+                                        </div>
+                                        <div class="pull-left small">
+                                            <span class="p-l-15">Last：</span>
+                                            <span class="cur-p btn btn-success no-padding p-l-5 p-r-5 font-montserrat" id="activeKeep" onclick="GetDetailPage('ActiveUser', 2, this)"> - </span>
+                                        </div>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <!-- END WIDGET -->
+                    </div>
+
+                    <!-- END WIDGET -->
+                </div>
+                <div class="row tab-pane fade" id="tab2FollowUs">
+                    <div class="col-md-4 m-b-10">
+                        <!-- START WIDGET -->
+                        <div class="panel no-border bg-white no-margin widget-loader-bar">
+                            <div class="panel-heading top-left top-right ">
+                                <div class="panel-title text-black hint-text">
+                                    <span class="fs-16 all-caps">
+                                        销售 <!-- <i class="fa fa-chevron-right"></i> -->
+                                    </span>
+                                </div>
+                                <div class="panel-controls">
+                                    <ul>
+                                        <li>
+                                            <a data-toggle="refresh" class="portlet-refresh text-black" href="#"><i class="portlet-icon portlet-icon-refresh"></i></a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="panel-body p-t-50">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <h1 class="data-attachment no-margin p-b-5 text-danger semi-bold" id="totalSale">-</h1>
+                                        <div class="pull-left small">
+                                            <span>活跃用户：</span>
+                                            <span class="cur-p btn btn-success no-padding p-l-5 p-r-5 font-montserrat" id="activeSale" onclick="GetDetailPage('Sale', 1, this)"> - </span>
+                                        </div>
+                                        <div class="pull-left small">
+                                            <span class="p-l-15">流失用户：</span>
+                                            <span class="cur-p btn btn-success no-padding p-l-5 p-r-5 font-montserrat" id="lostSale" onclick="GetDetailPage('Sale', 2, this)"> - </span>
+                                        </div>
+                                        <div class="pull-left small">
+                                            <span class="p-l-15">新用户：</span>
+                                            <span class="cur-p btn btn-success no-padding p-l-5 p-r-5 font-montserrat" id="addSale" onclick="GetDetailPage('Sale', 3, this)"> - </span>
+                                        </div>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- END WIDGET -->
+                    </div>
+
+                    <div class="col-md-4 m-b-10">
+                        <!-- START WIDGET -->
+                        <div class="panel no-border bg-white no-margin widget-loader-bar">
+                            <div class="panel-heading top-left top-right ">
+                                <div class="panel-title text-black hint-text">
+                                    <span class=" fs-16 all-caps">
+                                        会员 <!-- <i class="fa fa-chevron-right"></i> -->
+                                    </span>
+                                </div>
+                                <div class="panel-controls">
+                                    <ul>
+                                        <li>
+                                            <a data-toggle="refresh" class="portlet-refresh text-black" href="#"><i class="portlet-icon portlet-icon-refresh"></i></a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="panel-body p-t-50">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <h1 class="data-attachment no-margin p-b-5 text-danger semi-bold" id="totalUsr">-</h1>
+                                        <div class="pull-left small">
+                                            <span>活跃用户：</span>
+                                            <span class="cur-p btn btn-success no-padding p-l-5 p-r-5 font-montserrat" id="activeUsr" onclick="GetDetailPage('Usr', 1, this)"> - </span>
+                                        </div>
+                                        <div class="pull-left small">
+                                            <span class="p-l-15">流失用户：</span>
+                                            <span class="cur-p btn btn-success no-padding p-l-5 p-r-5 font-montserrat" id="lostUsr" onclick="GetDetailPage('Usr', 2, this)"> - </span>
+                                        </div>
+                                        <div class="pull-left small">
+                                            <span class="p-l-15">新用户：</span>
+                                            <span class="cur-p btn btn-success no-padding p-l-5 p-r-5 font-montserrat" id="addUsr" onclick="GetDetailPage('Usr', 3, this)"> - </span>
+                                        </div>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <!-- END WIDGET -->
+                    </div>
+                    <div class="col-md-4 m-b-10">
+                        <!-- START WIDGET -->
+                        <div class="panel no-border bg-white no-margin widget-loader-bar">
+                            <div class="panel-heading top-left top-right ">
+                                <div class="panel-title text-black hint-text">
+                                    <span class=" fs-16 all-caps">
+                                        商品 <!-- <i class="fa fa-chevron-right"></i> -->
+                                    </span>
+                                </div>
+                                <div class="panel-controls">
+                                    <ul>
+                                        <li>
+                                            <a data-toggle="refresh" class="portlet-refresh text-black" href="#"><i class="portlet-icon portlet-icon-refresh"></i></a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="panel-body p-t-50">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <h1 class="data-attachment no-margin p-b-5 text-danger semi-bold" id="totalGoods">-</h1>
+                                        <div class="pull-left small">
+                                            <span>活跃用户：</span>
+                                            <span class="cur-p btn btn-success no-padding p-l-5 p-r-5 font-montserrat" id="activeGoods" onclick="GetDetailPage('Goods', 1, this)"> - </span>
+                                        </div>
+                                        <div class="pull-left small">
+                                            <span class="p-l-15">流失用户：</span>
+                                            <span class="cur-p btn btn-success no-padding p-l-5 p-r-5 font-montserrat" id="lostGoods" onclick="GetDetailPage('Goods', 2, this)"> - </span>
+                                        </div>
+                                        <div class="pull-left small">
+                                            <span class="p-l-15">新用户:</span>
+                                            <span class="cur-p btn btn-success no-padding p-l-5 p-r-5 font-montserrat" id="addGoods" onclick="GetDetailPage('Goods', 3, this)"> - </span>
+                                        </div>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <!-- END WIDGET -->
+                    </div>
+                    <!-- END WIDGET -->
+                </div>
+                <div class="row tab-pane fade" id="tab2Inspire">
+                    <div class="col-md-4 m-b-10">
+                        <!-- START WIDGET -->
+                        <div class="panel no-border bg-white no-margin widget-loader-bar">
+                            <div class="panel-heading top-left top-right ">
+                                <div class="panel-title text-black hint-text">
+                                    <span class=" fs-16 all-caps">
+                                        短信 <!-- <i class="fa fa-chevron-right"></i> -->
+                                    </span>
+                                </div>
+                                <div class="panel-controls">
+                                    <ul>
+                                        <li>
+                                            <a data-toggle="refresh" class="portlet-refresh text-black" href="#"><i class="portlet-icon portlet-icon-refresh"></i></a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="panel-body p-t-50">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <h1 class="data-attachment no-margin p-b-5 text-danger semi-bold" id="totalSms">-</h1>
+                                        <div class="pull-left small">
+                                            <span>活跃用户：</span>
+                                            <span class="cur-p btn btn-success no-padding p-l-5 p-r-5 font-montserrat" id="activeSms" onclick="GetDetailPage('Sms', 1, this)"> - </span>
+                                        </div>
+                                        <div class="pull-left small">
+                                            <span class="p-l-15">流失用户：</span>
+                                            <span class="cur-p btn btn-success no-padding p-l-5 p-r-5 font-montserrat" id="lostSms" onclick="GetDetailPage('Sms', 2, this)"> - </span>
+                                        </div>
+                                        <div class="pull-left small">
+                                            <span class="p-l-15">新用户：</span>
+                                            <span class="cur-p btn btn-success no-padding p-l-5 p-r-5 font-montserrat" id="addSms" onclick="GetDetailPage('Sms', 3, this)"> - </span>
+                                        </div>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- END WIDGET -->
+                    </div>
+
+                    <div class="col-md-4 m-b-10">
+                        <!-- START WIDGET -->
+                        <div class="panel no-border bg-white no-margin widget-loader-bar">
+                            <div class="panel-heading top-left top-right ">
+                                <div class="panel-title text-black hint-text">
+                                    <span class=" fs-16 all-caps">
+                                        订单 <!-- <i class="fa fa-chevron-right"></i> -->
+                                    </span>
+                                </div>
+                                <div class="panel-controls">
+                                    <ul>
+                                        <li>
+                                            <a data-toggle="refresh" class="portlet-refresh text-black" href="#"><i class="portlet-icon portlet-icon-refresh"></i></a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="panel-body p-t-50">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div>
+                                            <h1 class="cur-p data-attachment no-margin p-b-5 text-danger semi-bold" id="totalOrder" onclick="GetDetailPage('PaidAll', 1, this)">-</h1>
+                                        </div>
+                                        <div class="pull-left small">
+                                            <span>活跃用户：</span>
+                                            <span class="cur-p btn btn-success no-padding p-l-5 p-r-5 font-montserrat" id="activeOrder" onclick="GetDetailPage('Order', 1, this)"> - </span>
+                                        </div>
+                                        <div class="pull-left small">
+                                            <span class="p-l-15">流失用户：</span>
+                                            <span class="cur-p btn btn-success no-padding p-l-5 p-r-5 font-montserrat" id="lostOrder" onclick="GetDetailPage('Order', 2, this)"> - </span>
+                                        </div>
+                                        <div class="pull-left small">
+                                            <span class="p-l-15">新用户：</span>
+                                            <span class="cur-p btn btn-success no-padding p-l-5 p-r-5 font-montserrat" id="addOrder" onclick="GetDetailPage('Order', 3, this)"> - </span>
+                                        </div>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <!-- END WIDGET -->
+                    </div>
+                    <div class="col-md-4 m-b-10">
+                        <!-- START WIDGET -->
+                        <div class="panel no-border bg-white no-margin widget-loader-bar">
+                            <div class="panel-heading top-left top-right ">
+                                <div class="panel-title text-black hint-text">
+                                    <span class=" fs-16 all-caps">
+                                        付费用户 <!-- <i class="fa fa-chevron-right"></i> -->
+                                    </span>
+                                </div>
+                                <div class="panel-controls">
+                                    <ul>
+                                        <li>
+                                            <a data-toggle="refresh" class="portlet-refresh text-black" href="#"><i class="portlet-icon portlet-icon-refresh"></i></a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="panel-body p-t-50">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <h1 class="data-attachment no-margin p-b-5 text-danger semi-bold" id="totalPaid">-</h1>
+                                        <div class="pull-left small">
+                                            <span>活跃用户：</span>
+                                            <span class="btn btn-success no-padding p-l-5 p-r-5 font-montserrat" id="activePaid"> - </span>
+                                        </div>
+                                        <div class="pull-left small">
+                                            <span class="p-l-15">流失用户：</span>
+                                            <span class="btn btn-success no-padding p-l-5 p-r-5 font-montserrat" id="lostPaid"> - </span>
+                                        </div>
+                                        <div class="pull-left small">
+                                            <span class="p-l-15">新用户:</span>
+                                            <span class="btn btn-success no-padding p-l-5 p-r-5 font-montserrat" id="addPaid"> - </span>
+                                        </div>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <!-- END WIDGET -->
+                    </div>
+                    <!-- END WIDGET -->
+                </div>
+                <div class="clear"></div>
+            </div>
+        </div>
+        <input type="hidden" value="0" id="paidAll">
+    </div>
+    <!-- DXCharts -->
+    <div class="col-md-12 col-lg-12 col-xlg-12 col-sm-12 col-xs-12">
+        <div class="panel no-border max-h-3 widget-loader-bar" id="ProgressCompare">
+            <div class="panel-heading pull-top" style="position: absolute;">
+                <div class="panel-title">活跃变化分析</div>
+                <!-- <div class="panel-controls">
+                    <ul>
+                        <li>
+                            <a data-toggle="refresh" class="portlet-refresh text-black" href="#"><i class="portlet-icon portlet-icon-refresh"></i></a>
+                        </li>
+                    </ul>
+                </div> -->
+            </div>
+            <div class="container-xs-height">
+                <div class="row-xs-height">
+                    <div id="container">
+                        <div id="chart" style="width: 100%; height: 252px; padding: 10px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-12 col-lg-12 col-xlg-12 col-sm-12 col-xs-12">
+        <!-- START PANEL -->
+        <div class="panel panel-transparent">
+            <div class="table-responsive">
+                <div id="detailedTable_wrapper" class="dataTables_wrapper form-inline no-footer">
+                    <table class="table table-hover dataTable no-footer bg-white" id="TodayYesterdayContrastTable" role="grid">
+                        <thead>
+                            <tr>
+                                <th>日期</th>
+                                <th>注册量</th>
+                                <th>销售笔数</th>
+                                <th>新增会员</th>
+                                <th>新增SKU</th>
+                                <th>短信量</th>
+                                <th>订单量<i class="portlet-icon portlet-icon-refresh m-l-50" style="cursor: pointer" onclick="refreshToday()"></i></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr id="todayTableTr">
+                                <td class="v-align-middle semi-bold">今日</td>
+                                <td class="v-align-middle">0</td>
+                                <td class="v-align-middle semi-bold">0</td>
+                                <td class="v-align-middle">0</td>
+                                <td class="v-align-middle">0</td>
+                                <td class="v-align-middle">0</td>
+                                <td class="v-align-middle">0</td>
+                            </tr>
+                            <tr id="yestaredayTableTr">
+                                <td class="v-align-middle semi-bold">昨日</td>
+                                <td class="v-align-middle">0</td>
+                                <td class="v-align-middle semi-bold">0</td>
+                                <td class="v-align-middle">0</td>
+                                <td class="v-align-middle">0</td>
+                                <td class="v-align-middle">0</td>
+                                <td class="v-align-middle">0</td>
+                            </tr>
+                            @*
+                                <tr>
+                                    <td class="v-align-middle semi-bold">预计今日</td>
+                                    <td class="v-align-middle">0</td>
+                                    <td class="v-align-middle semi-bold">0</td>
+                                    <td class="v-align-middle">0</td>
+                                    <td class="v-align-middle">0</td>
+                                    <td class="v-align-middle">0</td>
+                                    <td class="v-align-middle">0</td>
+                                </tr>*@
+                            <tr class=" disabledTr" id="yestaredayThisMoment" style="display:none;">
+                                <td class="v-align-middle semi-bold">昨日此时</td>
+                                <td class="v-align-middle">0</td>
+                                <td class="v-align-middle semi-bold">0</td>
+                                <td class="v-align-middle">0</td>
+                                <td class="v-align-middle">0</td>
+                                <td class="v-align-middle">0</td>
+                                <td class="v-align-middle">0</td>
+                            </tr>
+                            <tr class=" disabledTr" style="display:none;" id="averageTableTr">
+                                <td class="v-align-middle semi-bold">近30日平均</td>
+                                <td class="v-align-middle">0</td>
+                                <td class="v-align-middle semi-bold">0</td>
+                                <td class="v-align-middle">0</td>
+                                <td class="v-align-middle">0</td>
+                                <td class="v-align-middle">0</td>
+                                <td class="v-align-middle">0</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="table-double-down" onclick="TodayYesterdayContrastMore(this)"><i class="fa fa-angle-double-down fa-angle-double-up"></i></div>
+                </div>
+            </div>
+        </div>
+        <!-- END PANEL -->
+    </div>
+
+</div>
+
+<!-- <div class="row panel no-border widget-loader-circle">
+    <div class="panel-body">
+        <h2 class="pull-left">今日交易量</h2>
+        <h5 class="pull-left m-l-50 small" style="margin-top: 13px;">
+            <div class="btn-group" data-toggle="buttons" id="todayListType">
+                <label class="btn btn-complete active" onclick="todayList(this,1)">
+                    <input type="radio" name="options" value="shop" />店铺
+                </label>
+                <label class="btn btn-complete" onclick="todayList(this, 1)">
+                    <input type="radio" name="options" value="Reg" />会员
+                </label>
+                <label class="btn btn-complete" onclick="todayList(this, 1)">
+                    <input type="radio" name="options" value="Sell" />销售
+                </label>
+                <label class="btn btn-complete" onclick="todayList(this, 1)">
+                    <input type="radio" name="options" value="goods" />商品
+                </label>
+                <label class="btn btn-complete" onclick="todayList(this, 1)">
+                    <input type="radio" name="options" value="saleGoods" />销售商品
+                </label>
+                <label class="btn btn-complete" onclick="todayList(this, 1)">
+                    <input type="radio" name="options" value="Pay" />支出
+                </label>
+                <label class="btn btn-complete" onclick="todayList(this, 1)">
+                    <input type="radio" name="options" value="Sms" />短信
+                </label>
+                <label class="btn btn-complete" onclick="todayList(this, 1)">
+                    <input type="radio" name="options" value="Order" />订单
+                </label>
+                <label class="btn btn-complete" onclick="todayList(this, 1)">
+                    <input type="radio" name="options" value="kehuduan" />客户端登录
+                </label>
+                <label class="btn btn-complete" onclick="todayList(this, 1)">
+                    <input type="radio" name="options" value="loginNum" />登录
+                </label>
+            </div>
+        </h5>
+        <h5 class="pull-right m-l-50 small">
+            <div class="radio radio-default" id="dataSourceType" style="margin:0px;">
+                <input type="radio" checked="checked" value="all" onclick="todayList()" name="source" id="radio1Yes">
+                <label for="radio1Yes">总</label>
+                <input type="radio" value="android" name="source" onclick="todayList()" id="radio1No">
+                <label for="radio1No">Android</label>
+                <input type="radio" value="ios" name="source" onclick="todayList()" id="radio3">
+                <label for="radio3">IOS</label>
+            </div>
+        </h5>
+        <div id="container" style="min-width: 700px; height: 400px; margin-bottom:30px;">
+
+        </div>
+    </div>
+</div> -->
+<!-- START  交易量明细 -->
+<!-- <div class="row no-border widget-loader-circle">
+    <div class=" bg-white  col-sm-12 col-md-12 col-lg-12 col-xlg-12 m-b-20">
+        <div class="p-l-10">
+            <h2 class="pull-left">交易量明细</h2>
+            <h5 class="pull-left m-l-50 small">
+                <ul id="tabs-nvd3" class="list-inline">
+                    <li class="active">
+                        <a href="#tab-nvd3" data-charts="date" data-toggle="tab" class="font-montserrat text-master">日期</a>
+                    </li>
+                    <li>
+                        <a href="#tab-nvd3" data-charts="reg" data-toggle="tab" class="font-montserrat text-master">注册量</a>
+                    </li>
+                    <li>
+                        <a href="#tab-nvd3" data-charts="sales" data-toggle="tab" class="font-montserrat text-master">销售比数</a>
+                    </li>
+                    <li>
+                        <a href="#tab-nvd3" data-charts="mem" data-toggle="tab" class="font-montserrat text-master">新增会员</a>
+                    </li>
+                    <li>
+                        <a href="#tab-nvd3" data-charts="sku" data-toggle="tab" class="font-montserrat text-master">新增SKU</a>
+                    </li>
+                    <li>
+                        <a href="#tab-nvd3" data-charts="sms" data-toggle="tab" class="font-montserrat text-master">短信量</a>
+                    </li>
+                    <li>
+                        <a href="#tab-nvd3" data-charts="orders" data-toggle="tab" class="font-montserrat text-master">订单量</a>
+                    </li>
+                </ul>
+            </h5>
+
+            <div class="tab-content no-padding">
+                <div class="tab-pane active" id="tab-nvd3">
+                    <div id="nvd3-charts" class="line-chart m-t-30 text-center" data-x-grid="false">
+                        <svg></svg>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>-->
+<!-- END    交易量明细 -->
+<!-- END CONTAINER FLUID -->
+<div class="col-md-12 col-lg-12 col-xlg-12 col-sm-12 col-xs-12 no-padding">
+    <div class="row">
+        <!-- START CONTAINER FLUID -->
+        <div class="col-md-4 col-lg-4 col-xlg-4  m-b-10">
+            <div class="panel no-border max-h-3 widget-loader-bar">
+                <div class="panel-heading pull-top">
+                    <div class="panel-title">KPI</div>
+                    <div class="panel-controls">
+                        <ul>
+                            <li>
+                                <a data-toggle="refresh" class="portlet-refresh text-black" href="#"><i class="portlet-icon portlet-icon-refresh"></i></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="container-xs-height">
+                    <div class="row-xs-height">
+                        <div class="col-md-6 col-sm-6 col-xs-6 text-center m-b-30" id="piechart">
+                            <span class="easyPieChart" data-percent="0">
+                                <span class="percent"></span>
+                            </span>
+                            <p class="m-t-20 m-b-10">
+                                <small>新增商户：</small>
+                                <strong><span class="text-complete fs-12 RealCount">0</span></strong>
+                            </p>
+                            <p class="m-t-10 m-b-10">
+                                <small>预期目标：</small>
+                                <strong><span class="text-success fs-12 PresetCount">0</span></strong>
+                            </p>
+                            <!-- <p class="text-light"><i class="fa fa-caret-up text-success p-r-5"></i> 同比增长：<span class="per-increase">0</span>%</p> -->
+                        </div>
+                        <div class="col-md-6 col-sm-6 col-xs-6 text-center m-b-30" id="piechart2">
+                            <span class="easyPieChart" data-percent="0">
+                                <span class="percent"></span>
+                            </span>
+                            <p class="m-t-20 m-b-10">
+                                <small>订单金额：</small>
+                                <strong>&yen; <span class="text-primary fs-12 RealCount">0</span></strong>
+                            </p>
+                            <p class="m-t-10 m-b-10">
+                                <small>预期目标：</small>
+                                <strong><span class="text-success fs-12 PresetCount">0</span></strong>
+                            </p>
+                            <!-- <p class="text-light"><i class="fa fa-caret-up text-success p-r-5"></i> 同比增长：<span class="per-increase">0</span>%</p> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-lg-4 col-xlg-4">
+            <div class="panel no-border max-h-3 widget-loader-bar">
+                <div class="panel-heading pull-top">
+                    <div class="panel-title">本月计划</div>
+                    <div class="panel-controls">
+                        <ul>
+                            <li>
+                                <a data-toggle="refresh" class="portlet-refresh text-black" href="#"><i class="portlet-icon portlet-icon-refresh"></i></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="container-xs-height">
+                    <div class="row-xs-height">
+                        <div class="col-md-12 m-b-20" id="CompletePropList">
+                            <div class="progress-list clearfix" datakey="短信量">
+                                <div class="details inline">
+                                    <h6 class="title inline">短信量　</h6>
+                                    <h5 class="description inline fs-12">
+                                        <span class="text-complete m-l-10 RealCount">0</span> / <span class="text-success PresetCount">0</span> 条
+                                    </h5>
+                                </div>
+                                <div class="status pull-right Percent">
+                                    <span>0</span>%
+                                </div>
+
+                                <div class="progress">
+                                    <div class="progress-bar progress-bar-primary" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                            <div class="progress-list clearfix" datakey="新增商品">
+                                <div class="details inline">
+                                    <h6 class="title inline">新增商品</h6>
+                                    <h5 class="description inline fs-12">
+                                        <span class="text-complete m-l-10 RealCount">0</span> / <span class="text-success PresetCount">0</span> 件
+                                    </h5>
+                                </div>
+                                <div class="status pull-right Percent" data-toggle="tooltip" data-placement="right" title="">
+                                    <span>0</span>%
+                                </div>
+
+                                <div class="progress">
+                                    <div class="progress-bar progress-bar-complete" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                            <div class="progress-list clearfix" datakey="新增会员">
+                                <div class="details inline">
+                                    <h6 class="title inline">新增会员</h6>
+                                    <h5 class="description inline fs-12">
+                                        <span class="text-complete m-l-10 RealCount">0</span>  / <span class="text-success PresetCount">0</span> 人
+                                    </h5>
+                                </div>
+                                <div class="status pull-right Percent" data-toggle="tooltip" data-placement="right" title="">
+                                    <span>0</span>%
+                                </div>
+
+                                <div class="progress">
+                                    <div class="progress-bar progress-bar-success" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                            <div class="progress-list clearfix" datakey="销售笔数">
+                                <div class="details inline">
+                                    <h6 class="title inline">销售笔数</h6>
+                                    <h5 class="description inline fs-12">
+                                        <span class="text-complete m-l-10 RealCount">0</span> / <span class="text-success PresetCount">0</span> 笔
+                                    </h5>
+                                </div>
+                                <div class="status pull-right Percent" data-toggle="tooltip" data-placement="right" title="">
+                                    <span>0</span>%
+                                </div>
+
+                                <div class="progress">
+                                    <div class="progress-bar progress-bar-warning" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-lg-4 col-xlg-4">
+            <div class="panel no-border max-h-3 widget-loader-bar" id="ProgressCompare">
+                <div class="panel-heading pull-top">
+                    <div class="panel-title">本月计划完成比例</div>
+                    <div class="panel-controls">
+                        <p class="text-right inline pull-right m-b-5"><i class="fa fa-square text-complete p-r-5"></i>当前已完成</p>
+                        <p class="text-right inline pull-right p-r-10 m-b-5"><i class="fa fa-square text-primary p-r-5"></i>当前应完成</p>
+                        <!-- <ul>
+                            <li>
+                                <a data-toggle="refresh" class="portlet-refresh text-black" href="#"><i class="portlet-icon portlet-icon-refresh"></i></a>
+                            </li>
+                        </ul> -->
+                    </div>
+                </div>
+                <div class="container-xs-height" style="height: 252px;">
+                    <div class="row-xs-height">
+                        <!-- <div class="col-md-12 col-sm-12 col-xs-12"></div> -->
+                        <div class="col-md-2 col-sm-2 col-xs-2 no-padding m-t-80" datakey="注册量">
+                            <div class="progress-list progress-rotate clearfix">
+                                <div class="progress">
+                                    <div class="progress-bar progress-bar-primary progress-Target" style="width: 0%;"></div>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar progress-bar-complete progress-Real" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                            <p class="text-center m-t-40">注册</p>
+                            <p class="per-Target text-center text-primary m-b-0"><b>0</b>%</p>
+                            <p class="per-Real text-center text-complete m-b-20"><b>0</b>%</p>
+
+                        </div>
+
+                        <div class="col-md-2 col-sm-2 col-xs-2 no-padding m-t-80" datakey="订单金额">
+                            <div class="progress-list progress-rotate clearfix">
+                                <div class="progress">
+                                    <div class="progress-bar progress-bar-primary progress-Target" style="width: 0%;"></div>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar progress-bar-complete progress-Real" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                            <p class="text-center m-t-40">订单</p>
+                            <p class="per-Target text-center text-primary m-b-0"><b>0</b>%</p>
+                            <p class="per-Real text-center text-complete m-b-20"><b>0</b>%</p>
+
+                        </div>
+
+                        <div class="col-md-2 col-sm-2 col-xs-2 no-padding m-t-80" datakey="短信量">
+                            <div class="progress-list progress-rotate clearfix">
+                                <div class="progress">
+                                    <div class="progress-bar progress-bar-primary progress-Target" style="width: 0%;"></div>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar progress-bar-complete progress-Real" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                            <p class="text-center m-t-40">短信</p>
+                            <p class="per-Target text-center text-primary m-b-0"><b>0</b>%</p>
+                            <p class="per-Real text-center text-complete m-b-20"><b>0</b>%</p>
+
+                        </div>
+
+                        <div class="col-md-2 col-sm-2 col-xs-2 no-padding m-t-80" datakey="新增会员">
+                            <div class="progress-list progress-rotate clearfix">
+                                <div class="progress">
+                                    <div class="progress-bar progress-bar-primary progress-Target" style="width: 0%;"></div>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar progress-bar-complete progress-Real" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                            <p class="text-center m-t-40">会员</p>
+                            <p class="per-Target text-center text-primary m-b-0"><b>0</b>%</p>
+                            <p class="per-Real text-center text-complete m-b-20"><b>0</b>%</p>
+
+                        </div>
+
+                        <div class="col-md-2 col-sm-2 col-xs-2 no-padding m-t-80" datakey="新增商品">
+                            <div class="progress-list progress-rotate clearfix">
+                                <div class="progress">
+                                    <div class="progress-bar progress-bar-primary progress-Target" style="width: 0%;"></div>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar progress-bar-complete progress-Real" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                            <p class="text-center m-t-40">商品</p>
+                            <p class="per-Target text-center text-primary m-b-0"><b>0</b>%</p>
+                            <p class="per-Real text-center text-complete m-b-20"><b>0</b>%</p>
+
+                        </div>
+
+                        <div class="col-md-2 col-sm-2 col-xs-2 no-padding m-t-80" datakey="销售笔数">
+                            <div class="progress-list progress-rotate clearfix">
+                                <div class="progress">
+                                    <div class="progress-bar progress-bar-primary progress-Target" style="width: 0%;"></div>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar progress-bar-complete progress-Real" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                            <p class="text-center m-t-40">销售</p>
+                            <p class="per-Target text-center text-primary m-b-0"><b>0</b>%</p>
+                            <p class="per-Real text-center text-complete m-b-20"><b>0</b>%</p>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END CONTAINER FLUID -->
+<!-- END CONTAINER FLUID -->
+<!-- START CONTAINER FLUID -->
+<!-- <div class=" ">
+    <div class="row">
+        <div class="col-md-6 col-lg-6 col-xlg-6  m-b-10">
+            <div class="ar-2-1" style="overflow: visible;">
+                <div class="panel no-border  widget-loader-bar">
+                    <div class="panel-heading pull-top top-right">
+                        <div class="panel-controls">
+                            <ul>
+                                <li>
+                                    <a data-toggle="refresh" class="portlet-refresh text-black" href="#"><i class="portlet-icon portlet-icon-refresh"></i></a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="container-xs-height">
+                        <div class="row row-xs-height" id="propContainer" style="height: 350px;width: 1000px">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-6 col-xlg-6  m-b-10">
+            <div class="ar-2-1">
+                <div class="panel no-border  widget-loader-bar">
+                    <div class="panel-heading pull-top top-right">
+                        <div class="panel-controls">
+                            <ul>
+                                <li>
+                                    <a data-toggle="refresh" class="portlet-refresh text-black" href="#"><i class="portlet-icon portlet-icon-refresh"></i></a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="container-xs-height">
+                        <div class="row row-xs-height">
+                            <div id="gaugePie" style="height: 350px;width: 1000px">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> -->
+<!-- END CONTAINER FLUID -->
+<!-- Modal -->
+<div class="modal fade slide-up disable-scroll" id="sourceAnalysis" tabindex="-1" role="dialog" aria-labelledby="modalSlideUpLabel" aria-hidden="false">
+    <div class="modal-dialog ">
+        <div class="modal-content-wrapper">
+            <div class="modal-content">
+                <div class="modal-header clearfix text-left">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        <i class="pg-close fs-14"></i>
+                    </button>
+                    <h5>新用户注册来源分析</h5>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-hover dataTable">
+                        <tbody>
+                            <tr>
+                                <td></td>
+                                <td>昨日</td>
+                                <td>今日</td>
+                                <td>增幅</td>
+                            </tr>
+
+                            <tr>
+                                <td>iPhone注册</td>
+                                <td id="YesterIOS">0</td>
+                                <td id="IOS">0</td>
+                                <td id="cIOS" class="font-montserrat"><i class="fa fa-plus text-danger"></i></td>
+                            </tr>
+                            <tr>
+                                <td>iPad注册</td>
+                                <td id="YesterPad">0</td>
+                                <td id="Pad">0</td>
+                                <td id="cPad" class="font-montserrat"><i class="fa fa-plus text-danger"></i></td>
+                            </tr>
+                            <tr>
+                                <td>安卓注册</td>
+                                <td id="YesterAndroid">0</td>
+                                <td id="Android">0</td>
+                                <td id="cAndroid" class="font-montserrat"><i class="fa fa-plus text-danger"></i></td>
+                            </tr>
+                            <tr>
+                                <td>PC客户端</td>
+                                <td id="YesterPC">0</td>
+                                <td id="PC">0</td>
+                                <td id="cPC" class="font-montserrat"><i class="fa fa-minus text-success"></i></td>
+                            </tr>
+                            <tr>
+                                <td>网站注册</td>
+                                <td id="YesterWeb">0</td>
+                                <td id="Web">0</td>
+                                <td id="cWeb" class="font-montserrat"><i class="fa fa-minus text-success"></i></td>
+                            </tr>
+                            <tr>
+                                <td>手机Web注册</td>
+                                <td id="YesterMobileWeb">0</td>
+                                <td id="MobileWeb">0</td>
+                                <td id="cMobileWeb" class="font-montserrat"><i class="fa fa-minus text-success"></i></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+</div>
+
+<div class="modal fade slide-up disable-scroll" id="loginAnalysis" tabindex="-1" role="dialog" aria-labelledby="modalSlideUpLabel" aria-hidden="false">
+    <div class="modal-dialog ">
+        <div class="modal-content-wrapper">
+            <div class="modal-content">
+                <div class="modal-header clearfix text-left">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        <i class="pg-close fs-14"></i>
+                    </button>
+                    <h5>用户登录端分析</h5>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-hover dataTable">
+                        <tbody>
+                            <tr>
+                                <td></td>
+                                <td>昨日</td>
+                                <td>今日</td>
+                                <td>增幅</td>
+                            </tr>
+
+                            <tr>
+                                <td>PC客户端</td>
+                                <td id="YesterPCLog">0</td>
+                                <td id="PCLog">0</td>
+                                <td id="cPCLog" class="font-montserrat"><i class="fa fa-plus text-danger"></i></td>
+                            </tr>
+                            <tr>
+                                <td>Web登录</td>
+                                <td id="YesterWebLog">0</td>
+                                <td id="WebLog">0</td>
+                                <td id="cWebLog" class="font-montserrat"><i class="fa fa-plus text-danger"></i></td>
+                            </tr>
+                            <tr>
+                                <td>iPhone登录</td>
+                                <td id="YesterIOSLog">0</td>
+                                <td id="IOSLog">0</td>
+                                <td id="cIOSLog" class="font-montserrat"><i class="fa fa-minus text-success"></i></td>
+                            </tr>
+                        <tr>
+                            <td>Android登录</td>
+                            <td id="YesterAndroidLog">0</td>
+                            <td id="AndroidLog">0</td>
+                            <td id="cAndroidLog" class="font-montserrat"><i class="fa fa-minus text-success"></i></td>
+                        </tr>
+                            <tr>
+                                <td>iPad登录</td>
+                                <td id="YesterPadLog">0</td>
+                                <td id="PadLog">0</td>
+                                <td id="cPadLog" class="font-montserrat"><i class="fa fa-minus text-success"></i></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="checkbox check-success m-t-10" style="display: inline">
+                        <input type="checkbox" value="mergeShow" id="mergeShow" onchange="SetVenn();" checked="checked">
+                        <label for="mergeShow">仅显示移动端对比</label>
+                    </div>
+
+                    <div id="vennDiv">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+</div>
+
+<div class="modal fade slide-up disable-scroll" id="activeVennAnalysis" tabindex="-1" role="dialog" aria-labelledby="modalSlideUpLabel" aria-hidden="false">
+    <div class="modal-dialog ">
+        <div class="modal-content-wrapper">
+            <div class="modal-content">
+                <div class="modal-header clearfix text-left">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        <i class="pg-close fs-14"></i>
+                    </button>
+                    <h5>七天活跃用户变化</h5>
+                </div>
+                <div class="modal-body">
+                    <div id="activeVennDiv">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+</div>
+<!-- /.modal-dialog -->
+@*@Scripts.Render("~/js/gaugeCharts")*@
+@*表单 & 表格*@
+@Scripts.Render("~/js/begin/form")
+@*D3*@
+@*@Scripts.Render("~/js/nvd3")*@
+<!-- <script src="~/Scripts/plugins/asset/echarts-all.js"></script> -->
+<script src="/Scripts/plugins/easypiechart/jquery.easypiechart.min.js"></script>
+<script src="/Scripts/plugins/gaugeCharts/globalize.min.js"></script>
+<script src="/Scripts/plugins/gaugeCharts/dx.chartjs.js"></script>
+<script src="~/Scripts/plugins/artTemplate/template.js"></script>
+
+
+<script type="text/html" id="TodayYestaredayScript">
+    <td class="v-align-middle semi-bold">{{nowTimeString}}</td>
+    <td class="v-align-middle">{{regNum}}</td>
+    <td class="v-align-middle semi-bold">{{saleNum}}，&yen; {{saleMoney | moneyFormat}}元</td>
+    <td class="v-align-middle">{{userNum}}</td>
+    <td class="v-align-middle">{{goodsNum}}</td>
+    <td class="v-align-middle">{{smsNum}}</td>
+    <td class="v-align-middle">{{orderNum}}，&yen; {{orderMoney | moneyFormat}}元</td>
+</script>
+
+<script type="text/javascript">
+    function GetTodayYesterdayContrast(callback) {
+        var url = "/Home/TodayYesterdayContrast";
+        $.doAjax(url, null, function (msg) {
+            if (msg != "" && msg != "null") {
+                var json = $.parseJSON(msg);
+                var today = template("TodayYestaredayScript", json.today);
+                var yestartday = template("TodayYestaredayScript", json.yestareday);
+                $("#totalOrder").html(json.today.orderNum + " <span class='text-master hint-text fs-16 m-l-5 ordersTotal'>( " + json.today.orderMoney + " 元)</span>" + " <img src='' id=iconOrder></img><span id=formerDataOrder class='font-montserrat no-margin m-b-3 fs-16'></span>");
+                $("#paidAll").val(json.today.orderNum);
+
+                $("#todayTableTr").html(today);
+                $("#yestaredayTableTr").html(yestartday);
+
+                if (callback) {
+                    callback();
+                }
+            }
+        });
+    }
+
+    template.helper('moneyFormat', function (data) {
+        return parseFloat(data.toFixed(2));
+    });
+
+    function GetDataContrast(callback) {
+        var url = "/Home/GetYesterdayData";
+        $.doAjax(url, null, function (msg) {
+            if (msg != "" && msg != "null") {
+                var json = $.parseJSON(msg);
+
+                if (json.today.saleNum >= json.yestareday.saleNum) {
+                    $("#iconSale").attr("src", "../../img/Indicators/up.png");
+                    $("#formerDataSale").html("+" + (json.today.saleNum - json.yestareday.saleNum));
+                    $("#formerDataSale").addClass("text-danger");
+                } else {
+                    $("#iconSale").attr("src", "../../img/Indicators/down.png");
+                    $("#formerDataSale").html((json.today.saleNum - json.yestareday.saleNum));
+                    $("#formerDataSale").addClass("text-success");
+                }
+                $("#iconSale").attr("title", json.yestareday.saleNum);
+
+                if (json.today.userNum >= json.yestareday.userNum) {
+                    $("#iconUsr").attr("src", "../../img/Indicators/up.png");
+                    $("#formerDataUsr").html("+" + (json.today.userNum - json.yestareday.userNum));
+                    $("#formerDataUsr").addClass("text-danger");
+                } else {
+                    $("#iconUsr").attr("src", "../../img/Indicators/down.png");
+                    $("#formerDataUsr").html((json.today.userNum - json.yestareday.userNum));
+                    $("#formerDataUsr").addClass("text-success");
+                }
+                $("#iconUsr").attr("title", json.yestareday.userNum);
+
+                if (json.today.goodsNum >= json.yestareday.goodsNum) {
+                    $("#iconGoods").attr("src", "../../img/Indicators/up.png");
+                    $("#formerDataGoods").html("+" + (json.today.goodsNum - json.yestareday.goodsNum));
+                    $("#formerDataGoods").addClass("text-danger");
+                } else {
+                    $("#iconGoods").attr("src", "../../img/Indicators/down.png");
+                    $("#formerDataGoods").html((json.today.goodsNum - json.yestareday.goodsNum));
+                    $("#formerDataGoods").addClass("text-success");
+                }
+                $("#iconGoods").attr("title", json.yestareday.goodsNum);
+
+                if (json.today.smsNum >= json.yestareday.smsNum) {
+                    $("#iconSms").attr("src", "../../img/Indicators/up.png");
+                    $("#formerDataSms").html("+" + (json.today.smsNum - json.yestareday.smsNum));
+                    $("#formerDataSms").addClass("text-danger");
+                } else {
+                    $("#iconSms").attr("src", "../../img/Indicators/down.png");
+                    $("#formerDataSms").html((json.today.smsNum - json.yestareday.smsNum));
+                    $("#formerDataSms").addClass("text-success");
+                }
+                $("#iconSms").attr("title", json.yestareday.smsNum);
+
+                if (json.today.orderNum >= json.yestareday.orderNum) {
+                    $("#iconOrder").attr("src", "../../img/Indicators/up.png");
+                    $("#formerDataOrder").html("+" + (json.today.orderNum - json.yestareday.orderNum));
+                    $("#formerDataOrder").addClass("text-danger");
+                } else {
+                    $("#iconOrder").attr("src", "../../img/Indicators/down.png");
+                    $("#formerDataOrder").html((json.today.orderNum - json.yestareday.orderNum));
+                    $("#formerDataOrder").addClass("text-success");
+                }
+                $("#iconOrder").attr("title", json.yestareday.orderNum);
+
+                if (json.today.regNum >= json.yestareday.regNum) {
+                    $("#iconReg").attr("src", "../../img/Indicators/up.png");
+                    $("#formerDataReg").html("+" + (json.today.regNum - json.yestareday.regNum));
+                    $("#formerDataReg").addClass("text-danger");
+                } else {
+                    $("#iconReg").attr("src", "../../img/Indicators/down.png");
+                    $("#formerDataReg").html((json.today.regNum - json.yestareday.regNum));
+                    $("#formerDataReg").addClass("text-success");
+                }
+                $("#iconReg").attr("title", json.yestareday.regNum);
+
+                if (callback) {
+                    callback();
+                }
+            }
+        });
+    }
+
+    function TodayYesterdayContrastMore(obj) {
+        //fa-angle-double-down fa-angle-double-up
+        if ($(obj).find("i.fa-angle-double-down").size() > 0) {
+
+            $(obj).find("i").removeClass("fa-angle-double-down").addClass("fa-angle-double-up");
+
+            var url = "/Home/TodayYesterdayContrastMore";
+            $.doAjax(url, null, function (msg) {
+                if (msg != "" && msg != "null") {
+                    var json = $.parseJSON(msg);
+                    var yestareday = template("TodayYestaredayScript", json.yestareday);
+                    var average = template("TodayYestaredayScript", json.average);
+                    $("#yestaredayThisMoment").html(yestareday);
+                    $("#averageTableTr").html(average);
+
+                    $("#TodayYesterdayContrastTable .disabledTr").show();
+                }
+            });
+        } else {
+            $(obj).find("i").removeClass("fa-angle-double-up").addClass("fa-angle-double-down");
+
+            $("#TodayYesterdayContrastTable .disabledTr").hide();
+        }
+
+
+    }
+
+</script>
+
+<script type="text/javascript">
+    var globalLoginTypeJsonStr = "";
+
+    $(document).ready(function () {
+
+        var url = window.location.href;
+
+        if (url.indexOf("testsys.yuanbei.biz") > 0) {
+            dialog({ content: "测试服务器，不加载首页信息", title: '错误!' }).show();
+            return false;
+        }
+
+        window.setInterval(GetBalance, 30000);
+        //window.setInterval(GetBalance, 30000);
+        $('.timeType .page-where-othertime .input-daterange').datepicker();
+        TabsToggleClick(1);
+        setTimeout(function () {
+            initFunc();
+            GetUsrRegDiff();
+            GetUsrLogDiff();
+            SetActiveUsrVenn();
+            GetBalance();
+        }, 2000);
+        $(".metro").liveTile();
+    });
+
+    function initFunc() {
+        GetTodayYesterdayContrast(function () {
+            GetDataContrast(function () {
+                MonthCompare();
+            });
+        });
+
+    }
+
+    function refreshToday() {
+        GetTodayYesterdayContrast();
+    }
+
+    function TabsToggleClick(type) {
+
+        switch (type) {
+            case 1:
+                if ($("#tab2hellowWorld").attr("ajax") != "yes") {
+                    GetNewUsrData(function () {
+                        GetActiveData(function () {
+                            GetLoginData(function () {
+                                GetNewUsrDataDetail();
+                            });
+                            GetActiveStatusChart();
+                        });
+                    });
+                    $("#tab2hellowWorld").attr("ajax", "yes");
+                }
+                break;
+            case 3:
+            case 2:
+                if ($("#tab2FollowUs").attr("ajax") != "yes") {
+                    GetStatusDataBoard();
+                    GetDataContrast();
+                    $("#tab2FollowUs").attr("ajax", "yes");
+                }
+                break;
+        }
+    }
+
+    function GetLoginData(callback) {
+        var ur = "/Home/GetLoginBoard";
+        $.doAjax(ur, null, function (msg) {
+            var json = jQuery.parseJSON(msg);
+
+            $("#loginTotal").html(json.Total + "<img src='' class='m-l-10' title='" + json.Data.YesterData + "' id=iconLogin ></img><span id=formerDataLogin class='font-montserrat no-margin m-b-3 fs-16'></span>");
+            //$("#loginTotal").html(json.Total + " <img src='' id=iconLogin ></img><span id=formerDataLogin class='text-master hint-text fs-16 m-l-5'></span>");
+            $("#loginActive").html(json.Data.ActiveUsr);
+            $("#loginLost").html(json.Data.LostUsr);
+            $("#loginNew").html(json.Data.NewUsr);
+
+            if (json.Data.YesterData > json.Total) {
+                $("#iconLogin").attr("src", "../../img/Indicators/down.png");
+                $("#formerDataLogin").html(json.Total - json.Data.YesterData);
+                $("#formerDataLogin").addClass("text-success");
+            } else {
+                $("#iconLogin").attr("src", "../../img/Indicators/up.png");
+                $("#formerDataLogin").html("+" + (json.Total - json.Data.YesterData));
+                $("#formerDataLogin").addClass("text-danger");
+            }
+
+            if (callback) {
+                callback();
+            }
+        }, true);
+    }
+
+    function GetActiveData(callback) {
+        var ur = "/Home/GetActiveBoard";
+        $.doAjax(ur, null, function (msg) {
+            var json = jQuery.parseJSON(msg);
+            $("#activeNot").html(json.Data.NotActive);
+            $("#activeNew").html(json.Data.NewActive);
+            $("#activeKeep").html(json.Data.KeepActive);
+            if (json.Data.NotActive >= json.Data.NewActive && json.Data.NotActive !== 0) {
+                $("#activeTotal").html(json.Total + "<img style='width: 44px;margin-top: -12px;' src='../../img/alertIcon/death.gif'></img><span class='text-master hint-text fs-16 m-l-5'>(" + parseFloat(json.Data.NotActive * 100 / json.Data.NewActive).toFixed(2) + "%)</span>");
+            } else if (json.Data.NotActive !== 0) {
+                if (json.Data.NotActive * 100 / json.Data.NewActive > 50) {
+                    $("#activeTotal").html(json.Total + "<img style='margin-left: 8px; margin-top: -8px;' src='../../img/alertIcon/alert.gif'></img><span class='text-master hint-text fs-16 m-l-5'>(" + parseFloat(json.Data.NotActive * 100 / json.Data.NewActive).toFixed(2) + "%)</span>");
+                } else {
+                    $("#activeTotal").html(json.Total);
+                }
+            } else {
+                $("#activeTotal").html(json.Total);
+            }
+
+
+            if (callback) {
+                callback();
+            }
+        }, true);
+    }
+
+    function GetNewUsrData(callback) {
+        var ur = "/Home/GetNewUsrBoard";
+        $.doAjax(ur, null, function (msg) {
+            var json = jQuery.parseJSON(msg);
+
+            //$.each(json.Data, function(key, value) {
+            //    $("#active" + key).html(value);
+            //});
+            $("#newTotal").html(json.Total + " <img src='' id=iconReg ></img><span id=formerDataReg class='font-montserrat no-margin m-b-3 fs-16'></span>");
+            //$("#newUsr").html(json.Data.userNum);
+            //$("#newGoods").html(json.Data.goodsNum);
+            //$("#newOrder").html(json.Data.orderNum);
+            //$("#newSale").html(json.Data.saleNum);
+            //$("#newSms").html(json.Data.smsNum);
+            if (callback) {
+                callback();
+            }
+        }, true);
+    }
+
+    function GetNewUsrDataDetail(callback) {
+        var ur = "/Home/GetNewUsrBoardDetail";
+        $.doAjax(ur, null, function (msg) {
+            var json = jQuery.parseJSON(msg);
+
+            //$.each(json.Data, function(key, value) {
+            //    $("#active" + key).html(value);
+            //});
+            //$("#newTotal").html(json.Total + " <img src='' id=iconReg ></img><span id=formerDataReg class='font-montserrat no-margin m-b-3 fs-16'></span>");
+            $("#newUsr").html(json.Data.userNum);
+            $("#newGoods").html(json.Data.goodsNum);
+            $("#newOrder").html(json.Data.orderNum);
+            $("#newSale").html(json.Data.saleNum);
+            $("#newSms").html(json.Data.smsNum);
+            if (callback) {
+                callback();
+            }
+        }, true);
+    }
+
+    function GetStatusDataBoard() {
+        var ur = "/Home/GetStatusDataBoard";
+        $.doAjax(ur, null, function (msg) {
+            var json = jQuery.parseJSON(msg);
+
+            $.each(json, function (i, n) {
+                var prefix = "";
+                switch (n.Name) {
+                    case "销售笔数":
+                        prefix = "Sale";
+                        break;
+                    case "会员数量":
+                        prefix = "Usr";
+                        break;
+                    case "商品数量":
+                        prefix = "Goods";
+                        break;
+                    case "短信数量":
+                        prefix = "Sms";
+                        break;
+                    case "订单笔数":
+                        prefix = "Order";
+                        break;
+                    case "付费用户":
+                        prefix = "Paid";
+                        break;
+                    default:
+                        break;
+                }
+                if (prefix != "") {
+                    if (prefix != "Order") {
+                        if (prefix != "Paid") {
+                            $("#total" + prefix).html(n.Total + " <img src='' id=icon" + prefix + "></img><span id=formerData" + prefix + " class='font-montserrat no-margin m-b-3 fs-16'></span>");
+                        } else {
+                            $("#total" + prefix).html(n.Total);
+                        }
+
+                    }
+
+                    $.each(n.Data, function (key, value) {
+                        if (key == "ActiveUsr") {
+                            $("#active" + prefix).html(value);
+                        } else if (key == "LostUsr") {
+                            $("#lost" + prefix).html(value);
+                        } else
+                            $("#add" + prefix).html(value);
+                    });
+                }
+
+            });
+        }, true);
+    }
+
+    function todayList(obj, t) {
+
+        var type = $("#todayListType label.active input").val();
+
+        if (obj != undefined && obj != null) {
+            type = $(obj).find("input").val();
+        }
+
+
+        if (type == "shop") {
+            $("#dataSourceType").show();
+        } else {
+            $("#dataSourceType").hide();
+            $("#dataSourceType input:radio:first").prop("checked", true);
+        }
+
+        var source = $("#dataSourceType input:checked").val();
+
+        var param = {
+            "gType": type,
+            "dt": null,
+            "source": source
+        };
+
+        var ur = "/Home/GetTableData";
+        $.doAjax(ur, param, function (msg) {
+            var json = jQuery.parseJSON(msg);
+            var XLable = new Array();
+            var tbData = {};
+
+            var series = new Array();
+
+            option.title.text = "";
+            $.each(json.DataList, function (i, n) {
+                XLable.push(i + ":00");
+                $.each(n.ItemList, function (itemI, itemN) {
+                    var dataItemValue = {};
+                    dataItemValue["value"] = itemN.Values;
+                    if (!tbData.hasOwnProperty(itemN.series)) {
+                        tbData[itemN.series] = new Array();
+                    }
+                    tbData[itemN.series].push(dataItemValue);
+                });
+
+            });
+            var legend = new Array();
+            $.each(tbData, function (i, n) {
+                var seriesItem = {
+                    name: i + "",
+                    type: 'line',
+                    symbol: 'Circle',
+                    data: n
+                }
+
+                if (i.indexOf("昨日") > -1) {
+                    seriesItem["itemStyle"] = { normal: { lineStyle: { type: "dashed" } } };
+                }
+
+                series.push(seriesItem);
+                legend.push(seriesItem.name);
+            });
+
+            option.xAxis[0].data = XLable;
+            option.legend.data = legend;
+            option.series = series;
+            myChart.clear().setOption(option);
+        }, true);
+    }
+
+
+    function MonthCompare(callback) {
+        var ur = "/Home/GetCompleteProp";
+        $.doAjax(ur, null, function (msg) {
+            if (msg != "" && msg != null) {
+                var json = jQuery.parseJSON(msg);
+
+                $.each(json, function (i, n) {
+
+                    if (n.SeriesName == "注册量") {
+                        $('#piechart .easyPieChart').data('easyPieChart').update(Number(n.Percent));
+                        $('#piechart .PresetCount').html(n.PresetCount);
+                        $('#piechart .RealCount').html(n.RealCount);
+                    } else if (n.SeriesName == "订单金额") {
+                        $('#piechart2 .easyPieChart').data('easyPieChart').update(Number(n.Percent));
+                        $('#piechart2 .PresetCount').html(n.PresetCount);
+                        $('#piechart2 .RealCount').html(n.RealCount);
+                    } else {
+                        var ProgressObj = $("#CompletePropList .progress-list[datakey='" + n.SeriesName + "']");
+                        ProgressObj.find(".details .RealCount").html(n.RealCount);
+                        ProgressObj.find(".details .PresetCount").html(n.PresetCount);
+                        ProgressObj.find(".status.Percent span").html(Number(n.Percent));
+                        ProgressObj.find(".progress .progress-bar").css("width", n.Percent + "%");
+                    }
+
+                    var progressList = $("#ProgressCompare div[datakey='" + n.SeriesName + "']");
+
+                    var nowTime = new Date();
+                    var thisDay = nowTime.getDate();
+                    var now = (new Date(nowTime.getFullYear(), nowTime.getMonth(), 1)).getTime();
+                    var next = (new Date(nowTime.getFullYear(), nowTime.getMonth() + 1, 1)).getTime();
+                    var nowMonthDay = (next - now) / (1000 * 60 * 60 * 24);
+
+
+                    var Supposed = Math.round((n.PresetCount / nowMonthDay) * thisDay / n.PresetCount * 100);
+
+
+                    var Actual = Math.round(n.Percent);
+
+                    progressList.find('.per-Target > b').html(Supposed);
+                    progressList.find('.per-Real > b').html(Actual);
+                    progressList.find('.progress-Target').css("width", Supposed + "%");
+                    progressList.find('.progress-Real').css("width", Actual + "%");
+
+                });
+
+                if (callback) {
+                    callback();
+                }
+            }
+
+        }, true);
+    }
+
+    function BYJHDataValueJson(value, label, position) {
+        return {
+            value: value,
+            itemStyle: {
+                normal: {
+                    label: {
+                        show: true,
+                        position: position,
+                        formatter: function () {
+                            return label;
+                        }
+                    }
+                }
+            }
+        };
+    }
+
+    function GetDetailPage(type, index, obj) {
+        var cnt = "";
+        if (type !== "PaidAll") {
+            cnt = $(obj).html();
+        } else
+            cnt = $("#paidAll").val();
+
+        //alert(cnt);
+        window.open("/IndexDetailInfo/Index?type=" + type + "&index=" + index + "&pageIndex=1" + "&cnt=" + cnt);
+    }
+
+    function GetUsrRegDiff() {
+        var ur = "/Home/GetRegUsr";
+        $.doAjax(ur, null, function (msg) {
+            var json = jQuery.parseJSON(msg);
+
+            $.each(json, function (i, n) {
+                $("#" + i).html(n);
+            });
+
+            if (json.YesterAndroid > json.Android) {
+                $("#cAndroid").addClass("text-success");
+                $("#cAndroid").html("-" + (json.YesterAndroid - json.Android));
+
+            } else {
+                $("#cAndroid").addClass("text-danger");
+                $("#cAndroid").html("+" + (json.Android - json.YesterAndroid));
+            }
+            if (json.YesterPad > json.Pad) {
+                $("#cPad").addClass("text-success");
+                $("#cPad").html("-" + (json.YesterPad - json.Pad));
+
+            } else {
+                $("#cPad").addClass("text-danger");
+                $("#cPad").html("+" + (json.Pad - json.YesterPad));
+            }
+            if (json.YesterIOS > json.IOS) {
+                $("#cIOS").addClass("text-success");
+                $("#cIOS").html("-" + (json.YesterIOS - json.IOS));
+            } else {
+                $("#cIOS").addClass("text-danger");
+                $("#cIOS").html("+" + (json.IOS - json.YesterIOS));
+            }
+            if (json.YesterMobileWeb > json.MobileWeb) {
+                $("#cMobileWeb").addClass("text-success");
+                $("#cMobileWeb").html("-" + (json.YesterMobileWeb - json.MobileWeb));
+            } else {
+                $("#cMobileWeb").addClass("text-danger");
+                $("#cMobileWeb").html("+" + (json.MobileWeb - json.YesterMobileWeb));
+            } if (json.YesterPC > json.PC) {
+                $("#cPC").addClass("text-success");
+                $("#cPC").html("-" + (json.YesterPC - json.PC));
+            } else {
+                $("#cPC").addClass("text-danger");
+                $("#cPC").html("+" + (json.PC - json.YesterPC));
+            }
+            if (json.YesterWeb > json.Web) {
+                $("#cWeb").addClass("text-success");
+                $("#cWeb").html("-" + (json.YesterWeb - json.Web));
+            } else {
+                $("#cWeb").addClass("text-danger");
+                $("#cWeb").html("+" + (json.Web - json.YesterWeb));
+            }
+            //$("#activeNot").html(json.Data.NotActive);
+            //$("#activeNew").html(json.Data.NewActive);
+            //$("#activeKeep").html(json.Data.KeepActive);
+            //if (json.Data.NotActive >= json.Data.NewActive && json.Data.NotActive !== 0) {
+            //    $("#activeTotal").html(json.Total + "<img style='width: 44px;margin-top: -12px;' src='../../img/alertIcon/death.gif'></img><span class='text-master hint-text fs-16 m-l-5'>(" + parseFloat(json.Data.NotActive * 100 / json.Data.NewActive).toFixed(2) + "%)</span>");
+            //} else if (json.Data.NotActive !== 0) {
+            //    if (json.Data.NotActive * 100 / json.Data.NewActive > 50) {
+            //        $("#activeTotal").html(json.Total + "<img style='margin-left: 8px; margin-top: -8px;' src='../../img/alertIcon/alert.gif'></img><span class='text-master hint-text fs-16 m-l-5'>(" + parseFloat(json.Data.NotActive * 100 / json.Data.NewActive).toFixed(2) + "%)</span>");
+            //    } else {
+            //        $("#activeTotal").html(json.Total);
+            //    }
+            //} else {
+            //    $("#activeTotal").html(json.Total);
+            //}
+
+        }, true);
+    }
+
+    function GetUsrLogDiff() {
+        var ur = "/Home/GetLoginType";
+        $.doAjax(ur, null, function (msg) {
+            var json = jQuery.parseJSON(msg);
+
+            $.each(json, function (i, n) {
+                $("#" + i).html(n);
+            });
+
+            if (json.YesterPCLog > json.PCLog) {
+                $("#cPCLog").addClass("text-success");
+                $("#cPCLog").html("-" + (json.YesterPCLog - json.PCLog));
+
+            } else {
+                $("#cPCLog").addClass("text-danger");
+                $("#cPCLog").html("+" + (json.PCLog - json.YesterPCLog));
+            }
+            if (json.YesterWebLog > json.WebLog) {
+                $("#cWebLog").addClass("text-success");
+                $("#cWebLog").html("-" + (json.YesterWebLog - json.WebLog));
+            } else {
+                $("#cWebLog").addClass("text-danger");
+                $("#cWebLog").html("+" + (json.WebLog - json.YesterWebLog));
+            }
+            if (json.YesterIOSLog > json.IOSLog) {
+                $("#cIOSLog").addClass("text-success");
+                $("#cIOSLog").html("-" + (json.YesterIOSLog - json.IOSLog));
+            } else {
+                $("#cIOSLog").addClass("text-danger");
+                $("#cIOSLog").html("+" + (json.IOSLog - json.YesterIOSLog));
+            }
+            if (json.YesterAndroidLog > json.AndroidLog) {
+                $("#cAndroidLog").addClass("text-success");
+                $("#cAndroidLog").html("-" + (json.YesterAndroidLog - json.AndroidLog));
+            } else {
+                $("#cAndroidLog").addClass("text-danger");
+                $("#cAndroidLog").html("+" + (json.AndroidLog - json.YesterAndroidLog));
+            }
+            if (json.YesterPadLog > json.PadLog) {
+                $("#cPadLog").addClass("text-success");
+                $("#cPadLog").html("-" + (json.YesterPadLog - json.PadLog));
+            } else {
+                $("#cPadLog").addClass("text-danger");
+                $("#cPadLog").html("+" + (json.PadLog - json.YesterPadLog));
+            }
+
+            globalLoginTypeJsonStr = msg;
+            SetVenn();
+            //var chart = venn.VennDiagram();
+            //var div = d3.select("#vennDiv");
+            //d3.select("#vennDiv").datum(sets).call(chart);
+
+            //// add a tooltip
+            //var tooltip = d3.select("#vennDiv").append("div")
+            //    .attr("class", "venntooltip");
+
+            //// add listeners to all the groups to display tooltip on mousover
+            //div.selectAll("g")
+            //    .on("mouseover", function (d, i) {
+            //        // sort all the areas relative to the current item
+            //        venn.sortAreas(div, d);
+
+            //        // Display a tooltip with the current size
+            //        tooltip.transition().duration(400).style("opacity", .9);
+            //        tooltip.text(d.size + " 个用户");
+
+            //        // highlight the current path
+            //        var selection = d3.select(this).transition("tooltip").duration(400);
+            //        selection.select("path")
+            //            .style("stroke-width", 3)
+            //            .style("fill-opacity", d.sets.length == 1 ? .4 : .1)
+            //            .style("stroke-opacity", 1);
+            //    })
+
+            //    .on("mousemove", function () {
+            //        tooltip.style("left", (d3.event.pageX) + "px")
+            //               .style("top", (d3.event.pageY - 28) + "px");
+            //    })
+
+            //    .on("mouseout", function (d, i) {
+            //        tooltip.transition().duration(400).style("opacity", 0);
+            //        var selection = d3.select(this).transition("tooltip").duration(400);
+            //        selection.select("path")
+            //            .style("stroke-width", 0)
+            //            .style("fill-opacity", d.sets.length == 1 ? .25 : .0)
+            //            .style("stroke-opacity", 0);
+            //    });
+        }, true);
+    }
+
+    function SetActiveUsrVenn() {
+        var ur = "/Home/GetActiveUsrVenn";
+        $.doAjax(ur, null, function (msg) {
+            var json = jQuery.parseJSON(msg);
+
+            var activeSets = new Array();
+            var Set = new Array();
+
+            $.each(json.SetsList, function (i, n) {
+
+                $.each(n.SetsElements, function (k, m) {
+                    Set.push(m);
+                });
+
+                activeSets.push({
+                    sets: Set,
+                    size: n.SetsCount
+                });
+
+                Set = new Array();
+                //console.log(activeSets);
+            });
+
+            //var sets = [{ sets: ['移动端'], size: mobileData },
+            //             { sets: ['桌面端'], size: webData },
+            //             { sets: ['移动端', '桌面端'], size: crossData }];
+
+            var actChart = venn.VennDiagram();
+            var actDiv = d3.select("#activeVennDiv");
+            d3.select("#activeVennDiv").datum(activeSets).call(actChart);
+
+            // add a tooltip
+            var tooltip = d3.select("#activeVennDiv").append("div")
+                .attr("class", "venntooltip");
+
+            // add listeners to all the groups to display tooltip on mousover
+            actDiv.selectAll("g")
+                .on("mouseover", function (d, i) {
+                    // sort all the areas relative to the current item
+                    venn.sortAreas(actDiv, d);
+
+                    // Display a tooltip with the current size
+                    tooltip.transition().duration(400).style("opacity", .9);
+                    tooltip.text(d.size + " 个用户");
+
+                    // highlight the current path
+                    var selection = d3.select(this).transition("tooltip").duration(400);
+                    selection.select("path")
+                        .style("stroke-width", 3)
+                        .style("fill-opacity", d.sets.length == 1 ? .4 : .1)
+                        .style("stroke-opacity", 1);
+                })
+
+                .on("mousemove", function () {
+                    tooltip.style("left", (d3.event.pageX) + "px")
+                           .style("top", (d3.event.pageY - 28) + "px");
+                })
+
+                .on("mouseout", function (d, i) {
+                    tooltip.transition().duration(400).style("opacity", 0);
+                    var selection = d3.select(this).transition("tooltip").duration(400);
+                    selection.select("path")
+                        .style("stroke-width", 0)
+                        .style("fill-opacity", d.sets.length == 1 ? .25 : .0)
+                        .style("stroke-opacity", 0);
+                });
+        }, true);
+    }
+
+    function GetBalance() {
+        var ur = "/Home/GetBalance";
+        $.doAjax(ur, null, function (msg) {
+            try {
+                var json = jQuery.parseJSON(msg);
+
+                $("#accountBalance").html(json.result.money);
+                if (json.result.money > 1000) {
+                    $("#accountBalance").css('color', 'green');
+                } else {
+                    $("#accountBalance").css('color', 'red');
+                }
+            } catch (e) {
+                $("#accountBalance").html("暂无数据");
+            } 
+            
+        }, true);
+    }
+
+    function SetVenn() {
+        var json = jQuery.parseJSON(globalLoginTypeJsonStr);
+
+        if ($('#mergeShow').prop('checked')) {
+            var mobileData = json.IOSLog + json.AndroidLog + json.PadLog;
+            var webData = json.WebLog + json.PCLog;
+            var crossData = json.WebIOS + json.WebAndroid + json.PCAndroid + json.PCIOS + json.PCPad + json.WebPad;
+
+            var sets = [{ sets: ['移动端'], size: mobileData },
+                         { sets: ['桌面端'], size: webData },
+                         { sets: ['移动端', '桌面端'], size: crossData }];
+        } else {
+            // define sets and set set intersections
+            var sets = [{ sets: ['Web'], size: json.WebLog },
+                         { sets: ['PC'], size: json.PCLog },
+                         { sets: ['iPhone'], size: json.IOSLog },
+                         { sets: ['Android'], size: json.AndroidLog },
+                         { sets: ['Pad'], size: json.PadLog },
+                         { sets: ['Web', 'PC'], size: json.WebPC },
+                         { sets: ['Web', 'iPhone'], size: json.WebIOS },
+                         { sets: ['Web', 'Android'], size: json.WebAndroid },
+                         { sets: ['PC', 'Android'], size: json.PCAndroid },
+                         { sets: ['PC', 'iPhone'], size: json.PCIOS },
+                         { sets: ['PC', 'Pad'], size: json.PCPad },
+                         { sets: ['iPhone', 'Pad'], size: json.IOSPad },
+                         { sets: ['Android', 'Pad'], size: json.AndroidPad },
+                         { sets: ['Web', 'Pad'], size: json.WebPad },
+                         { sets: ['iPhone', 'Android'], size: json.IOSAndroid }];
+
+        }
+
+        var chart = venn.VennDiagram();
+
+        var div = d3.select("#vennDiv");
+        div.datum(sets).call(chart);
+
+        $('#vennDiv').filter(".venntooltip").remove();
+        var tooltip = d3.select("#vennDiv").append("div")
+            .attr("class", "venntooltip");
+
+        div.selectAll("path")
+            .style("stroke-opacity", 0)
+            .style("stroke", "#fff")
+            .style("stroke-width", 0);
+
+        div.selectAll("g")
+            .on("mouseover", function (d, i) {
+                // sort all the areas relative to the current item
+                venn.sortAreas(div, d);
+
+                // Display a tooltip with the current size
+                tooltip.transition().duration(400).style("opacity", .9);
+                tooltip.text(d.size + " 个用户");
+
+                // highlight the current path
+                var selection = d3.select(this).transition("tooltip").duration(400);
+                selection.select("path")
+                    .style("stroke-width", 3)
+                    .style("fill-opacity", d.sets.length == 1 ? .4 : .1)
+                    .style("stroke-opacity", 1);
+            })
+
+            .on("mousemove", function () {
+                tooltip.style("left", (d3.event.pageX) + "px")
+                       .style("top", (d3.event.pageY - 28) + "px");
+            })
+
+            .on("mouseout", function (d, i) {
+                tooltip.transition().duration(400).style("opacity", 0);
+                var selection = d3.select(this).transition("tooltip").duration(400);
+                selection.select("path")
+                    .style("stroke-width", 0)
+                    .style("fill-opacity", d.sets.length == 1 ? .25 : .0)
+                    .style("stroke-opacity", 0);
+            });
+    }
+
+</script>
+
+<!-- EasyPieChart -->
+<script>
+    $(function () {
+        var piechart = $('#piechart .easyPieChart').easyPieChart({
+            easing: 'easeOutBounce',
+            delay: 3000,
+            size: 120,
+            barColor: '#418bca',
+            trackColor: '#eee',
+            scaleColor: false,
+            lineWidth: 10,
+            trackWidth: 10,
+            lineCap: 'round',
+            onStep: function (from, to, percent) {
+                $(this.el).find('.percent').text(Math.round(percent));
+                // $(this.el).find('.percent').html('<i class="fa fa-user text-complete"></i>');
+            }
+        });
+        var piechart2 = $('#piechart2 .easyPieChart').easyPieChart({
+            easing: 'easeOutBounce',
+            delay: 3000,
+            size: 120,
+            barColor: '#6d5cae',
+            trackColor: '#eee',
+            scaleColor: false,
+            lineWidth: 10,
+            trackWidth: 10,
+            lineCap: 'round',
+            onStep: function (from, to, percent) {
+                $(this.el).find('.percent').text(Math.round(percent));
+                // $(this.el).find('.percent').html('<i class="fa fa-usd text-primary"></i>');
+            }
+        });
+        var chart = window.chart = $('#piechart').data('easyPieChart');
+        $('.js_update').on('click', function () {
+            chart.update(Math.random() * 200 - 100);
+        });
+    });
+</script>
+
+<!-- DXCharts -->
+<!-- AreaChart -->
+<script>
+    var dataSource = [],
+        // var dataSource = [{
+        //         time: "China",
+        //         data1: 320866959,
+        //         data2: 87774113
+        //     }, {
+        //         time: "India",
+        //         data1: 340419115,
+        //         data2: 47063757
+        //     }, {
+        //         time: "United States",
+        //         data1: 58554755,
+        //         data2: 34835293
+        //     }, {
+        //         time: "Indonesia",
+        //         data1: 68715705,
+        //         data2: 10053690
+        //     }, {
+        //         time: "Brazil",
+        //         data1: 50278034,
+        //         data2: 9190842
+        //     }, {
+        //         time: "Russia",
+        //         data1: 26465156,
+        //         data2: 18412243
+        //     }],
+        chartOptions = {
+            dataSource: dataSource,
+            commonSeriesSettings: {
+                type: "splineArea",
+                argumentField: "time",
+                label: {
+                    overlappingBehavior: { mode: 'rotate', rotationAngle: 80 }
+                }
+            },
+            series: [
+                {
+                    valueField: "data1",
+                    name: "新增活跃"
+                }, {
+                    valueField: "data2",
+                    name: "流失活跃"
+                }
+            ],
+            //label: {
+            //    overlappingBehavior: 'auto'
+            //},
+            margin: {
+                bottom: 20
+            },
+            argumentAxis: {
+                valueMarginsEnabled: false
+            },
+            legend: {
+                visible: true,
+                orientation: 'horizontal',
+                position: 'right'
+            },
+            tooltip: {
+                enabled: true,
+                shared: true,
+                location: "center"
+            }
+            // title: {
+            //     text: "活跃变化分析",
+            //     font: {
+            //         family: 'Microsoft Yahei',
+            //         size: 12,
+            //         weight: 600
+
+            //     },
+            //     horizontalAlignment: "left"
+            // }
+        };
+
+    //var chart = $("#chart").dxChart(chartOptions).dxChart("instance");
+</script>
+
+<script type="text/javascript">
+
+    function GetActiveStatusChart() {
+        var url = "/UserRetention/GetActiveStatus";
+
+        var postJson = {};
+        var timeValue = $.timePeriod(0 - 30);
+        postJson["stTime"] = timeValue.start.toLocaleDateString();
+        postJson["edTime"] = timeValue.end.toLocaleDateString();
+
+
+        $.doAjax(url, postJson, function (msg) {
+            if (msg != "null" && msg != "" && msg != null) {
+                var json = $.parseJSON(msg);
+
+                var ds = new Array();
+
+                $.each(json.dataList, function (i, n) {
+                    ds.unshift(
+                    {
+                        time: n.Date,
+                        data1: n.NewActive,
+                        data2: n.LostActive
+                    });
+
+                });
+
+                chartOptions.dataSource = ds;
+                var chart = $("#chart").dxChart(chartOptions).dxChart("instance");
+            }
+        }, true);
+    }
+
+
+    //var myChartActive = echarts.init(document.getElementById('activeChange'));
+
+    //var optionActive = {
+    //    color:
+    //    [
+    //        '#87cefa', '#ff7f50', '#da70d6', '#32cd32', '#6495ed',
+    //        '#ff69b4', '#ba55d3', '#cd5c5c', '#ffa500', '#40e0d0',
+    //        '#1e90ff', '#ff6347', '#7b68ee', '#00fa9a', '#ffd700',
+    //        '#6b8e23', '#ff00ff', '#3cb371', '#b8860b', '#30e0e0'
+    //    ],
+    //    //title: {
+    //    //    text: '活跃用户变化',
+    //    //    textAlign: "center",
+    //    //    x: "center"
+    //    //},
+    //    tooltip: {
+    //        show: true,
+    //        trigger: 'axis'
+    //    },
+    //    legend: {
+    //        data: [
+    //            '新增活跃', '流失活跃'
+    //        ],
+    //        y: "bottom"
+    //    },
+    //    toolbox: {
+    //        show: false,
+    //        feature: {
+    //            mark: { show: true },
+    //            dataView: { show: true, readOnly: false },
+    //            magicType: { show: true, type: ['line', 'bar'] },
+    //            restore: { show: true },
+    //            saveAsImage: { show: true }
+    //        }
+    //    },
+    //    //dataZoom: { show: true, realtime: true, y: 36, height: 20, start: 0, end: 100 },
+    //    calculable: false,
+    //    grid: { y: 60, y2: 70, x2: 20 },
+    //    xAxis: [
+    //        {
+    //            type: 'category',
+    //            boundaryGap: false,
+    //            axisLine: { show: false }, //坐标轴线
+    //            axisTick: { show: true }, //坐标轴小标记
+    //            axisLabel: { show: true }, //坐标轴文本标签
+    //            splitArea: { show: true }, //分隔区域
+    //            splitLine: { show: false }, //分隔线
+    //            data: ['0', '0', '0', '0', '0', '0', '0']
+    //        }
+    //    ],
+    //    yAxis: [
+    //        {
+    //            type: 'value'
+    //        }
+    //    ],
+    //    axis: { scale: true },
+    //    series: [
+    //        {
+    //            name: '新增活跃',
+    //            type: 'line',
+    //            symbol: 'Circle',
+    //            data: [0, 0, 0, 0, 0, 0, 0]
+    //        },
+    //        {
+    //            name: '流失活跃',
+    //            type: 'line',
+    //            symbol: 'Circle',
+    //            data: [0, 0, 0, 0, 0, 0, 0]
+    //        }
+    //    ]
+    //};
+
+
+    //// 为echarts对象加载数据
+    //myChartActive.setOption(optionActive);
+</script>

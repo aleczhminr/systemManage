@@ -1,0 +1,83 @@
+﻿
+@{
+    ViewBag.Title = "推送消息";
+}
+@section Style{
+    @Styles.Render("~/style/form")
+    <link href="~/Scripts/plugins/qtip/jquery.qtip.min.css" rel="stylesheet" />
+    <link href="~/css/MsgCenter/MsgCenter.css" rel="stylesheet" />
+<link href="~/css/plugins/summernote/summernote.css" rel="stylesheet" />
+<style type="text/css">
+    .form-group .f-wInitial label {
+        font-weight: initial;
+    } 
+</style>
+
+}
+<div class="panel panel-default" id="messageCenter" >
+    <div class="panel-body no-scroll ">
+        <div class="form-group">
+            <label>消息类型：</label>
+            <div id="MessageType" class="radio radio-success f-wInitial" onclick="MessageTypeClick()">
+                <input type="radio" value="2" checked="checked" name="MessageType" id="commonmessage">
+                <label for="commonmessage" class=" ">普通消息</label>
+                <input type="radio" value="1" name="MessageType" id="announcement">
+                <label for="announcement" class=" ">全站公告</label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>接收平台：</label>
+            <div class="radio radio-success f-wInitial" id="PingTaiType">
+                <input type="radio" value="1" checked="checked" name="pingtai" id="pcWeb">
+                <label for="pcWeb" class=" ">网站</label>
+                <input type="radio" value="2" name="pingtai" id="mobile">
+                <label for="mobile" class=" ">移动端</label>
+            </div>
+        </div>
+        <div class="form-group" id="msgAccountId">
+            <label>店铺ID：</label>
+            <span class="help">多个店铺用“,”分开</span>
+            <input type="text" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label>消息标题：</label>
+            <input type="text" class="form-control" id="msgTitle" />
+        </div>
+        <div class="form-group">
+            <label>推送内容：</label>
+            <div id="VisitContent"></div>
+        </div>
+        <div class="form-group" id="expireTime" style=" display:none;">
+            <label>公告过期时间：</label>
+            <div class="input-group date col-sm-8" style="width:200px;">
+                <input type="text" class="form-control" /><span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+            </div>
+        </div>
+        <div>
+            <button class="btn btn-default btn-cons msgBaseBtn" onclick="SendMessageClick()">推送消息</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/js/begin/form") 
+    <script src="~/Scripts/MsgCenter/MsgCenter.js"></script> 
+<script src="~/Scripts/plugins/summernote/js/summernote.min.js"></script>
+<script src="~/Scripts/MsgCenter/SendMessage.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            
+            $('#expireTime .input-group.date').datepicker();
+
+            $('#VisitContent').summernote({
+                height: 150,
+                onfocus: function (e) {
+                    $('body').addClass('overlay-disabled');
+                },
+                onblur: function (e) {
+                    $('body').removeClass('overlay-disabled');
+                }
+            });
+        });
+    </script>
+}

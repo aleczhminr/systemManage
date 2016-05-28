@@ -1,0 +1,348 @@
+﻿@{
+    ViewBag.Title = "店铺筛选器";
+}
+@section Style{
+    @Styles.Render("~/style/form")
+    <link href="~/css/FiltrateData/Filtrate.css?2015042702" rel="stylesheet"/>    
+}
+
+
+<div class="WhereBody">
+    <div class="WhereItemList">
+
+        <div class="WhereItemOtherList" id="WhereListDiv">
+
+            <div class="AddWhere btn btn-primary" onclick="SelectWhereShow()">新增</div>
+            <div class="clear"></div>
+
+        </div>
+
+        <div class="WhereItemSliderList" id="WhereSliderListDiv">
+            <div class="ItemSliderList">
+
+            </div>
+            <div class="clear"></div>
+        </div>
+    </div>
+</div>
+<div class="SelectWhereBody" style="display:none; height: max-content;overflow: auto">
+    <span class="titleClose" title="关闭" onclick="HideSelectWhereBody()">×</span>
+    @*<div class="SelectWhereTitle" onclick="TriggerLabel(this)">
+        <div>基本检索条件<span class="pg-arrow_minimize_line" style="margin-left: 5px;margin-top: 3px"></span></div>
+    </div>
+    <div class="SelectOtherWhere">
+        <div class="clear"></div>
+    </div>
+    <div class="SelectWhereTitle" onclick="TriggerLabel(this)">
+        <div>高级检索<span class="pg-arrow_minimize_line" style="margin-left: 5px;margin-top: 3px"></span></div>
+    </div>
+    <div class="SelectSliderList">
+        <div class="SelectList" where="SmsLesserThanUser" onclick="SmsLesserThanUser(this)">短信小于会员数</div>
+        <div class="SelectList" where="OrderProject" onclick="BuyOrderProject(this)">按购买产品搜索</div>
+        <div class="SelectList" where="MonthIndexActive" onclick="MonthIndexActive(this)" style="display:none;">当月首次活跃</div>
+        <div class="SelectList" where="MonthActiveDrain" onclick="MonthActiveDrain(this)" style="display:none;">当月活跃进入流失</div>
+        <div class="SelectList" where="gndqsj" onclick="" style="display:none;">功能到期时间</div>
+        <div class="SelectList" where="AccountActive" onclick="AccountActive(this)">按店铺状态</div>
+        <div class="SelectList" wheselectwheretitlere="excludeAccount" onclick="ExcludeAccount(this)">排除以下店铺</div>
+        <div class="SelectList" where="SearchByAgent" onclick="SearchByAgent(this)">按代理商搜索</div>
+        <div class="SelectList" where="soleAccount" onclick="SoleAccount(this)">只查询以下店铺</div>
+        <div class="clear"></div>
+    </div>
+    <div id="tag" class="SelectWhereTitle tagList" onclick="TriggerLabel(this)" style="display:none;">
+        <div>按标签检索<span class="pg-arrow_minimize_line" style="margin-left: 5px;margin-top: 3px"></span></div>
+    </div>
+    <div class="SelectSliderList" id="AccountTagInfo" style="display:none;">
+        <div class="clear"></div>
+    </div>
+
+    <div class="SelectWhereTitle" style="display:none;">
+     </div>*@
+    @*<div class="AccomplishButtonList">
+        <div class="AccomplishButton"><input type="button" onclick="SelectDataSet()" value="查询数据" class="btn btn-primary AButton" /></div>
+        <div class="AddWhere" onclick="SelectWhereShow()">新增</div>
+    </div>*@
+
+    @*<div class="SelectSliderList" id="AccountTagInfo" style="display:none;">
+        <div class="clear"></div>
+    </div>*@
+
+</div>
+
+<div class="TableThSet">
+    <div class="SetttingIco" onclick="SettingThConfigClick()"></div>
+    <div class="ThList" id="SelectTableList" style="display:none;">
+        <div class="ThItemList" style="display:none;">
+            <label><input type="checkbox" value="CompanyName" checked="checked" name="tableThSet" />店铺名称</label>
+        </div>
+        <div class="ThItemList">
+            <label><input type="checkbox" value="UserRealName" name="tableThSet" />店主</label>
+        </div>
+        <div class="ThItemList">
+            <label><input type="checkbox" value="RegTime" name="tableThSet" />注册时间</label>
+        </div>
+        <div class="ThItemList">
+            <label><input type="checkbox" value="aotjb" checked="checked" name="tableThSet" />版本</label>
+        </div>
+        <div class="ThItemList">
+            <label><input type="checkbox" value="aotjbEndtime" name="tableThSet" />过期时间</label>
+        </div>
+        <div class="ThItemList">
+            <label><input type="checkbox" value="active" checked="checked" name="tableThSet" />店铺状态</label>
+        </div>
+        <div class="ThItemList">
+            <label><input type="checkbox" value="userNum" checked="checked" name="tableThSet" />会员数量</label>
+        </div>
+        <div class="ThItemList">
+            <label><input type="checkbox" value="dxunity" name="tableThSet" />短信数</label>
+        </div>
+        <div class="ThItemList">
+            <label><input type="checkbox" value="smsNum" checked="checked" name="tableThSet" />短信发送数量</label>
+        </div>
+        <div class="ThItemList">
+            <label><input type="checkbox" value="goodsNum" checked="checked" name="tableThSet" />商品数</label>
+        </div>
+        <div class="ThItemList">
+            <label><input type="checkbox" value="saleNum" checked="checked" name="tableThSet" />销售数量</label>
+        </div>
+        <div class="ThItemList">
+            <label><input type="checkbox" value="orderMoney" checked="checked" name="tableThSet" />订单金额</label>
+        </div>
+        <div class="ThItemList">
+            <label><input type="checkbox" value="outlayNum" checked="checked" name="tableThSet" />支出数量</label>
+        </div>
+        <div class="ThItemList">
+            <label><input type="checkbox" value="LoginTimeWeb" name="tableThSet" />登录次数</label>
+        </div>
+        <div class="ThItemList">
+            <label><input type="checkbox" value="allCount" name="tableThSet" />优惠券数</label>
+        </div>
+        <div class="ThItemList">
+            <label><input type="checkbox" value="userCount" name="tableThSet" />已使用优惠券</label>
+        </div>
+        <div class="ThItemList">
+            <label><input type="checkbox" value="LoginTimeLast" checked="checked" name="tableThSet" />最后登录时间</label>
+        </div>
+        <div class="ThItemList">
+            <label><input type="checkbox" value="returnInsertTime" name="tableThSet" />最后回访人</label>
+        </div>
+        <div class="ThItemList">
+            <label><input type="checkbox" value="PhoneNumber" name="tableThSet" />手机号</label>
+        </div>
+        <div class="ThItemList">
+            <label><input type="checkbox" value="UserEmail" name="tableThSet" />邮件</label>
+        </div>
+        <div class="ThItemList">
+            <label><input type="checkbox" value="AgentName" name="tableThSet" />代理商</label>
+        </div>
+    </div>
+    <div class="ThList" id="SelectTbaleRowCount">
+        共查到数据
+        <span style="color: red; font-weight: bold; font-size: 16px;"> 0 </span>行(店铺累计数据)
+        <a href="javascript:void(0)" style="padding-left: 20px;" onclick="OpenDownPage()" id="DwonExeclButton">导出数据</a>
+        <a href="javascript:void(0)" style="padding-left: 20px;" class="m-l-10 text-success" onclick="OpenDetailList()" id="DetailList">查看详情列表</a>
+        <a href="javascript:void(0)" style="padding-left: 20px;" class="m-l-10 text-success" onclick="SendMessage()" id="SendMsgButton">推送消息</a>
+        <a href="javascript:void(0)" style="padding-left: 20px;" class="m-l-10 text-success" onclick="GetFunnel()" id="GetFunnel">查看漏斗</a>        
+        <div id="loading" class="hidden text-center">
+            <img src="~/img/Loading.gif" alt="Loading" />
+        </div>
+    </div>
+</div>
+<div class="SelectWhereContent">
+    <table id="RequstDataTable" class="table table-hover  no-footer table-border-right" style="font-family: 宋体, Arial, 微软雅黑;">
+        <thead>
+
+        </thead>
+        <tbody></tbody>
+        <tfoot>
+
+        </tfoot>
+    </table>
+</div>
+
+<script type="text/html" id="SelectOtherTagScript">
+    {{each table}}
+    <div class="SelectList" value="{{$value.id}}">{{$value.t_Name}}</div>
+    {{/each}}
+</script>
+<script type="text/html" id="WhereSliderListScript">
+    <div class="WhereItemSliderList">
+        <div class="SliderWhere" id="{{id}}">
+            <div class="WhereTitle">{{title}}：</div>
+            <div class="MinValue">
+                <input class="MinValueText" type="text" value="0" />
+            </div>
+            <div class="SliderBody" maxvalue="{{maxValue}}"></div>
+            <div class="MaxValue">
+                <input class="MaxValueText" type="text" value="{{maxValue}}" />
+            </div>
+            <div class="clear"></div>
+        </div>
+    </div>
+</script>
+<div style="display:none;" id="MaxValueJson">
+    @ViewBag.MaxJson
+</div>
+
+<div style="display:none;">
+    <div class="SelectTime" id="TwoSelectTime">
+        <div class="MinTime">
+            <input type="text" class="MinTimeValue" datepicker="" value="" />
+        </div>
+        <div class="TitleTime">
+            <= &nbsp;<span class="Title">{title}</span> &nbsp;<=
+        </div>
+        <div class="MaxTime">
+            <input type="text" value="" datepicker="" class="MaxTimeValue" />
+        </div>
+        <div class="clear"></div>
+    </div>
+
+    <div class="SelectTime" id="TwoSelectNumber">
+        <div class="MinTime">
+            <input type="text" onkeyup="NumberVerification(this)" class="MinTimeValue" value="" placeholder="0" />
+        </div>
+        <div class="TitleTime">
+            <= &nbsp;<span class="Title">{title}</span> &nbsp;<=
+        </div>
+        <div class="MaxTime">
+            <input type="text" value="" onkeyup="NumberVerification(this)" class="MaxTimeValue" placeholder="999" />
+        </div>
+        <div class="clear"></div>
+    </div>
+
+</div>
+
+<div style="display:none">
+    <div class="AccountActiveList" id="SelectAccountActiveList">
+        <div class="SelectList" value="0">新注册</div>
+        <div class="SelectList" value="3">需关怀</div>
+        <div class="SelectList" value="5">活跃</div>
+        <div class="SelectList" value="7">忠诚</div>
+        <div class="SelectList" value="-1">休眠</div>
+        <div class="SelectList" value="-3">流失</div>
+        <div class="clear"></div>
+    </div>
+
+</div>
+
+
+<div style="display:none;" id="WhereLogicHtml">
+    <div class="WhereLogic AndBrackets WhereLogicSelect" type="and">
+        <div class="AndBefore">{</div>
+        <div class="LogicContent"><div class="clear"></div></div>
+        <div class="AndBack">}</div>
+        <div class="clear"></div>
+    </div>
+</div>
+
+<div class="OrderProjectList" id="SelectOrderProjectList" style="display:none;">
+    <div class="clear"></div>
+</div>
+
+<div class="ItemList" id="SelectItemList" style="display:none;">
+    <div class="clear"></div>
+</div>
+
+<div style="display:none;" id="TableShowItemList"></div>
+<div style="display:none;" id="GetDataJson">
+
+</div>
+<script type="text/javascript">
+    $(function () {
+        GetItem();
+        SetTableThead();
+
+
+
+        //SelectTableThList
+
+        $("#SelectTableList input:checkbox").click(function () {
+            SelectTableThList(this);
+        });
+
+
+        //TwoSelectTimeShow();
+
+        $("#SelectAccountActiveList .SelectList").click(function () {
+            SelectListClick(this);
+        });
+
+        $("input[datepicker]").datepicker();
+
+    });
+
+
+
+
+
+
+    function SetWhereVlaue() {
+
+    }
+
+    function OpenDownPage() {
+        var verifi = $("#DwonExeclButton").attr("verifi");
+        var count = $("#DwonExeclButton").attr("count");
+        window.open("/FiltrateData/Download?verif=" + verifi);
+    }
+
+    function SendMessage() {
+        var verifi = $("#DwonExeclButton").attr("verifi");
+        var count = $("#DwonExeclButton").attr("count");
+        window.open("/messagesending/Index?verif=" + verifi + "&count=" + count);
+    }
+
+    function GetFunnel() {
+        var verifi = $("#DwonExeclButton").attr("verifi");
+        window.open("/FunnelAnalyze/Index?verif=" + verifi);
+    }
+
+    function OpenDetailList() {
+        var verifi = $("#DwonExeclButton").attr("verifi");
+        var count = $("#DwonExeclButton").attr("count");
+
+        window.open("/IndexDetailInfo/Index?type=Filter&pageIndex=1&index=1&verif=" + verifi + "&cnt=" + count);
+    }
+
+    function TriggerLabel(item) {
+        var oItem = $(item);
+        var visible = oItem.attr("rel");
+        if (visible && visible == "off") {
+            oItem.next().fadeIn("fast");
+            oItem.attr("rel", "on");
+            oItem.removeClass("HideCss");
+            oItem.children("div").children("span").attr("class", "pg-arrow_minimize_line");
+        } else {
+            oItem.next().fadeOut("fast");
+            oItem.attr("rel", "off");
+            oItem.addClass("HideCss");
+            oItem.children("div").children("span").attr("class", "pg-arrow_lright_line_alt");
+        }
+    }
+
+    
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@section Scripts{
+    @Scripts.Render("~/js/begin/form")
+    <script src="~/Scripts/FiltrateData/FilterEx.js"></script>
+    <script src="~/Scripts/plugins/artTemplate/template.js"></script>
+    <script src="~/Scripts/plugins/dialog/dialog-plus.js"></script>
+    
+}

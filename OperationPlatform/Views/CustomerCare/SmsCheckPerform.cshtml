@@ -1,0 +1,122 @@
+﻿@{
+    ViewBag.Title = "短信审核时效";
+}
+@Styles.Render("~/style/form")
+<div class="page-where smsCheckWhere" style="margin-top: 10px;">
+    <div class="btn-group">
+        <button type="button" class="btn btn-default btn-select" value="7" onclick=" smsCheckWhereTimeButtonClick(this) ">7天</button>
+        <button type="button" class="btn btn-default" value="15" onclick=" smsCheckWhereTimeButtonClick(this) ">15天</button>
+        <button type="button" class="btn btn-default" value="30" onclick=" smsCheckWhereTimeButtonClick(this) ">30天</button>
+        <button type="button" class="btn btn-default" value="other" onclick=" smsCheckWhereTimeButtonClick(this) ">其他时间</button>
+    </div>
+    <div class="btn-group page-where-othertime" style="display: none;">
+        <button type="button" value="return" class="btn btn-default border-right0" onclick=" smsCheckWhereTimeButtonClick(this) ">返回</button>
+        <div class="page-where-time-input">
+            <div class="input-daterange input-group">
+                <input type="text" placeholder="开始时间" class="input-sm form-control" name="start" />
+                <span class="input-group-addon">to</span>
+                <input type="text" placeholder="结束时间" class="input-sm form-control" name="end" />
+            </div>
+        </div>
+    </div>
+    <button type="button" value="select" class="btn btn-default btn-inquire" onclick="GetSmsCheckData()">查询</button>
+</div>
+
+@Scripts.Render("~/js/begin/form")
+<script src="~/Scripts/plugins/artTemplate/template.js"></script>
+
+
+<table class="table table-hover" id="smsCheckerList">
+    <thead>
+        <tr>
+            <th class="text-center">审核人</th>
+            <th class="text-center">两分钟内审核率</th>
+            <th class="text-center">最短审核时间</th>
+            @*<th class="text-center">版本</th>*@
+            <th class="text-center">最长审核时间</th>
+            <th class="text-center">平均审核时间</th>
+            @*<th class="text-center">登录时间</th>*@
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<script type="text/html" id="smsCheckerListScript">
+    {{each dataList}}
+    {{if $value.Name!=null}}
+    <tr>
+        @*<td class="text-center v-align-middle" title="{{$value.aotjbEndTime}}">{{$value.aotjbName}}</td>*@
+        <td class="text-center v-align-middle">{{$value.Name}}</td>
+        {{if $value.Ratio>=90}}
+        <td class="text-center v-align-middle" style="color:red">{{$value.Ratio}}%</td>
+        {{else}}
+        {{if $value.Ratio>=80}}
+        <td class="text-center v-align-middle" style="color:tomato">{{$value.Ratio}}%</td>
+        {{else}}
+        <td class="text-center v-align-middle" style="color:lightcoral">{{$value.Ratio}}%</td>
+        {{/if}}
+        {{/if}}
+        <td class="text-center v-align-middle">{{$value.Shortest}}分钟</td>
+        <td class="text-center v-align-middle">{{$value.Longest}}分钟</td>
+        <td class="text-center v-align-middle">{{$value.Average}}分钟</td>
+        @*<td class="text-center v-align-middle">{{$value.LoginTimeLast}}</td>*@
+    </tr>
+    {{/if}}
+    {{/each}}
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.smsCheckWhere .page-where-othertime .input-daterange').datepicker();
+
+        GetSmsCheckData();
+    });
+
+    function smsCheckWhereTimeButtonClick(obj) {
+        var value = obj.value;
+
+        $(obj).parent().find(".btn-select").removeClass("btn-select");
+        $(obj).addClass("btn-select");
+
+        if (value == "return") {
+            $(".smsCheckWhere .btn-group").show().filter(".page-where-othertime").hide();
+        } else {
+            $(obj).parent().find(".btn-select").removeClass("btn-select");
+            $(obj).addClass("btn-select");
+            if (value == "other") {
+                $(".smsCheckWhere .btn-group").hide().filter(".page-where-othertime").show();
+            }
+        }
+    }
+
+    function GetSmsCheckData() {
+        var postJson = {};
+
+        var timeType = $(".smsCheckWhere .btn-group .btn.btn-select").val();
+        if (timeType == "other") {
+            var statTime = $(".smsCheckWhere .page-where-othertime input[name='start']").val();
+            var endTime = $(".smsCheckWhere .page-where-othertime input[name='end']").val();
+            if (statTime.length > 0) {
+                postJson["stDate"] = statTime;
+            }
+            if (endTime.length > 0) {
+                postJson["edDate"] = endTime;
+            }
+        } else {
+            var timeValue = $.timePeriod(0 - Number(timeType));
+            postJson["stDate"] = timeValue.start.toLocaleDateString();
+            postJson["edDate"] = timeValue.end.toLocaleDateString();
+        }
+
+        var url = "/Sms/GetSmsCheckPerform";
+
+        $.doAjax(url, postJson, function (msg) {
+            if (msg != "") {
+                var json = jQuery.parseJSON(msg);
+                $("#smsCheckerList tbody").html(template("smsCheckerListScript", json));
+            } 
+        }, true);
+
+    }
+
+</script>

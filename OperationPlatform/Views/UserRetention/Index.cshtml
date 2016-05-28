@@ -1,0 +1,686 @@
+﻿@{
+    ViewBag.Title = "用户留存率分析";
+}
+
+@section Style{
+    @Styles.Render("~/style/form")
+    <style>
+        .page-container .page-content-wrapper {
+            background-color: #f5f5f5;
+        }
+    </style>
+
+    <!-- <script src="/Scripts/plugins/echarts/echarts-all.js"></script> -->
+}
+
+
+
+<div class="panel">
+
+    <div class="panel-heading retentionWhere">
+        <div class="btn-group">
+            <button type="button" class="btn btn-default btn-select" value="day" onclick=" whereTimeButtonClick(this) ">日</button>
+            <button type="button" class="btn btn-default" value="week" onclick=" whereTimeButtonClick(this) ">周</button>
+            <button type="button" class="btn btn-default" value="month" onclick=" whereTimeButtonClick(this) ">月</button>
+        </div>
+        <div class="form-group inline whereitem">
+            <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" id="usrType" onchange="" style="width: 139px;">
+                <option value="regUser">注册用户</option>
+                <option value="paidUser">付费用户</option>
+            </select>
+        </div>
+        <div class="form-group inline whereitem">
+            <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" id="regSource" onchange="" style="width: 139px;">
+                <option value="all">全部注册端</option>
+                <option value="0">网站注册</option>
+                <option value="10">IOS</option>
+                <option value="11">Android</option>
+                <option value="8">PC客户端</option>
+                @*<option value="9">SEM推广</option>*@
+                <option value="12">手机Web</option>
+                <option value="13">iPad</option>
+            </select>
+        </div>
+        <div class="btn-group page-where-othertime">
+            <div class="page-where-time-input m-r-5">
+                <div class="input-daterange input-group">
+                    <input type="text" placeholder="开始时间" class="input-sm form-control" name="start" value="@ViewBag.bgTime" />
+                    <span class="input-group-addon">to</span>
+                    <input type="text" placeholder="结束时间" class="input-sm form-control" name="end" value="@ViewBag.edTime" />
+                </div>
+            </div>
+            <button type="button" value="select" class="btn btn-default btn-inquire" onclick="GetRetentionData()">查询</button>
+        </div>
+        <div class="checkbox check-success" style="display: inline">
+            <input type="checkbox" value="agentSelect" id="agentSelect" onchange="ChangeAgent();">
+            <label for="agentSelect">显示代理商留存</label>
+        </div>
+        <div class="form-group inline whereitem hidden" id="agentSelectItem">
+            <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" id="agentSource" onchange="" style="width: 139px;"></select>
+        </div>
+    </div>
+
+    @*<div id="summary" style="margin: 10px">
+        </div>*@
+
+    <div class="panel-body">
+        <table class="table table-hover  no-footer AccountListTableId">
+            <thead>
+                <tr>
+                    <th class="text-center">注册时间</th>
+                    <th class="text-center">注册当<span class="unit"></span><img class="m-l-5" style="cursor:pointer" src="../../img/FiltrateData/hint.png" alt="查看纵向留存" title="查看纵向留存" onclick="ShowDailyRetention(2)" /></th>
+                    <th class="text-center">第2<span class="unit"></span><img class="m-l-5" style="cursor:pointer" src="../../img/FiltrateData/hint.png" alt="查看纵向留存" title="查看纵向留存" onclick="ShowDailyRetention(3)" /></th>
+                    <th class="text-center">第3<span class="unit"></span><img class="m-l-5" style="cursor:pointer" src="../../img/FiltrateData/hint.png" alt="查看纵向留存" title="查看纵向留存" onclick="ShowDailyRetention(4)" /></th>
+                    <th class="text-center">第4<span class="unit"></span><img class="m-l-5" style="cursor:pointer" src="../../img/FiltrateData/hint.png" alt="查看纵向留存" title="查看纵向留存" onclick="ShowDailyRetention(5)" /></th>
+                    <th class="text-center">第5<span class="unit"></span><img class="m-l-5" style="cursor:pointer" src="../../img/FiltrateData/hint.png" alt="查看纵向留存" title="查看纵向留存" onclick="ShowDailyRetention(6)" /></th>
+                    <th class="text-center">第6<span class="unit"></span><img class="m-l-5" style="cursor:pointer" src="../../img/FiltrateData/hint.png" alt="查看纵向留存" title="查看纵向留存" onclick="ShowDailyRetention(7)" /></th>
+                    <th class="text-center">第7<span class="unit"></span><img class="m-l-5" style="cursor:pointer" src="../../img/FiltrateData/hint.png" alt="查看纵向留存" title="查看纵向留存" onclick="ShowDailyRetention(8)" /></th>
+                    <th class="text-center">第8<span class="unit"></span><img class="m-l-5" style="cursor:pointer" src="../../img/FiltrateData/hint.png" alt="查看纵向留存" title="查看纵向留存" onclick="ShowDailyRetention(9)" /></th>
+                    <th class="text-center">第9<span class="unit"></span><img class="m-l-5" style="cursor:pointer" src="../../img/FiltrateData/hint.png" alt="查看纵向留存" title="查看纵向留存" onclick="ShowDailyRetention(10)" /></th>
+                    <th class="text-center">第10<span class="unit"></span><img class="m-l-5" style="cursor:pointer" src="../../img/FiltrateData/hint.png" alt="查看纵向留存" title="查看纵向留存" onclick="ShowDailyRetention(11)" /></th>
+                    <th class="text-center">第11<span class="unit"></span><img class="m-l-5" style="cursor:pointer" src="../../img/FiltrateData/hint.png" alt="查看纵向留存" title="查看纵向留存" onclick="ShowDailyRetention(12)" /></th>
+                    <th class="text-center">第12<span class="unit"></span><img class="m-l-5" style="cursor:pointer" src="../../img/FiltrateData/hint.png" alt="查看纵向留存" title="查看纵向留存" onclick="ShowDailyRetention(13)" /></th>
+                </tr>
+            </thead>
+            <tbody id="container"></tbody>
+        </table>
+    </div>
+
+    <div id="detailChart" style="display: none; width: 600px; height: 300px"></div>
+
+    @*<form id="accidForm" name="accidForm" style="display: none" method="post" target="_blank" onsubmit="OpenWindow()">
+            <fieldset>
+                <input type="hidden" id="type" name="type" value=" " />
+                <input type="hidden" id="accids" name="accids" value=""/>
+                <input type="hidden" id="pageIndex" name="pageIndex" value="1" />
+
+                <input type="submit"/>
+            </fieldset>
+        </form>*@
+
+
+</div>
+
+<script type="text/html" id="AccountDetailScript">
+
+    {{each dataList}}
+    {{if $value!=null}}
+    <tr class="ratioData">
+        <td class="text-center v-align-middle" onclick="ShowCharts('{{$value.RowMark}}');" style="cursor: pointer">{{$value.Date}} <span class="pg-arrow_lright_line_alt" id="id_{{$value.RowMark}}"></span></td>
+        {{if $value!=null}}
+        {{each $value.DataList as index}}
+        {{if index.NowActive != -1}}
+        <td class="text-center">
+            <h5 class="no-margin inline fs-16" style="cursor: pointer" rel="{{$value.Date}}" ratio="{{index.Ratio}}" onclick="GetDetailPage('{{index.NowActive}}','{{$value.Date}}','{{index.DayNum}}')">{{index.NowActive}}</h5>
+            <h5 class="no-margin inline fs-12">({{index.Ratio}}%)</h5>
+        </td>
+        {{else}}
+        <td class="text-center bg-master v-align-middle"> - </td>
+        {{/if}}
+        {{/each}}
+        {{else}}
+        <td class="text-center"> 0 (0%) </td>
+        {{/if}}
+    </tr>
+    <tr class="noHover" name="tr_{{$value.RowMark}}" style="display: none;">
+        <td colspan="13" class="no-padding chartParent">
+            <div id="chartContainer_{{$value.RowMark}}" class="thisCharts" style="width:100%; min-width: 100%; height: 300px;">
+
+            </div>
+        </td>
+    </tr>
+    {{else}}
+    <tr>
+        <td colspan="13">暂无数据</td>
+    </tr>
+    {{/if}}
+    {{/each}}
+
+</script>
+
+@Scripts.Render("~/js/begin/form")
+<script src="~/Scripts/plugins/artTemplate/template.js"></script>
+<script src="~/Scripts/plugins/asset/echarts-all.js"></script>
+
+<script type="text/javascript">
+    $(function () {
+        $('.retentionWhere .page-where-othertime .input-daterange').datepicker();
+        GetRetentionData();
+        //ShowCharts();
+        var $window = $(window),
+            $chart = $('.thisCharts'),
+            $chartContainer = $('.chartParent'),
+            $width = $chartContainer.width();
+
+        $window.on('resize load', resizeCharts());
+
+        function resizeCharts() {
+            $chart.css({
+                'width': $width + 'px'
+            });
+        }
+
+        if ($('#agentSelect').prop('checked')) {
+            $('#agentSelectItem').removeClass('hidden');
+            GetAgent();
+        } else {
+            $('#agentSelectItem').addClass('hidden');
+        }
+
+    });
+
+
+    var pageJson = null;
+    var myChart = null;
+    var option = null;
+
+    function GetRetentionData() {
+        var url = "/UserRetention/GetUserRetention",
+            postJson = {},
+            dateType = $(".retentionWhere .btn-group .btn.btn-select").val(),
+            statTime = $(".retentionWhere .page-where-othertime input[name='start']").val(),
+            endTime = $(".retentionWhere .page-where-othertime input[name='end']").val(),
+            usrType = $("#usrType").val(),
+            regSource = $("#regSource").val();
+
+        postJson["dateType"] = dateType;
+        postJson["bgTime"] = statTime;
+        postJson["edTime"] = endTime;
+        postJson["usrType"] = usrType;
+        postJson["regSource"] = regSource;
+        if ($('#agentSelect').prop('checked')) {
+            postJson["agent"] = $("#agentSource").val();
+        } else {
+            postJson["agent"] = "";
+        }
+
+        switch (dateType) {
+            case "day":
+                $(".unit").html("天");
+                break;
+            case "week":
+                $(".unit").html("周");
+                break;
+            case "month":
+                $(".unit").html("月");
+                break;
+        }
+
+        var stDate = new Date(statTime);
+        var edDate = new Date(endTime);
+        var days = Math.floor((edDate.getTime() - stDate.getTime()) / (24 * 3600 * 1000));
+
+        if (usrType == "regUser" && regSource == "all" && postJson["agent"] == "" && days > 100) {
+            url = "/UserRetention/GetUserRetentionEx";
+        }
+
+        $.doAjax(url, postJson, function (msg) {
+            if (msg != "") {
+                var json = jQuery.parseJSON(msg);
+                pageJson = json;
+                $("#container").html(template('AccountDetailScript', json));
+
+                $("tr.ratioData:eq(2)>h5:first").each(function () {
+                    console.log($(this).html());
+                });
+
+
+                var html = "";
+                if ($('#agentSelect').prop('checked')) {
+                    html += "<tr><td class='text-center v-align-middle first'> 平均留存 </td>";
+                    var avg = new Array();
+                    for (var i = 0; i < 12; i++) {
+                        avg.push({
+                            "value": 0,
+                            "count": 0
+                        });
+                    }
+
+                    $.each(json.dataList, function (i, n) {
+                        if (n != null) {
+                            for (var k = 0; k < 12; k++) {
+                                if (n.DataList[k].Ratio !== 0) {
+                                    avg[k]["value"] += n.DataList[k].Ratio;
+                                    avg[k]["count"] += 1;
+                                }
+                            }
+                        }
+
+                        //$.each(n.DataList, function (k, m) {
+
+                        //});
+                    });
+
+                    for (var v = 0; v < 12; v++) {
+                        //html += "<span class='fs-12 hint-text'>第" + (v + 1).toString() + "天：</span>";
+                        if (avg[v]["value"] !== 0) {
+                            var perAnd = (avg[v]["value"] / avg[v]["count"]);
+
+                            if (perAnd < 25) {
+                                html += "<td class='text-center first' style='height:25px'><h3 class='no-margin inline fs-16 text-success'>" + changeTwoDecimal(perAnd) + "%</h3></td> ";
+                            } else
+                                html += "<td class='text-center first'><h3 class='no-margin inline fs-16 text-danger'>" + changeTwoDecimal(perAnd) + "%</h3></td> ";
+                        } else {
+                            html += "<td class='text-center first'><h3 class='no-margin inline fs-16 text-success'>0%</h3></td> ";
+                        }
+                    }
+                    html += "</tr>";
+                } else {
+                    html += "<tr><td class='text-center v-align-middle first' onclick='ShowRatioChart();'> 平均留存 <span class='pg-arrow_lright_line_alt' id='id_Ratio'></span></td>";
+                    //var avg = new Array();
+                    //for (var i = 0; i < 12; i++) {
+                    //    avg.push({
+                    //        "value": 0,
+                    //        "count": 0
+                    //    });
+                    //}
+
+                    //$.each(json.dataList, function(i, n) {
+                    //    for (var k = 0; k < 12; k++) {
+                    //        if (n.DataList[k].Ratio !== 0) {
+                    //            avg[k]["value"] += n.DataList[k].Ratio;
+                    //            avg[k]["count"] += 1;
+                    //        }
+                    //    }
+                    //    //$.each(n.DataList, function (k, m) {
+
+                    //    //});
+                    //});
+
+                    for (var v = 0; v < 12; v++) {
+                        //html += "<span class='fs-12 hint-text'>第" + (v + 1).toString() + "天：</span>";
+                        if (json.avgRatio[v] !== 0) {
+                            var perAnd = json.avgRatio[v];
+
+                            if (perAnd < 25) {
+                                html += "<td class='text-center first' style='height:25px'><h3 class='no-margin inline fs-16 text-success'>" + changeTwoDecimal(perAnd) + "%</h3></td> ";
+                            } else
+                                html += "<td class='text-center first'><h3 class='no-margin inline fs-16 text-danger'>" + changeTwoDecimal(perAnd) + "%</h3></td> ";
+                        } else {
+                            html += "<td class='text-center first'><h3 class='no-margin inline fs-16 text-success'>0%</h3></td> ";
+                        }
+                    }
+                    html += "</tr>";
+                    html += "<tr class='noHover' name='tr_Ratio' style='display: none;'>" +
+                        "<td colspan='13' class='no-padding chartParent'>" +
+                        "<div id='chartContainer_Ratio' class='thisCharts' style='width:100%; min-width: 100%; height: 300px;'>" +
+                        "</div></td></tr>";
+                }
+
+
+                $("#container").prepend(html);
+                $("#container .first").css('padding', '5px');
+            }
+        }, true);
+    }
+
+    function whereTimeButtonClick(obj) {
+        var value = obj.value;
+
+        $(obj).parent().find(".btn-select").removeClass("btn-select");
+        $(obj).addClass("btn-select");
+
+    }
+
+    function ChangeAgent() {
+        if ($('#agentSelect').prop('checked')) {
+            $('#agentSelectItem').removeClass('hidden');
+            GetAgent();
+        } else {
+            $('#agentSelectItem').addClass('hidden');
+        }
+    }
+
+    function GetAgent() {
+        var ur = "/FiltrateData/AnentList";
+        $.doAjax(ur, null, function (msg) {
+            if (msg != "[]") {
+                var json = $.parseJSON(msg);
+                var html = "<option value='all'>全部代理商</option>";
+
+                $.each(json, function (i, n) {
+                    html += "<option value=" + n.ID + ">" + n.AgentName + "</option>";
+                });
+
+                $("#agentSource").html(html);
+            }
+        }, true);
+    }
+
+    function changeTwoDecimal(x) {
+        var f_x = parseFloat(x);
+        if (isNaN(f_x)) {
+            return x;
+        }
+        var f_x = Math.round(x * 100) / 100;
+
+        return f_x;
+    }
+
+    function GetDetailPage(count, date, day) {
+        //$('#accids').val(obj);
+        //$('#type').val(type);
+        window.open("/IndexDetailInfo/Index?type=NowActiveByLogin&index=0&pageIndex=1&cnt=" + count + "&date=" + date + "&day=" + day);
+    }
+
+    function post(URL, PARAMS) {
+        var temp_form = document.createElement("form");
+        temp_form.action = URL;
+        temp_form.target = "_blank";
+        temp_form.method = "post";
+        temp_form.style.display = "none";
+        for (var x in PARAMS) {
+            var opt = document.createElement("textarea");
+            opt.name = x;
+            opt.value = PARAMS[x];
+            temp_form.appendChild(opt);
+        }
+        document.body.appendChild(temp);
+        temp_form.submit();
+    }
+
+    function ShowCharts(markId) {
+        if ($("#id_" + markId).attr('class') == "pg-arrow_minimize_line") {
+            $("#id_" + markId).attr('class', 'pg-arrow_lright_line_alt');
+            $("tr.noHover").hide();
+        } else {
+            $("tr.noHover").hide().filter("[name='tr_" + markId + "']").show();
+            $("span").filter("[class='pg-arrow_minimize_line']").attr('class', 'pg-arrow_lright_line_alt');
+            $("#id_" + markId).attr('class', 'pg-arrow_minimize_line');
+            myChart = echarts.init(document.getElementById('chartContainer_' + markId));
+            option = {
+                color: ['#87cefa'],
+                calculable: false,
+                xAxis: [
+                    {
+                        type: 'category',
+                        boundaryGap: false,
+                        axisLine: {
+                            show: false
+                        }, //坐标轴线
+                        axisTick: {
+                            show: true
+                        }, //坐标轴小标记
+                        axisLabel: {
+                            show: true
+                        }, //坐标轴文本标签
+                        splitArea: {
+                            show: false
+                        }, //分隔区域
+                        splitLine: {
+                            show: false
+                        }, //分隔线
+                        data: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+                    }
+                ],
+                yAxis: [
+                    {
+                        type: 'value'
+                    }
+                ],
+                axis: {
+                    scale: true
+                },
+                series: [
+                    {
+                        name: '用户留存量',
+                        type: 'line',
+                        symbol: 'Circle',
+                        smooth: true,
+                        data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                    }
+                ],
+                tooltip:
+                {
+                    show: true,
+                    trigger: 'item',
+                    formatter: function (params) {
+                        var res = params[1] + '</br>' + params[0] + ':' + params[2] + '</br>留存率: ' + params[5].name + '%';
+                        //for (var i = 0; i < option.xAxis[0].data.length; i++) {
+                        //    if (params[1] == option.xAxis[0].data[i]) {
+                        //        res += option.series[0].data[i].name + '%';
+                        //    }
+                        //}
+                        return res;
+                    }
+                }
+
+            };
+
+            $.each(pageJson.dataList, function (i, n) {
+                if (n !== null && typeof (n) != "undefined") {
+                    if (n.RowMark == markId) {
+                        $.each(n.DataList, function (k, m) {
+                            option.series[0].data[k] =
+                            {
+                                value: m.NowActive,
+                                name: m.Ratio
+                            };
+                        });
+                    }
+                }
+            });
+
+            option.xAxis[0].data[0] = "初始状态";
+            var unit = "";
+            var dateType = $(".retentionWhere .btn-group .btn.btn-select").val();
+            switch (dateType) {
+                case "day":
+                    unit = "天";
+                    break;
+                case "week":
+                    unit = "周";
+                    break;
+                case "month":
+                    unit = "月";
+                    break;
+            }
+
+            for (var i = 1; i < 12; i++) {
+                option.xAxis[0].data[i] = (i + 1).toString() + unit + "后";
+            }
+
+            // 为echarts对象加载数据
+            myChart.setOption(option);
+            window.onresize = myChart.resize;
+        }
+    }
+
+    function ShowRatioChart() {
+        if ($("#id_Ratio").attr('class') == "pg-arrow_minimize_line") {
+            $("#id_Ratio").attr('class', 'pg-arrow_lright_line_alt');
+            $("tr.noHover").hide();
+        } else {
+            $("tr.noHover").hide().filter("[name='tr_Ratio']").show();
+            $("span").filter("[class='pg-arrow_minimize_line']").attr('class', 'pg-arrow_lright_line_alt');
+            $("#id_Ratio").attr('class', 'pg-arrow_minimize_line');
+            myChart = echarts.init(document.getElementById('chartContainer_Ratio'));
+            option = {
+                color: ['#87cefa'],
+                calculable: false,
+                xAxis: [
+                    {
+                        type: 'category',
+                        boundaryGap: false,
+                        axisLine: {
+                            show: false
+                        }, //坐标轴线
+                        axisTick: {
+                            show: true
+                        }, //坐标轴小标记
+                        axisLabel: {
+                            show: true
+                        }, //坐标轴文本标签
+                        splitArea: {
+                            show: false
+                        }, //分隔区域
+                        splitLine: {
+                            show: false
+                        }, //分隔线
+                        data: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+                    }
+                ],
+                yAxis: [
+                    {
+                        type: 'value'
+                    }
+                ],
+                axis: {
+                    scale: true
+                },
+                series: [
+                    {
+                        name: '用户平均留存率',
+                        type: 'line',
+                        symbol: 'Circle',
+                        smooth: true,
+                        data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                    }
+                ],
+                tooltip:
+                {
+                    show: true,
+                    trigger: 'axis',
+                    formatter: function (params) {
+                        var res = params[1] + '</br>' + params[2] + '%';
+                        //for (var i = 0; i < option.xAxis[0].data.length; i++) {
+                        //    if (params[1] == option.xAxis[0].data[i]) {
+                        //        res += option.series[0].data[i].name + '%';
+                        //    }
+                        //}
+                        return res;
+                    }
+                }
+
+            };
+
+            $.each(pageJson.avgRatio, function (i, n) {
+                if (n !== null && typeof (n) != "undefined") {
+
+
+                    option.series[0].data[i] =
+                    {
+                        value: n,
+                        name: '平均留存率'
+                    };
+
+
+                }
+            });
+
+            option.xAxis[0].data[0] = "初始状态";
+            var unit = "";
+            var dateType = $(".retentionWhere .btn-group .btn.btn-select").val();
+            switch (dateType) {
+                case "day":
+                    unit = "天";
+                    break;
+                case "week":
+                    unit = "周";
+                    break;
+                case "month":
+                    unit = "月";
+                    break;
+            }
+
+
+            for (var i = 1; i < 12; i++) {
+                option.xAxis[0].data[i] = (i + 1).toString() + unit + "后";
+            }
+
+            // 为echarts对象加载数据
+            myChart.setOption(option);
+            window.onresize = myChart.resize;
+        }
+
+    }
+
+    //显示固定日留存变化
+    function ShowDailyRetention(dayCnt) {
+        var XLable = new Array();
+
+        var tbData = new Array();
+
+        $("tr.ratioData td:nth-child(" + dayCnt + ")").each(function () {
+            if ($($(this).children("h5").get(0)).html()) {
+                tbData.push($($(this).children("h5").get(0)).attr('ratio'));
+                XLable.push($($(this).children("h5").get(0)).attr('rel'));
+            }
+        });
+
+        //console.log(XLable);
+        //console.log(tbData);
+
+        optionD.xAxis[0].data = XLable;
+        optionD.series[0].data = tbData;
+        //option.title.text = "第" + dayCnt + "日留存趋势";
+        detailChart.clear().setOption(optionD);
+
+        dialog({
+            id: "retrntionContext",
+            title: "留存率变化趋势",
+            lock: true,
+            opacity: 0.57, // 透明度
+            content: document.getElementById("detailChart"),
+            cancel: true
+        }).showModal();
+    }
+
+
+</script>
+
+<script type="text/javascript">
+    var detailChart = echarts.init(document.getElementById('detailChart'));
+
+    var optionD = {
+        color: ['#87cefa'],
+        calculable: false,
+        xAxis: [
+            {
+                type: 'category',
+                boundaryGap: false,
+                axisLine: {
+                    show: false
+                }, //坐标轴线
+                axisTick: {
+                    show: true
+                }, //坐标轴小标记
+                axisLabel: {
+                    show: true
+                }, //坐标轴文本标签
+                splitArea: {
+                    show: false
+                }, //分隔区域
+                splitLine: {
+                    show: false
+                }, //分隔线
+                data: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+            }
+        ],
+        yAxis: [
+            {
+                type: 'value'
+            }
+        ],
+        axis: {
+            scale: true
+        },
+        series: [
+            {
+                name: '用户留存率',
+                type: 'line',
+                symbol: 'Circle',
+                smooth: true,
+                data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            }
+        ],
+        tooltip:
+        {
+            show: true,
+            trigger: 'axis'
+        }
+
+    };
+    detailChart.setOption(optionD);
+</script>
+

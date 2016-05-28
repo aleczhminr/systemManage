@@ -1,0 +1,311 @@
+﻿
+@{
+    ViewBag.Title = "新增优惠券";
+}
+
+@Styles.Render("~/style/form")
+
+<div class="col-md-12">
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <div class="panel-title">
+                新增优惠券
+            </div>
+        </div>
+        <div class="panel-body" id="addCouponTable">
+            <div class="form-group" >
+                <label>优惠券名称</label>
+                <input class="form-control" type="text" required="" id="couponDesc">
+            </div>
+            <div class="form-group" id="couponType">
+                <label>优惠券类型</label>
+                <div class="radio radio-success">
+                    <input id="couponType_1" type="radio" onclick="couponTypeOnClick(1)" name="couponType" value="1" checked="checked">
+                    <label for="couponType_1">抵值券</label>
+                    <input id="couponType_2" type="radio" onclick="couponTypeOnClick(2)" name="couponType" value="2">
+                    <label for="couponType_2">功能券</label>
+                </div>
+            </div>
+            <div class="form-group useType dizhijuan" id="bindType">
+                <label>限制使用类型</label>
+                <div class="radio radio-success">
+                    <input id="bindType_1" type="radio" name="bindType" onclick="bindTypeOnClick(0)" value="0" checked="checked">
+                    <label for="bindType_1">无限制</label>
+                    <input id="bindType_2" type="radio" name="bindType" onclick="bindTypeOnClick(1)" value="1">
+                    <label for="bindType_2">类别</label>
+                    <input id="bindType_3" type="radio" name="bindType" onclick="bindTypeOnClick(2)" value="2">
+                    <label for="bindType_3">产品</label>
+                </div>
+            </div>
+            <div class="form-group category dizhijuan">
+                <label>限制产品类别</label>
+                <div class="radio radio-success" id="bindValue">
+                    <input id="bindValue_1" type="radio" name="bindValue" value="0" checked="checked">
+                    <label for="bindValue_1">无限制</label>
+                </div>
+            </div>
+            <div class="form-group dizhijuan">
+                <label>限制说明</label>
+                <input class="form-control" type="text" id="bindName" required="" value="无限制">
+            </div>
+            <div class="form-group dizhijuan" id="ruleType">
+                <label>优惠类别</label>
+                <div class="radio radio-success">
+                    <input id="ruleType_2" type="radio" name="ruleType" onclick="RuleTypeOnClick(1)" value="1" checked="checked">
+                    <label for="ruleType_2">满减</label>
+                    <input id="ruleType_1" type="radio" name="ruleType" onclick="RuleTypeOnClick(0)" value="0">
+                    <label for="ruleType_1">无限制</label>
+                </div>
+            </div>
+            <div class="form-group dizhijuan manjiner">
+                <label>满：</label>
+                <input class=" autonumeric form-control" type="text" required="" placeholder="元" data-a-sign="￥" id="ruleValue">
+            </div>
+            <div class="form-group dizhijuan">
+                <label>减：</label>
+                <input class="autonumeric  form-control" type="text" required="" placeholder="元"   data-a-sign="￥" id="couponValue_M">
+            </div>
+            <div class="form-group product gongnengjuan" style=" display:none;">
+                <label>赠送产品</label>
+                <div class="radio radio-success" id="bindValue_V">
+                </div>
+            </div>
+            <div class="form-group gongnengjuan" style=" display:none;">
+                <label>赠送产品数量</label>
+                <input class="form-control" type="number" required="" placeholder="几月/几天/几条" id="couponValue_V">
+            </div>
+            <div class="form-group">
+                <label>优惠券数量</label>
+                <input class="form-control" type="number" required="" placeholder="张" id="maxLimitNum">
+            </div>
+            <div class="form-group input-daterange" id="deadLine">
+                <label>截止时间</label>
+                <input type="text" placeholder="" class="input-sm form-control" name="start" id="endDate" style="width:120px; text-align:left;" />
+            </div>
+            <div class="form-group inline whereitem">
+                <label>版本前缀和绑定代理商</label>
+                <div class="select-puppet">
+                    <select class="cs-select cs-skin-slide" onchange="showDisplayRemark(this)" id="prefixAgent">
+                        <option value='0' rel=''>无绑定</option>
+                    </select>
+                </div>
+                <span id="prefixTips" style="margin-left: 15px; color: #999; font-size: 12px;"></span>
+            </div>
+            <div class="form-group">
+                <label>备注说明：</label>
+                <input class="form-control" type="text" required="" id="remark">
+            </div>
+            <button type="button" value="select" class="btn btn-success btn-inquire" onclick=" SaveCoupon() ">保存优惠券信息</button>
+        </div>
+    </div>
+
+</div>
+
+@Scripts.Render("~/js/begin/form")
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('.input-daterange').datepicker();
+        //GetOrderProject();
+        setCouponValueVHtml();
+        GetAgent();
+    });
+
+    function GetOrderProject(i) {
+        var url = "/OrderCoupon/GetOrderProject";
+
+        $.doAjax(url, null, function(msg) {
+            if (msg != "") {
+                var json = jQuery.parseJSON(msg);
+                $("#addCouponTable").data("orderProject", json);
+                if (i == 2) {
+                    bindTypeOnClick(2);
+                } else if (i == 3) {
+                    setCouponValueVHtml();
+                }
+            } else {
+                $("#addCouponTable").data("orderProject", null);
+            }
+        }, true);
+
+    }
+
+
+
+    function GetAgent() {
+        var url = "/OrderCoupon/GetAgent";
+
+        $.doAjax(url, null, function(msg) {
+            if (msg != "") {
+                var json = jQuery.parseJSON(msg);
+
+                $.each(json, function(i, n) {
+                    $("#prefixAgent").append("<option value='" + n.id + "' rel='" + n.remark + "'>" + n.preName + "[" + n.agentId + "]</option>");
+                });
+            }
+        }, true);
+
+    }
+
+    function SaveCoupon() {
+        var data = {};
+
+        data["couponDesc"] = $("#couponDesc").val();
+        if (data["couponDesc"].length < 1) {
+            alert("请输入优惠券名称");
+            return false;
+        }
+
+        data["couponType"] = $("#couponType input:radio:checked").val();
+        data["bindType"] = 2;
+        data["bindValue"] = 0;
+        data["bindName"] = "";
+        data["ruleType"] = 0;
+        data["ruleValue"] = 0;
+        data["couponValue"] = 0;
+        if (data["couponType"] == "1") {
+            data["bindType"] = $("#bindType input:radio:checked").val();
+            data["bindValue"] = $("#bindValue input:radio:checked").val();
+            data["bindName"] = $("#bindName").val();
+            if (data["bindName"].length < 1) {
+                alert("请录入限制说明");
+                return false;
+            }
+            data["ruleType"] = $("#ruleType input:radio:checked").val();
+            data["ruleValue"] = $.trim($("#ruleValue").val());
+            if (data["ruleValue"].length < 1) {
+                data["ruleValue"] = 0;
+            }
+            data["couponValue"] = $.trim($("#couponValue_M").val());
+            if (data["couponValue"].length < 1) {
+                data["couponValue"] = 0;
+            }
+        } else if (data["couponType"] == "2") {
+
+            data["bindValue"] = $("#bindValue_V input:radio:checked").val();
+            data["couponValue"] = $("#couponValue_V").val();
+        } else {
+            alert("请选择优惠券类型");
+            return false;
+        }
+
+        data["maxLimitNum"] = $("#maxLimitNum").val();
+        if (data["maxLimitNum"].length < 1) {
+            data["maxLimitNum"] = "1";
+        }
+
+        data["endDate"] = $("#endDate").val();
+        if (data["endDate"].length < 1) {
+            alert("请输入截至时间");
+            return false;
+        }
+        data["remark"] = $("#remark").val();
+        data["prefix"] = $("#prefixAgent").val();
+
+        var url = "/OrderCoupon/AddCoupon";
+
+        $.doAjax(url, data, function(msg) {
+            if (msg != "") {
+                if (msg == "0") {
+                    alert("增加优惠券成功");
+                    window.location.href = "/OrderCoupon";
+                } else {
+                    alert("增加优惠券失败");
+                }
+            }
+        }, true);
+
+    }
+
+    function SelectChange() {
+
+    }
+
+    function bindTypeClick() {
+
+    }
+    function couponTypeOnClick(val) {
+        if (val == 2) {
+            $("#addCouponTable div.dizhijuan").hide();
+            $("#addCouponTable div.gongnengjuan").show();
+        } else {
+            $("#addCouponTable div.dizhijuan").show();
+            $("#addCouponTable div.gongnengjuan").hide();
+        }
+    }
+    function bindTypeOnClick(index) {
+        var json = {};
+        $("#bindValue").html("");
+        if (index == 0) {
+            json["0"] = "无限制";
+        } else if (index == 1) {
+            json["1"] = "短信";
+            json["2"] = "版本";
+            json["3"] = "产品";
+            json["4"] = "套餐";
+        } else {
+            var proJson = $("#addCouponTable").data("orderProject");
+            if (proJson == undefined) {
+                GetOrderProject(2);
+            } else {
+                if (proJson.length > 0) {
+                    $.each(proJson, function (i, n) {
+                        json[n.busId] = n.displayName;
+                    });
+                }
+            }
+        }
+        var num = 0;
+        $.each(json, function (i, n) {
+            $("#bindValue").append('<input id="bindValue_' + i + '" onclick="setBindNameVal()" name="bindValue" type="radio" value="' + i + '" /><label for="bindValue_' + i + '">' + n + '</label>');
+            if (num == 7) {
+                //$("#bindValue").append("<br/>");
+                num = 0;
+            } else {
+                num++;
+            }
+        });
+        $("#bindValue input:radio:first").prop("checked", true);
+        setBindNameVal();
+    }
+    function setBindNameVal() {
+        var bindValue = $.trim($("#bindValue input:radio:checked").next().text());
+        if (bindValue == "无限制") {
+            $("#bindName").val("无限制");
+        } else {
+            $("#bindName").val("仅限" + bindValue);
+        }
+    }
+    function RuleTypeOnClick(i) {
+        if (i == 0) {
+            $("#addCouponTable div.manjiner").hide();
+        } else {
+            $("#addCouponTable div.manjiner").show();
+        }
+    }
+    function setCouponValueVHtml() {
+        var proJson = $("#addCouponTable").data("orderProject");
+        if (proJson == undefined) {
+            GetOrderProject(3);
+        } else {
+            if (proJson.length > 0) {
+                var num = 0;
+                $.each(proJson, function (i, n) {
+                    $("#bindValue_V").append(' <input id="couponValue_' + n.busId + '" name="couponValue" type="radio" value="' + n.busId + '"/><label for="couponValue_' + n.busId + '" >' + n.displayName + '</label>');
+                    if (num == 7) {
+                        //$("#bindValue_V").append("<br/>");
+                        num = 0;
+                    } else {
+                        num++;
+                    }
+                });
+                $("#bindValue_V input:radio:first").prop("checked", true);
+            }
+        }
+    }
+    function showDisplayRemark(item) {
+        var strMsg = $(item).find("option:selected").attr("rel");
+        $("#prefixTips").html(strMsg);
+    }
+</script>

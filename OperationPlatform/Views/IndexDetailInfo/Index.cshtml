@@ -1,0 +1,79 @@
+﻿@section Style{
+
+    @Styles.Render("~/style/form")
+}
+<!-- 容器开始 -->
+<div class="panel">
+    <!-- 容器标题 -->
+    <div class="panel-heading">
+        <!-- 标题内容 -->
+        <div class="panel-title" id="statusTitle">
+            @{@ViewBag.Title}                    
+                </div>
+                <!-- 控制组  查询条件位置 -->
+                <div class="panel-controls">
+                    <!-- <input type="text" id="search-table" class="form-control pull-right" placeholder=""> -->
+                </div>
+            </div>
+            <!-- 控件容器 -->
+            <div id="AccountActiveListTable" class="panel-body">
+                <!-- 表格本体 -->
+                <table class="table table-hover AccountListTableId"></table>
+                <!-- 分页信息 -->
+                <div class="dataTables_wrapper AccountListPageHtmlId" id="ListPageHtml">
+                    <div class="dataTablePagText dataTables_info"></div>
+                    <div class="dataTables_paginate paging_bootstrap pagination">
+                        <ul>
+                            <li class="prev disabled">
+                                <a href="javascript:void(0)">
+                                    <i class="pg-arrow_left"></i>
+                                </a>
+                            </li>
+                            <li class="active">
+                                <a href="javascript:void(0)">1</a>
+                            </li>
+                            <li class="next disabled">
+                                <a href="javascript:void(0)">
+                                    <i class="pg-arrow_right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- <div class="row column-seperation m-t-10" id="AccountActiveListTable">
+            <table></table>
+        </div> -->
+
+        <input type="hidden" name="page" id="page" value="@ViewBag.Page" />
+        <input type="hidden" name="type" id="type" value="@ViewBag.Type" />
+        <input type="hidden" name="index" id="index" value="@ViewBag.Index" />
+        <input type="hidden" name="cnt" id="cnt" value="@ViewBag.Cnt" />
+        <input type="hidden" name="location" id="location" value="@ViewBag.Location" />
+        <input type="hidden" name="verif" id="verif" value="@ViewBag.Verif" />
+        <input type="hidden" name="ord" id="ord" value="LoginTimeWeb" />
+
+        <input type="hidden" name="date" value="@ViewBag.Date" id="date" />
+        <input type="hidden" name="day" value="@ViewBag.Day" id="day" />
+        <input type="hidden" name="keyword" value="@ViewBag.Keyword" id="keyword" />
+
+
+
+        <script type="text/html" id="AccountDetailScript">
+            @RenderPage("~/Views/Shared/_AccountListTable.cshtml")
+        </script>
+        @section Scripts{
+            @Scripts.Render("~/js/begin/form")
+            <script src="~/Scripts/plugins/artTemplate/template.js"></script>
+            <script src="~/Scripts/AccountListTable.js"></script>
+            <script type="text/javascript">
+                $(document).ready(function () {
+                    if ($("#location").val() != null && $("#location").val() != "") {
+                        GetLocationStatus($("#location").val());
+                    }
+                    GetDetailInfo(1);
+                });
+
+            </script>
+        }

@@ -1,0 +1,106 @@
+﻿@model Utility.Menu.UserMenu
+@{
+    ViewBag.Title = "设置店铺权限";
+}
+@section Style{
+    @Styles.Render("~/style/form")
+    <link href="~/css/SysManage/SysManage.css" rel="stylesheet" />
+}
+<div class="LeftMenu">
+    <h1>左侧菜单</h1>
+    @foreach (var itemModel in Model.LeftMenu)
+    {
+        <h5>@Html.DisplayFor(modelItem => itemModel.MenuTitle)</h5>
+        <ul>
+            @foreach (var itemList in itemModel.ItemList)
+            {
+                <li>
+                    <div class="checkbox check-default">
+                        <input type="checkbox" name="UserMenu" value="@Html.DisplayFor(modelItem => itemList.MenuId)" id="checkbox_@Html.DisplayFor(modelItem => itemList.MenuId)">
+                        <label for="checkbox_@Html.DisplayFor(modelItem => itemList.MenuId)">@Html.DisplayFor(modelItem => itemList.MenuTitle)</label>
+                    </div>
+                </li>
+            }
+        </ul>
+    }
+</div>
+<div class="FunctionMap">
+    <h1>站点导航</h1>
+    @foreach (var itemModel in Model.FunctionMap)
+    {
+        <div>
+            <h5 class="MapTitle">
+                @Html.DisplayFor(modelItem => itemModel.MenuTitle)
+            </h5>
+            <div class="MapList">
+                <div class="checkbox check-default">
+                    @foreach (var itemList in itemModel.ItemList)
+                    {
+                        <input type="checkbox" name="UserMenu" value="@Html.DisplayFor(modelItem => itemList.MenuId)" id="checkbox_@Html.DisplayFor(modelItem => itemList.MenuId)">
+                        <label for="checkbox_@Html.DisplayFor(modelItem => itemList.MenuId)">@Html.DisplayFor(modelItem => itemList.MenuTitle)</label>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+    <div class="button m-t-20">
+        <button class="btn btn-complete btn-cons" onclick="SavMenu()">保存权限</button>
+    </div>
+</div>
+<input type="hidden" value="@ViewBag.AccId" id="userId" />
+@section Scripts{
+    @Scripts.Render("~/js/begin/form")
+
+    <script type="text/javascript">
+        $(function () {
+            GetUserMenu();
+        });
+
+        function GetUserMenu() {
+            var uid = $("#userId").val();
+            var url = "/SysManage/GetUserM/" + uid;
+            $.doAjax(url, null, function (msg) {
+                if (msg != "") {
+                    var list = msg.split(',');
+                    $.each(list, function (i, n) {
+                        $("#checkbox_" + n).prop("checked", true);
+                    });
+                } else {
+                    alert("您无权超作此权限！");
+                    window.location.href = "/";
+                }
+
+            }, true);
+        }
+
+
+        function SavMenu() {
+            var url = "/SysManage/SaveMenu";
+            var checkList = $("input:checkbox[name='UserMenu']:checked");
+            var idList = new Array();
+            $.each(checkList, function (i, n) {
+                idList.push(n.value);
+            });
+            var postJson = {};
+
+            postJson["uid"] = $("#userId").val();;
+            postJson["idList"] = idList.join(",");
+
+            $.doAjax(url, postJson, function (msg) {
+                if (msg == "1") {
+                    alert("修改成功");
+                    window.location.href = "/SysManage/UserList/";
+                } else if (msg == "0") {
+                    alert("修改失败");
+                } else if (msg == "log") {
+                    alert("您无权超作此权限！");
+                    window.location.href = "/";
+                } else {
+                    alert("权限信息错误，请更正！");
+                }
+            }, true);
+
+        }
+    </script>
+
+}

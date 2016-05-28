@@ -1,0 +1,59 @@
+﻿@model IEnumerable<Model.SmsNotifyItem>
+
+<table class="table table-hover table-condensed  no-footer  fs-12">
+    <thead>
+        <tr>
+            <th class="text-center" style="width:175px;">
+                @Html.DisplayNameFor(model => model.StoreName)
+            </th>
+            <th class="text-center" style="width:80px;">
+                @Html.DisplayNameFor(model => model.UserCnt)
+            </th>
+            <th class="text-center" style="width:70px;">
+                @Html.DisplayNameFor(model => model.TotalSmsCnt)
+            </th>
+            <th style="min-width: 210px; width: 200px">
+                @Html.DisplayNameFor(model => model.SmsContent)
+            </th>
+            <th class="text-center" style="width: 121px;">
+                @Html.DisplayNameFor(model => model.SubmitTime)
+            </th>
+            <th class="text-center" style="width: 190px;">详细</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (!Model.Any())
+        {
+            <tr>
+                <td colspan="6"><div class="DataNull">无需要审核的短信</div></td>
+            </tr>
+        }
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    <a href="/shopinfo/index/@Html.DisplayFor(modelItem => item.AccId)" target="_blank"> @Html.DisplayFor(modelItem => item.StoreName)【@Html.DisplayFor(modelItem => item.AccId)】</a>
+                </td>
+                <td class="text-center">
+                    @Html.DisplayFor(modelItem => item.UserCnt)
+                </td>
+                <td class="text-center">
+                    @Html.DisplayFor(modelItem => item.TotalSmsCnt)
+                </td>
+                <td class="SmsContent" style="white-space:initial;" smstype="@Html.DisplayFor(modelItem => item.SmsTypeName)" onclick="ZeroClipClick(this)" id="smsContext_@Html.DisplayFor(modelItem => item.Id)">
+                    @Html.DisplayFor(modelItem => item.SmsContent)
+                </td>
+                <td class="text-center">
+                    @Html.DisplayFor(modelItem => item.SubmitTime)
+                </td>
+                <td class="text-center">
+                    <a onclick="updateSmsContent(@Html.DisplayFor(modelItem => item.Id))" href="javascript:void(0)">修改内容</a>
+                    <button class="btn btn-primary btn-sm" data-toggle="modal" style=" margin-left:10px;" onclick='SmsCheckClick(@Html.DisplayFor(modelItem => item.Id))'>
+                        审核处理
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+

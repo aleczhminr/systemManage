@@ -1,0 +1,66 @@
+﻿@{
+    ViewBag.Title = "短信预告";
+}
+<fieldset style="margin-top: 20px;clear: both;">
+    <legend><small>编辑短信预报内容</small></legend>
+    <div class=" checkbox check-default">
+        <input id="chkNotice" noticeid="@ViewBag.noticeId" type="checkbox" @ViewBag.chValue>
+        <label class="checkbox check-default" for="chkNotice"> 显示短信预报提示</label>
+    </div>
+    <div class="form-horizontal">
+        <textarea style="width: 500px;" cols="100%" rows="5" id="noticeText">@ViewBag.strContent</textarea>
+        <div class=" checkbox check-default">
+            <span class="btn btn-success" onclick="SaveNotice()">保存设置</span>
+        </div>
+        <div id="OldNewText" style="display:none;">@ViewBag.strContent</div>
+    </div>
+</fieldset>
+
+
+<script type="text/javascript">
+
+    function SaveNotice() {
+        var flagEdit = 0;
+        var oChk = $("#chkNotice");
+        var noticeId = oChk.attr("noticeId");
+        var noticeChk = 0;
+        if (oChk.is(':checked')) {
+            noticeChk = 1;
+        }
+
+        var oItem = $("#noticeText");
+        var orginText = $("#OldNewText").html();
+        var newText = oItem.val();
+        if (orginText != newText) {
+            flagEdit = 1;
+        }
+
+        var dataObj = {};
+        dataObj["flagEdit"] = flagEdit;
+        dataObj["noticeId"] = noticeId;
+        dataObj["noticeChk"] = noticeChk;
+        dataObj["noticeText"] = escape(newText);
+
+        var sUrl = "/sms//SaveNoticeText";
+        $.ajax({
+            type: "POST",
+            url: sUrl,
+            data: dataObj,
+            success: function (msg) {
+                if (msg == "1") {
+                    dialog({
+                        content: '短信通告保存成功',
+                        quickClose: true// 点击空白处快速关闭
+                    }).show();
+                    setTimeout(function () {
+                        loadmess(6);
+                    }, 2000);
+
+                } else {
+                    alert('提交失败，请重试！');
+                }
+            }
+        });
+    }
+
+</script>

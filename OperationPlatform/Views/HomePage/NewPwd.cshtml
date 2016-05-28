@@ -1,0 +1,49 @@
+﻿@model OperationPlatform.Models.NewPwdModels
+
+@{
+    ViewBag.Title = "修改密码";
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <section id="loginForm">
+            @using (Html.BeginForm("NewPwd", "HomePage", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+            {
+                @Html.AntiForgeryToken()
+                <h4>修改密码</h4>
+                <hr />
+                @Html.ValidationSummary(true)
+                <div class="form-group">
+                    @Html.LabelFor(m => m.OldPwd, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10">
+                        @Html.PasswordFor(m => m.OldPwd, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.OldPwd)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.NewPwd, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10">
+                        @Html.PasswordFor(m => m.NewPwd, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.NewPwd)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.RepeatPwd, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10">
+                        @Html.PasswordFor(m => m.RepeatPwd, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.RepeatPwd)
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="修改密码" class="btn btn-default" />
+                    </div>
+                </div>
+            }
+        </section>
+    </div>
+</div>
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    @Html.Raw(@ViewBag.js)
+}

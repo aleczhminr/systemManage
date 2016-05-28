@@ -1,0 +1,38 @@
+﻿@model Utility.Menu.UserMenu
+@{
+    ViewBag.Title = "运营分析功能地图";
+}
+
+<style>
+    /*ul, li {
+        margin: 10px;
+        padding: 0;
+        list-style-type:none;
+    }*/
+</style>
+
+<div class="row">
+
+    @foreach (var itemModel in Model.FunctionMap)
+    {
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="panel-title">
+                    <h3 class="no-margin">@Html.DisplayFor(modelItem => itemModel.MenuTitle)</h3>
+                </div>
+            </div>
+            <div class="panel-body">
+                <ul class="m-t-10 list-unstyled list-inline">
+                    @foreach (var listItemModel in itemModel.ItemList)
+                    {
+                    <li class="m-b-10">
+                        <a class="btn" href="@Html.DisplayFor(modelItem => listItemModel.MenuUrl)">@Html.DisplayFor(modelItem => listItemModel.MenuTitle)</a>
+                    </li>             
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+    }
+</div>

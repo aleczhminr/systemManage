@@ -1,0 +1,933 @@
+﻿@model IEnumerable<Model.Model4View.OrderInfoModel>
+@{
+    ViewBag.Title = "订单信息";
+}
+@section Style{
+    @Styles.Render("~/style/form")
+
+    <style type="text/css">
+        .icon-multiple {
+            background-color: #959595;
+        }
+
+        .icon-font {
+            display: inline-block;
+            color: #fff;
+            font-style: normal;
+            font-size: 12px;
+            line-height: 16px;
+            text-align: center;
+            border-radius: 1px;
+            margin-right: 3px;
+            padding: 0px 1px 0px 2px;
+            background-color: #f63;
+            margin-top: 2px;
+        }
+    </style>
+
+}
+
+<div class="panel">
+    <div class="panel-heading page-where orderWhere">
+        <div class="panel-title">
+
+            <div class="cs-wrapper pull-left m-r-10">
+
+                <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" name="orderStatus" id="orderStatus">
+                    <option value="-99">订单状态</option>
+                    <option value="0">未付款</option>
+                    <option value="2">交易成功</option>
+                    <option value="-2">退款订单</option>
+                    <option value="1">成功支付</option>
+                    <option value="-1">订单过期</option>
+                </select>
+
+            </div>
+
+            <div class="cs-wrapper pull-left m-r-10">
+
+                <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" name="payType" id="payType">
+                    <option value="-99">支付类型</option>
+                    @*<option value="0">平台订单</option>*@
+                    <option value="1">线下订单</option>
+                    <option value="2">支付宝</option>
+                    @*<option value="3">财付通</option>*@
+                    @*<option value="4">快钱</option>*@
+                    <option value="5">微信支付</option>
+                    <option value="6">IOS支付</option>
+                    <option value="7">安卓支付</option>
+                </select>
+
+            </div>
+
+            <input type="hidden" id="timeType" value="" name="timePeriod" />
+            <div class="btn-group page-where-othertime" style="float: left; margin-right: 10px">
+                <div class="page-where-time-input">
+                    <div class="input-daterange input-group">
+                        <input type="text" class="input-sm form-control" placeholder="订单时间" name="start">
+                        <span class="input-group-addon">to</span>
+                        <input type="text" class="input-sm form-control" placeholder="订单时间" name="end">
+                    </div>
+                </div>
+            </div>
+            <div style="float: left; margin-right: 10px; width: 120px">
+                <input class="form-control" type="text" placeholder="订单号" name="orderNo" id="orderNo">
+
+            </div>
+            <div style="float: left; margin-right: 10px; width: 80px">
+                <input class="form-control" type="text" placeholder="店铺ID" name="accId" id="accId">
+            </div>
+            <div style="float: left; margin-right: 10px; width: 120px">
+                <input class="form-control" type="text" placeholder="业务名称" name="busName" id="busName">
+            </div>
+            <div style="float: left; margin-right: 10px; width: 80px">
+                <input class="form-control" type="text" placeholder="备注" name="remark" id="remark">
+            </div>
+            <button type="button" value="select" class="btn btn-default btn-inquire" onclick=" GetOrderList(1) ">查询</button>
+
+            <div class="checkbox check-success m-l-10" style="display: inline">
+                <input type="checkbox" value="noZero" id="noZero" onchange="GetOrderList(1);">
+                <label for="noZero" title="去除0元订单">去0订单</label>
+            </div>
+            <div class="checkbox check-success m-l-10" style="display: inline">
+                <input type="checkbox" value="noRecharge" id="noRecharge" onchange="GetOrderList(1);">
+                <label for="noRecharge" title="去除手机充值订单">去充值</label>
+            </div>
+            <div class="checkbox check-success m-l-10" style="display: inline">
+                <input type="checkbox" value="exchange" id="exchange" onchange="GetOrderList(1);">
+                <label for="exchange" title="只看有几分抵值的订单">只看抵值</label>
+            </div>
+            <div>
+                @*<div class="panel-body">
+                        <table id="orderInfoListTable" class="table table-hover table-condensed  no-footer table-border-right fs-12">
+                            <thead>
+                            <tr>
+                                <th style="width: 185px;">
+                                    @Html.DisplayNameFor(model => model.orderNo)
+                                </th>
+                                <th style="min-width: 200px; width: 200px;">
+                                    @Html.DisplayNameFor(model => model.accountName)
+                                </th>
+                                <th style="width: 145px;">
+                                    @Html.DisplayNameFor(model => model.OrderProjectName)
+                                </th>
+                                <th style="width: 80px;">
+                                    @Html.DisplayNameFor(model => model.busQuantity)
+                                </th>
+                                <th style="width: 80px;">
+                                    @Html.DisplayNameFor(model => model.orderStatus)
+                                </th>
+                                <th style="width: 79px;">
+                                    @Html.DisplayNameFor(model => model.orderPayDesc)
+                                </th>
+                                <th style="width: 90px;">
+                                    @Html.DisplayNameFor(model => model.RealPayMoney)
+                                </th>
+                                <th style="width: 150px;">
+                                    @Html.DisplayNameFor(model => model.createDate)
+                                </th>
+                                <th style="width: 120px;">操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @if (Model != null)
+                            {
+                                foreach (var item in Model)
+                                {
+                                    <tr @if (item.orderStatus == 2)
+                                        {
+                                            @Html.Raw("class='odd'")
+                                            ;
+                                        }
+                                        else
+                                        {
+                                            @Html.Raw("class='odd disabledTr'")
+                                            ;
+                                        } role="row">
+                                        <td class="v-align-middle">
+                                            <a href="javascript:void(0)" onclick=" orderInfoShow(@Html.DisplayFor(modelItem => item.oid)) ">@Html.DisplayFor(modelItem => item.orderNo)</a>
+                                        </td>
+                                        <td class="v-align-middle">
+                                            <a href="/shopinfo/index/@Html.DisplayFor(modelItem => item.accId)" target="_blank">@Html.DisplayFor(modelItem => item.accountName)</a>
+                                        </td>
+                                        <td class="v-align-middle">
+                                            @Html.DisplayFor(modelItem => item.OrderProjectName)
+                                        </td>
+                                        <td class="v-align-middle">
+                                            @Html.DisplayFor(modelItem => item.busQuantity)
+                                        </td>
+                                        <td class="v-align-middle">
+                                            @Html.DisplayFor(modelItem => item.orderStatusName)
+                                        </td>
+                                        <td class="v-align-middle">
+                                            @Html.DisplayFor(modelItem => item.orderPayDesc)
+                                        </td>
+                                        <td class="v-align-middle">
+                                            @Html.DisplayFor(modelItem => item.RealPayMoney)
+                                        </td>
+                                        <td class="v-align-middle">
+                                            @Html.DisplayFor(modelItem => item.createDate)
+                                        </td>
+                                        <td class="v-align-middle">
+                                            <a href="javascript:void(0)" onclick=" orderInfoShow(@Html.DisplayFor(modelItem => item.oid)) ">查询详情</a>
+                                            @if (item.orderStatus == 2)
+                                            {
+                                                @Html.Raw(" | ")
+                                                @Html.ActionLink("退款", "DrawBack", new {id = item.oid})
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr class="row-details" name="orderinfo_@Html.DisplayFor(modelItem => item.oid)" style="display: none;">
+                                        <td colspan="9" class="no-padding">
+                                            <table class="table table-hover table-condensed no-footer fs-12 tableGoTable">
+                                                <thead>
+                                                <tr>
+                                                    <th>订单编号</th>
+                                                    <th>业务名称</th>
+                                                    <th>支付方式</th>
+                                                    <th>生成时间</th>
+                                                    <th>支付时间</th>
+                                                    <th>订单状态</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr>
+                                                    <td>@Html.DisplayFor(modelItem => item.orderNo)</td>
+                                                    <td>@Html.DisplayFor(modelItem => item.OrderProjectName)</td>
+                                                    <td>@Html.DisplayFor(modelItem => item.orderPayType)</td>
+                                                    <td>@Html.DisplayFor(modelItem => item.createDate)</td>
+                                                    <td>@Html.DisplayFor(modelItem => item.transactionDate)</td>
+                                                    <td>@Html.DisplayFor(modelItem => item.orderStatusName)</td>
+                                                </tr>
+                                                </tbody>
+                                                <thead>
+                                                <tr>
+                                                    <th>业务单价</th>
+                                                    <th>购买数量</th>
+                                                    <th>应付金额</th>
+                                                    <th>优惠金额</th>
+                                                    <th>支付金额</th>
+                                                    <th>订单操作</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr>
+                                                    <td>@Html.DisplayFor(modelItem => item.busPrice)</td>
+                                                    <td>@Html.DisplayFor(modelItem => item.busQuantity)</td>
+                                                    <td>@Html.DisplayFor(modelItem => item.busSumMoney)</td>
+                                                    <td>@Html.DisplayFor(modelItem => item.couponMoney)</td>
+                                                    <td>@Html.DisplayFor(modelItem => item.RealPayMoney)</td>
+                                                    <td></td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="9">
+                                        <p>
+                                            暂无订单信息
+                                        </p>
+                                    </td>
+                                </tr>
+                            }
+                            </tbody>
+
+                        </table>
+                        <div>
+                            @if (ViewBag.Page != 1)
+                            {
+                                @Html.ActionLink("首页", "Index", new {pageIndex = 1})
+                                @Html.Raw(" ")
+                                @Html.ActionLink("上一页", "Index", new {pageIndex = ViewBag.Page - 1})
+                            }
+                            else
+                            {
+                                @:首页
+                                @Html.Raw(" ")
+                                @:上一页
+                            }
+                            @Html.Raw(" ")
+                            @if (ViewBag.Page < ViewBag.AllPage)
+                            {
+                                @Html.ActionLink("下一页", "Index", new {pageIndex = ViewBag.Page + 1})
+                                @Html.Raw(" ")
+                                @Html.ActionLink("尾页", "Index", new {pageIndex = ViewBag.AllPage})
+                            }
+                            else
+                            {
+                                @:下一页
+                                @Html.Raw(" ")
+                                @:尾页
+                            }
+                        </div>
+                    </div>*@
+            </div>
+
+            <div class="clearfix"></div>
+        </div>
+    </div>
+
+    <div class="panel-body no-padding">
+        <div class="table-responsive">
+            <table class="table table-hover table-detailed dataTable" id="ListTable">
+                <thead>
+                    <tr>
+                        <th>订单号 </th>
+                        <th>商铺名称</th>
+                        <th>业务名称</th>
+                        <th class="text-center">购买数量</th>
+                        <th class="text-center">订单状态</th>
+                        <th class="text-center">支付类型</th>
+                        <th class="text-center">支付金额</th>
+                        <th class="text-center">购买时间</th>
+                        <th class="text-center">操作</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <div class="dataTables_wrapper m-t-10" id="ListPageHtml">
+                <div class="dataTables_paginate pagination no-padding">
+                    <ul>
+                        <li class="prev disabled">
+                            <a href="javascript:void(0)">
+                                <i class="pg-arrow_left"></i>
+                            </a>
+                        </li>
+                        <li class="active">
+                            <a href="javascript:void(0)">1</a>
+                        </li>
+                        <li class="next disabled">
+                            <a href="javascript:void(0)">
+                                <i class="pg-arrow_right">
+                                </i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="dataTablePagText p-l-20"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div style="display: none;">
+    <div id="confirmShowDiv" style="width: 300px;">
+        <table class="table table-bordered removeBottom">
+            <tr>
+                <th style="line-height: 26px; text-align: right;">汇款金额：</th>
+                <td><input id="confirmMoney" class="span1 removeBottom" style="width: 180px;" type="text" /></td>
+            </tr>
+            <tr>
+                <th style="line-height: 26px; text-align: right;">信息备注</th>
+                <td><input id="confirmRemark" class="span1 removeBottom" style="width: 180px;" type="text" /></td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div style="display: none;">
+    <div id="invoiceShowDiv" style="width: 300px;">
+        <table class="table table-bordered removeBottom">
+            <tr>
+                <th style="line-height: 26px; text-align: right;">收件人</th>
+                <td><input id="invoiceAddressee" class="span1 removeBottom" style="width: 180px;" type="text"/></td>
+            </tr>
+            <tr>
+                <th style="line-height: 26px; text-align: right;">联系电话</th>
+                <td><input id="invoicePhone" class="span1 removeBottom" style="width: 180px;" type="text"/></td>
+            </tr>
+            <tr>
+                <th style="line-height: 26px; text-align: right;">发票抬头</th>
+                <td><input id="invoiceName" class="span1 removeBottom" style="width: 180px;" type="text"/></td>
+            </tr>
+            <tr>
+                <th style="line-height: 26px; text-align: right;">发票地址</th>
+                <td><input id="invoiceAdress" class="span1 removeBottom" style="width: 180px;" type="text"/></td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div style="display: none;">
+    <div id="drawbackShowDiv" style="width: 300px;">
+        <table class="table table-bordered removeBottom">
+            <tr>
+                <th style="line-height: 26px; text-align: right;">退款金额</th>
+                <td><input id="drwabackMoney" class="span1 removeBottom" style="width: 180px;" type="text" /></td>
+            </tr>
+            <tr>
+                <th style="line-height: 26px; text-align: right;">退款说明</th>
+                <td><input id="drawbackDesc" class="span1 removeBottom" style="width: 180px;" type="text" /></td>
+            </tr>            
+        </table>
+    </div>
+</div>
+
+<div style="display: none;">
+    <div id="sendingShowDiv" style="width: 300px;">
+        <table class="table table-bordered removeBottom">
+            <tr>
+                <th style="line-height: 26px; text-align: right;">物流公司</th>
+                <td><input id="expressCompany" class="span1 removeBottom" style="width: 180px;" type="text" /></td>
+            </tr>
+            <tr>
+                <th style="line-height: 26px; text-align: right;">物流单号</th>
+                <td><input id="expressCode" class="span1 removeBottom" style="width: 180px;" type="text" /></td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div style=" display:none;">
+    <div id="addShowDiv" style="width:300px;">
+        <table class="table table-bordered removeBottom">
+            <tr>
+                <th style="line-height: 26px; text-align:right;">收件人</th>
+                <td><input id="mName" class="span1 removeBottom" style=" width:180px;" type="text" readonly /></td>
+            </tr>
+            <tr>
+                <th style="line-height: 26px; text-align: right;">联系电话</th>
+                <td><input id="mTel" class="span1 removeBottom" style="width: 180px;" type="text" readonly /></td>
+            </tr>
+            <tr>
+                <th style="line-height: 26px; text-align: right;">收件地址</th>
+                <td><input id="mAdd" class="span1 removeBottom" style="width: 180px;" type="text" readonly /></td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<script type="text/html" id="ListTableScript">
+    {{each list}}
+
+
+    {{if $value.orderStatusName!="交易成功" && $value.orderStatusName!="已付款（待发货）"&& $value.orderStatusName!="已付款（已发货）"}}
+    <tr class="even deal-success" role="row">
+    {{else}}
+    <tr class="odd" role="row">
+        {{/if}}
+
+        <td class="v-align-middle">
+            {{$value.orderNo}}{{if $value.FirstFlag=="1"}}
+            <img src="../../img/FirstStatus/active.png" title="首次交易成功"/>
+            {{/if}}
+        </td>
+        <td>
+            <a href="/shopinfo/index/{{$value.accId}}" tar target="_blank" data-toggle="tooltip" data-placement="left" title="{{$value.accountName}} 【{{$value.UserRealName}}】">
+                <img src="/img/Shop/{{$value.Edit | $aotjbImg}}" style="margin-right: 10px;" alt="{{$value.Edit}}"/>
+                <span style="{{$value.LoginLast |$logLength}}">{{$value.accountName | dateFormat}}</span>
+            </a>
+        </td>
+        <td>{{$value.OrderProjectName}}</td>
+        <td class="v-align-middle text-center">{{$value.busQuantity}}</td>
+        {{if $value.orderStatusName=="交易成功"}}
+        <td class="v-align-middle text-center" style="color: green">{{$value.orderStatusName}}</td>
+        {{else if $value.orderStatusName=="已付款（待发货）"}}
+        <td class="v-align-middle text-center" style="color: yellowgreen">{{$value.orderStatusName}}</td>
+        {{else}}
+        <td class="v-align-middle text-center">{{$value.orderStatusName}}</td>
+        {{/if}}
+        {{if ($value.orderPayDesc=="IOS支付" || $value.orderPayDesc=="安卓支付") && $value.orderStatusName=="交易成功"}}
+        <td class="v-align-middle text-center text-danger">{{$value.orderPayDesc}}</td>
+        {{else}}
+        <td class="v-align-middle text-center">{{$value.orderPayDesc}}</td>
+        {{/if}}
+        {{if $value.commuteIntegral!=""&&$value.commuteIntegral!=null&&$value.commuteIntegral!=0&&$value.commuteIntegral!="0"&&$value.commuteIntegralMoney<20}}
+        <td class="v-align-middle">￥{{$value.RealPayMoney}}<span class="icon-font icon-multiple m-l-10" title="{{$value.commuteIntegral}}分/￥{{$value.commuteIntegralMoney}}">抵现</span></td>
+
+        {{else if $value.commuteIntegral!=""&&$value.commuteIntegral!=null&&$value.commuteIntegral!=0&&$value.commuteIntegral!="0"&&$value.commuteIntegralMoney>=20}}
+        <td class="v-align-middle">￥{{$value.RealPayMoney}}<span class="icon-font icon-multiple m-l-10" title="{{$value.commuteIntegral}}分/￥{{$value.commuteIntegralMoney}}">抵现</span><span title="兑换金额大于20元" class="icon-font icon-multiple">！</span></td>
+        {{else}}
+        <td class="v-align-middle ">￥{{$value.RealPayMoney}}</td>
+        {{/if}}
+        <td class="v-align-middle text-center">
+            {{$value.createDate}}
+        </td>
+        <td class="v-align-middle text-center">
+            <a href="javascript:void(0)" onclick="orderInfoShow('{{$value.oid}}') ">查看详情</a>
+            {{if $value.orderStatusName=="交易成功" || $value.orderStatusName=="已付款（待发货）"}}
+            <button class="btn btn-success btn-sm m-l-10" name="{{$value.id}}" onclick="Drawback('{{$value.oid}}', '{{$value.accId}}')">
+                退款
+            </button>
+            {{else}}
+            <button class="btn btn-sm m-l-10" data-toggle="modal" data-target="#modalSlideUp" name="{{$value.id}}" disabled="disabled">
+                退款
+            </button>
+            {{/if}}
+        </td>
+    </tr>
+    <tr class="row-details" name="orderinfo_{{$value.oid}}" style="display: none;">
+        <td colspan="9" class="no-padding">
+            <table class="table table-inline no-margin">
+                <tbody>
+                <tr>
+                    <td class="no-border"></td>
+                    <td class="no-border bold">订单编号</td>
+                    <td class="no-border bold">业务名称</td>
+                    <td class="no-border bold">支付方式</td>
+                    <td class="no-border bold">生成时间</td>
+                    <td class="no-border bold">支付时间</td>
+                    <td class="no-border bold">订单状态</td>
+                    <td class="no-border"></td>
+                </tr>
+                <tr>
+                    <td class="no-border"></td>
+                    <td class="no-border">{{$value.orderNo}}</td>
+                    <td class="no-border">{{$value.OrderProjectName}}</td>
+                    <td class="no-border">{{$value.orderPayDesc}}</td>
+                    <td class="no-border">{{$value.createDate}}</td>
+
+                    {{if $value.transactionDate=='0001-01-01'}}
+                    <td class="no-border">尚未支付</td>
+                    {{else}}
+                    <td class="no-border">{{$value.transactionDate}}</td>
+                    {{/if}}
+
+                    <td class="no-border">{{$value.orderStatusName}}</td>
+                    <td class="no-border"></td>
+                </tr>
+                <tr>
+                    <td class="no-border"></td>
+                    <td class="no-border bold">业务单价</td>
+                    <td class="no-border bold">购买数量</td>
+                    <td class="no-border bold">应付金额</td>
+                    <td class="no-border bold">优惠金额</td>
+                    <td class="no-border bold">支付金额</td>
+                    <td class="no-border bold">订单操作</td>
+                    <td class="no-border"></td>
+                </tr>
+                <tr>
+                    <td class="no-border"></td>
+                    <td class="no-border">￥{{$value.busPrice}}</td>
+                    <td class="no-border">{{$value.busQuantity}}</td>
+                    <td class="no-border">￥{{$value.busSumMoney}}</td>
+                    <td class="no-border">￥{{$value.couponMoney}}</td>
+                    <td class="no-border" id="RealPayMoney_{{$value.oid}}">￥{{$value.RealPayMoney}}</td>
+                    <td class="no-border">
+                        {{if ($value.orderPayType==1 && $value.orderStatus==0)}}
+                        <a href="javascript:void(0)" onclick="ShowConfirmDiv('{{$value.oid}}') ">确认订单</a>
+                        {{/if}}
+                        {{if ($value.orderStatus==2 || ($value.orderStatus==1 && $value.OrderTypeId==2)) && ($value.invoiceId==0 || $value.invoiceId==null)}}
+                        <a href="javascript:void(0)" onclick="ShowInvoiceDiv('{{$value.oid}}', '{{$value.RealPayMoney}}', '{{$value.accId}}')">补开发票 </a>
+                        {{/if}}
+                        {{if $value.OrderTypeId==2}}
+                        <a href="javascript:void(0)" onclick="ShowAddress('{{$value.ConsigneeName}}', '{{$value.TelNumber}}', '{{$value.Address}}')">收货信息 </a>
+                        {{/if}}
+                        {{if $value.orderStatus==1}}
+                        <a href="javascript:void(0)" onclick="ShowSendingDiv('{{$value.oid}}', '{{$value.accId}}', '{{$value.ExpressCompany}}', '{{$value.ExpressCode}}')">发货信息 </a>
+                        @*{{if}}
+                                <a href="javascript:void(0)" onclick="ShowSendingDiv('{{$value.oid}}', '{{$value.accId}}', '{{$value.ExpressCompany}}', '{{$value.ExpressCode}}')">发货 </a>
+                                {{else}}
+                                <a href="javascript:void(0)" onclick="ShowSendingDiv('{{$value.oid}}', '{{$value.accId}}', '{{$value.ExpressCompany}}', '{{$value.ExpressCode}}')">发货 </a>
+                                {{/if}}*@
+
+
+                        {{/if}}
+                        @*话费订单补充处理*@
+                        {{if $value.orderStatusName=="交易成功" && ($value.OrderProjectName=="手机充值100元"||$value.OrderProjectName=="手机充值30元"||$value.OrderProjectName=="手机充值50元")}}
+
+                        <a href="javascript:void(0)" onclick="MobileRecharge('{{$value.oid}}', '{{$value.accId}}') "> 话费补充 </a>
+                        {{/if}}
+                        <a href="javascript:void(0)" onclick="ResetOrderStatus('{{$value.oid}}')">重置 </a>
+                            @if (ViewBag.AuthStatus == 1)
+                            {
+                                <a href="javascript:void(0)" onclick="DeleteOrder('{{$value.oid}}') "> 删除订单</a>
+                            }
+                        </td>
+                        <td class="no-border"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </td>
+    </tr>
+    {{/each}}
+</script>
+
+<script src="~/Scripts/plugins/artTemplate/template.js"></script>
+<script src="~/Scripts/ShopList/ShopList.js"></script>
+
+@section Scripts{
+    @Scripts.Render("~/js/begin/form")
+    <script type="text/javascript">
+        $(function() {
+            $('.orderWhere .input-daterange').datepicker({ format: 'yyyy-mm-dd' });
+            GetOrderList(1);
+        });
+
+        template.helper('dateFormat', function(data) {
+            if (data == "" || data == undefined || data == null) {
+                return "-";
+            };
+            if (data == "1900-01-01 00:00:00") {
+                return "从未登录";
+            } else {
+                return data.toString().substr(0, 10);
+            };
+        });
+
+        function GetOrderList(pageIndex) {
+            var postJson = {};
+            //DateTime stDate, DateTime edDate, int pageIndex = 1, int pageSize = 15, int transactionStatus = 1,int invoiceStatus = -99, string accId = ""
+            postJson["pageIndex"] = pageIndex;
+            //var transactionStatus = $("#transactionStatus").val();
+            var orderStatus = $("#orderStatus").val();
+            var payType = $("#payType").val();
+
+            var statTime = $(".orderWhere input[name='start']").val();
+            var endTime = $(".orderWhere input[name='end']").val();
+
+            var stDate = new Date();
+            var edDate = new Date();
+            if (statTime.length === 0 && endTime.length === 0) {
+                postJson["start"] = "";
+                postJson["end"] = "";
+            } else {
+                if (statTime.length > 0) {
+                    postJson["start"] = statTime;
+                } else {
+                    postJson["start"] = stDate.toLocaleDateString();
+                }
+                if (endTime.length > 0) {
+                    postJson["end"] = endTime;
+                } else {
+                    postJson["end"] = edDate.toLocaleDateString();
+                }
+            }
+
+            var accId = $("#accId").val();
+            var orderNo = $("#orderNo").val();
+            var busName = $("#busName").val();
+            var remark = $("#remark").val();
+
+            //postJson["transactionStatus"] = transactionStatus;
+            postJson["orderStatus"] = orderStatus;
+            postJson["payType"] = payType;
+            postJson["accId"] = accId;
+            postJson["orderNo"] = orderNo;
+            postJson["busName"] = busName;
+            postJson["remark"] = remark;
+
+            if ($("#noZero").prop('checked')) {
+                postJson["zeroRemark"] = 1;
+            } else {
+                postJson["zeroRemark"] = 0;
+            }
+
+            if ($("#noRecharge").prop('checked')) {
+                postJson["noRecharge"] = 1;
+            } else {
+                postJson["noRecharge"] = 0;
+            }
+
+            if ($("#exchange").prop('checked')) {
+                postJson["exchange"] = 1;
+            } else {
+                postJson["exchange"] = 0;
+            }
+
+            var url = "/Order/GetOrderList";
+
+            $.doAjax(url, postJson, function(msg) {
+                if (msg != "") {
+                    var json = jQuery.parseJSON(msg);
+                    $("#ListTable tbody").html(template("ListTableScript", { "list": jQuery.parseJSON(json.list) }));
+
+                    if (pageIndex == 1) {
+                        $("#ListPageHtml").attr("rowcount", parseInt(json.RowCount)).attr("maxpage", parseInt(json.PageCount));
+                        $("#ListPageHtml .dataTablePagText").html("共" + parseInt(json.RowCount) + "条,总金额" + json.sum + "元" + ",抵现" + json.integral + "元" + ",抵积分" + json.integralSum + "分,优惠" + json.coupon + "元");
+                    }
+                    var pageHtml = $.listPageHtml(pageIndex, $("#ListPageHtml").attr("maxpage"), "GetOrderList", 5);
+                    $("#ListPageHtml .dataTables_paginate").html(pageHtml);
+                }
+            }, true);
+        }
+
+        function orderInfoShow(oid) {
+            $("#ListTable tbody tr.row-details").hide().filter("[name='orderinfo_" + oid + "']").show();
+        }
+
+        function ShowConfirmDiv(id) {
+            dialog({
+                id: "confirmShowDivdialog",
+                title: "记录汇款信息",
+                lock: true,
+                background: '#fff', // 背景色
+                opacity: 0.5, // 透明度
+                content: document.getElementById("confirmShowDiv"),
+                ok: function() {
+                    var ur = "/Order/ConfirmOfflineOrder";
+                    var cm = $("#confirmMoney").val();
+                    var cr = $("#confirmRemark").val();
+                    var payM = $("#RealPayMoney_" + id).html();
+                    var len = payM.toString().length;
+                    var pay = payM.toString().substring(1);
+                    if (parseFloat($.trim(pay)) != Number($.trim(cm))) {
+                        alert("汇款金额和订单金额不匹配");
+                        return false;
+                    } else {
+                        var postJson = {};
+                        postJson["confirmMoney"] = cm;
+                        postJson["confirmRemark"] = cr;
+                        postJson["oid"] = id;
+
+                        $.doAjax(ur, postJson, function(msg) {
+                            if (msg == "1") {
+                                dialog({
+                                    content: '订单处理成功',
+                                    quickClose: true // 点击空白处快速关闭
+                                }).show();
+                                GetOrderList(1);
+                            } else {
+                                alert("订单处理失败，请联系技术人员");
+                            }
+                        }, true);
+
+                    }
+                }
+            }).showModal();
+        }
+
+        function ShowInvoiceDiv(id, orderNum, accId) {
+            dialog({
+                id: "invoiceShowDivdialog",
+                title: "补开发票信息",
+                lock: true,
+                background: '#fff', // 背景色
+                opacity: 0.5, // 透明度
+                content: document.getElementById("invoiceShowDiv"),
+                ok: function() {
+                    var ur = "/Order/MakeUpInvoice";
+
+                    var postJson = {};
+                    postJson["accId"] = accId;
+                    postJson["invoiceMoney"] = orderNum;
+                    postJson["oid"] = id;
+                    postJson["invoiceAddressee"] = $("#invoiceAddressee").val();
+                    postJson["invoicePhone"] = $("#invoicePhone").val();
+                    postJson["invoiceName"] = $("#invoiceName").val();
+                    postJson["invoiceAdress"] = $("#invoiceAdress").val();
+
+                    $.doAjax(ur, postJson, function(msg) {
+                        if (msg == "1") {
+                            dialog({
+                                content: '补开成功！',
+                                quickClose: true // 点击空白处快速关闭
+                            }).show();
+                            GetOrderList(1);
+                        } else {
+                            alert("处理失败，请联系技术人员");
+                        }
+                    }, true);
+                }
+            }).showModal();
+        }
+
+        function ShowSendingDiv(oid, accId, com, code) {
+            if (com != null && code != null && com != "" && code != "") {
+                $("#expressCode").val(code);
+                $("#expressCompany").val(com);
+
+
+                dialog({
+                    id: "expressShowDivdialogEX",
+                    title: "收货信息",
+                    lock: true,
+                    background: '#fff', // 背景色
+                    opacity: 0.5, // 透明度
+                    content: document.getElementById("sendingShowDiv"),
+                    ok: function() {
+                    }
+                }).showModal();
+            } else {
+                dialog({
+                    id: "expressShowDivdialog",
+                    title: "快递信息",
+                    lock: true,
+                    background: '#fff', // 背景色
+                    opacity: 0.5, // 透明度
+                    content: document.getElementById("sendingShowDiv"),
+                    ok: function() {
+                        var ur = "/Order/AddExpressInfo";
+
+                        var postJson = {};
+                        postJson["accId"] = accId;
+                        postJson["oid"] = oid;
+                        if ($("#expressCompany").val() == "") {
+                            alert("物流公司不能为空!");
+                            return false;
+                        }
+                        if ($("#expressCode").val() == "") {
+                            alert("物流单号不能为空!");
+                            return false;
+                        }
+                        postJson["expressCompany"] = $("#expressCompany").val();
+                        postJson["expressCode"] = $("#expressCode").val();
+
+                        $.doAjax(ur, postJson, function(msg) {
+                            if (msg == "1") {
+                                dialog({
+                                    content: '发货完成！',
+                                    quickClose: true // 点击空白处快速关闭
+                                }).show();
+                                GetOrderList(1);
+                            } else {
+                                alert("处理失败，请联系技术人员");
+                            }
+                        }, true);
+                    }
+                }).showModal();
+            }
+
+        }
+
+        function ShowAddress(name, tel, add) {
+            $("#mName").val(name);
+            $("#mTel").val(tel);
+            $("#mAdd").val(add);
+
+            dialog({
+                id: "addShowDivdialog",
+                title: "收货信息",
+                lock: true,
+                background: '#fff', // 背景色
+                opacity: 0.5, // 透明度
+                content: document.getElementById("addShowDiv"),
+                ok: function() {
+                }
+            }).showModal();
+        }
+
+        function DeleteOrder(oid) {
+
+            dialog({
+                id: "confirmDelDialog",
+                title: "警告",
+                lock: true,
+                background: '#fff', // 背景色
+                opacity: 0.5, // 透明度
+                content: "确定删除？",
+                ok: function() {
+                    var ur = "/Order/DeleteOrder";
+
+                    var postJson = {};
+                    postJson["oid"] = oid;
+
+                    $.doAjax(ur, postJson, function(msg) {
+                        if (msg == "1") {
+                            dialog({
+                                content: '删除成功！',
+                                quickClose: true // 点击空白处快速关闭
+                            }).show();
+                            GetOrderList(1);
+                        } else {
+                            alert("删除出错，请联系技术人员");
+                        }
+                    }, true);
+                }
+            }).showModal();
+        }
+
+        function ResetOrderStatus(oid) {
+            dialog({
+                id: "confirmDelDialogReset",
+                title: "确认重置",
+                lock: true,
+                background: '#fff', // 背景色
+                opacity: 0.5, // 透明度
+                content: "确定重置订单状态为成功？",
+                ok: function() {
+                    var ur = "/Order/ConfirmOfflineOrder";
+
+                    var payM = $("#RealPayMoney_" + oid).html();
+
+                    var pay = payM.toString().substring(1);
+
+                    var postJson = {};
+                    postJson["confirmMoney"] = parseFloat($.trim(pay));
+                    postJson["confirmRemark"] = "";
+                    postJson["oid"] = oid;
+
+                    $.doAjax(ur, postJson, function(msg) {
+                        if (msg == "1") {
+                            dialog({
+                                content: '订单处理成功',
+                                quickClose: true // 点击空白处快速关闭
+                            }).show();
+                            GetOrderList(1);
+                        } else {
+                            alert("订单处理失败，请联系技术人员");
+                        }
+                    }, true);
+
+                }
+            }).showModal();
+        }
+
+        function Drawback(oid, accid) {
+            dialog({
+                id: "drawbackShowDivdialog",
+                title: "确认退款",
+                lock: true,
+                background: '#fff', // 背景色
+                opacity: 0.5, // 透明度
+                content: document.getElementById("drawbackShowDiv"),
+                ok: function() {
+                    var ur = "/Order/Drawback";
+
+                    var postJson = {};
+                    postJson["oid"] = oid;
+                    postJson["accid"] = accid;
+                    postJson["dDesc"] = $("#drawbackDesc").val();
+
+                    $.doAjax(ur, postJson, function(msg) {
+                        if (msg == "1") {
+                            dialog({
+                                content: '退款处理成功！',
+                                quickClose: true // 点击空白处快速关闭
+                            }).show();
+                            GetOrderList(1);
+                        } else {
+                            alert(msg);
+                            alert("处理失败，请联系技术人员");
+                        }
+                    }, true);
+                }
+            }).showModal();
+        }
+
+        //话费补充
+        function MobileRecharge(oid,accid) {
+            dialog({
+                id: "confirmRecDialog",
+                title: "警告",
+                lock: true,
+                background: '#fff', // 背景色
+                opacity: 0.5, // 透明度
+                content: "确定补充这笔话费？",
+                ok: function () {
+                    var ur = "/Order/RechargeMobile";
+
+                    var postJson = {};
+                    postJson["orderId"] = oid;
+                    postJson["accid"] = accid;
+
+                    $.doAjax(ur, postJson, function (msg) {
+                        if (msg == "1") {
+                            dialog({
+                                content: '补充提交成功！',
+                                quickClose: true // 点击空白处快速关闭
+                            }).show();
+                            GetOrderList(1);
+                        } else {
+                            alert(msg);
+                        }
+                    }, true);
+                }
+            }).showModal();
+        }
+    </script>
+}

@@ -1,0 +1,218 @@
+﻿@{
+    Layout = null;
+    ViewBag.Title = "店铺历史消息";
+}
+
+
+<div class="page-where MsgCenter" style=" margin-top:10px;">
+    <div class="btn-group" id="accMsgType" accdatatype="1">
+        <button type="button" class="btn btn-default btn-select" value="7" onclick="ChangeAccMsgType(this,1);">PC网页端消息</button>
+        <button type="button" class="btn btn-default" value="15" onclick="ChangeAccMsgType(this,2);">移动端消息</button>
+    </div>
+</div>
+
+
+<div class="row column-seperation" id="accMessageBox">
+    <table width="100%" border="0" align="center" class="table table-hover table-condensed  no-footer">
+        <thead>
+            <tr>
+                <th>消息标题</th>
+                <th class="noticePushItem" style="text-align:center;">弹窗状态</th>
+                <th style="text-align:center;">阅读状态</th>
+                <th>创建时间</th>
+                <th>发送人员</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="trLoading" style="display:none;"><td colspan="5" style="height: 80px;width:100%;background-image: url(./css/loading_s.gif); background-position: 42% 50%; background-repeat: no-repeat;background-color:#F1FDE9;text-align:center;vertical-align: middle;">正在加载...</td></tr>
+            <tr class='morebtn' style="display:none;"><td colspan='5' style='text-align: center;'><span style='font-weight:bold;color: #259FFF;'><a href='javascript:void(0)' onclick="LoadingMsgType()" style="color: #259FFF;">[ 点击加载更多 ]</a></span></td></tr>
+            <tr>
+                <td colspan="5" style="text-align:center; background:#F7F7F7">
+                    &nbsp;
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+ 
+<script id="accMsgList_Tpl" type="text/html">
+    {{each msgList}}
+    <tr class="msgItem">
+        <td><span class="msgItemTitle" style="cursor:help;" rel="{{$value.msgContent}}">{{$value.msgTitle}}</span></td>
+        <td class="noticePushItem" style="text-align:center;">
+            {{if $value.isPush==1}}
+            <span style="color:#468847;cursor:help;" title="弹窗时间：{{$value.pushTime}}">已弹窗</span>
+            {{else}}
+            <span>-</span>
+            {{/if}}
+        </td>
+        <td style="text-align:center;">
+            {{if $value.isRead==1}}
+            <span style="color:#468847;cursor:help;" title="阅读时间：{{$value.readTime}}">已阅读</span>
+            {{else}}
+            <span>-</span>
+            {{/if}}
+        </td>
+        <td>{{$value.createTime}}</td>
+        <td>{{$value.operatorName}}</td>
+    </tr>
+    {{/each}}
+</script>
+<script src="~/Scripts/MsgCenter/MsgCenter.js"></script>
+<script type="text/javascript">
+    $(function () {
+        GetAccMessageList(1)
+    });
+    function GetAccMessageList(page) {
+        var accid = Number($("#ShopInfo").val());
+        var oItem = $("#accMessageBox");
+        MsgCenter.getMessage(accid, page, function (data) {
+            if (data != "error") {
+                var json = $.parseJSON(data);
+                $("#accMessageBox .msgItem").remove();
+                $("#accMessageBox .trLoading").before(template('accMsgList_Tpl', json));
+
+                if (json.sumCount > 20) {
+                    oItem.find(".morebtn a").attr("rel", "2");
+                    oItem.find(".morebtn").show();
+                } else {
+                    oItem.find(".morebtn").hide();
+                }
+
+                ShowMsgListTips();
+
+                $(".noticePushItem").show();
+            }
+        });
+    }
+    function LoadMoreMsgList() {
+        var accid = Number($("#ShopInfo").val());
+        var oItem = $("#accMessageBox");
+        var loadPage = parseInt(oItem.find(".morebtn a").attr("rel"));
+        var timerId = setTimeout(function () {
+            oItem.find(".trLoading").show();
+        }, 100);
+        MsgCenter.getMessage(accid, loadPage, function (data) {
+            clearTimeout(timerId);
+            oItem.find(".trLoading").hide();
+            if (data != "error") {
+                var json = $.parseJSON(data);
+                if (json.msgList != null) {
+                    oItem.find(".trLoading").before(template('accMsgList_Tpl', json));
+
+                    var pageNum = (20 * (loadPage - 1)) + json.msgList.length;
+                    if (json.sumCount > pageNum) {
+                        oItem.find(".morebtn a").attr("rel", (loadPage + 1));
+                        oItem.find(".morebtn").show();
+                    } else {
+                        oItem.find(".morebtn").hide();
+                    }
+
+                    ShowMsgListTips();
+                    $(".noticePushItem").show();
+                }
+            }
+        });
+    }
+
+    function ShowMsgListTips() {
+        $("#accMessageBox .msgItemTitle").qtip({
+            content: {
+                attr: 'rel'
+            },
+            position: {
+                my: 'left center',
+                at: 'right center'
+            },
+            show: {
+                solo: true
+            },
+            style: {
+                classes: 'ui-tooltip-shadow ui-tooltip-light'
+            }
+
+        });
+    }
+
+
+    function ChangeAccMsgType(item, type) {
+
+         
+        $(item).parent().find(".btn-select").removeClass("btn-select");
+        $(item).addClass("btn-select");
+
+
+        var oItem = $(item);
+        var oTypeItem = oItem.parent().parent(); 
+        oTypeItem.attr("accDataType", type);
+
+        if (type == 1) {
+            GetAccMessageList(1);
+        } else {
+            GetAccMobileMessageList(1);
+        }
+    }
+
+    function LoadingMsgType() {
+        var type = $("#accMessageBox #accMsgType").attr("accDataType");
+        if (type == "1") {
+            LoadMoreMsgList();
+        } else {
+            LoadMoreMobileMsgList();
+        }
+    }
+    function LoadMoreMobileMsgList() {
+        var accid = Number($("#ShopInfo").val());
+        var oItem = $("#accMessageBox");
+        var loadPage = parseInt(oItem.find(".morebtn a").attr("rel"));
+        var timerId = setTimeout(function () {
+            oItem.find(".trLoading").show();
+        }, 100);
+        MobileMsgCenter.getMessage(accid, loadPage, function (data) {
+            clearTimeout(timerId);
+            oItem.find(".trLoading").hide();
+            if (data != "error") {
+                var json = $.parseJSON(data);
+                if (json.msgList.length > 0) {
+                    oItem.find(".trLoading").before(template('accMsgList_Tpl', json));
+
+                    var pageNum = (20 * (loadPage - 1)) + json.msgList.length;
+                    if (json.sumCount > pageNum) {
+                        oItem.find(".morebtn a").attr("rel", (loadPage + 1));
+                        oItem.find(".morebtn").show();
+                    } else {
+                        oItem.find(".morebtn").hide();
+                    }
+
+                    ShowMsgListTips();
+                    $(".noticePushItem").hide();
+                }
+            }
+        });
+    }
+
+    function GetAccMobileMessageList(page) {
+        var accid =Number( $("#ShopInfo").val());
+        var oItem = $("#accMessageBox");
+        MobileMsgCenter.getMessage(accid, page, function (data) {
+            if (data != "error") {
+                var json = $.parseJSON(data);
+                if (json.msgList.length > 0) {
+                    $("#accMessageBox .msgItem").remove();
+                    $("#accMessageBox .trLoading").before(template('accMsgList_Tpl', json));
+
+                    if (json.sumCount > 20) {
+                        oItem.find(".morebtn a").attr("rel", "2");
+                        oItem.find(".morebtn").show();
+                    } else {
+                        oItem.find(".morebtn").hide();
+                    }
+
+                    ShowMsgListTips();
+                    $(".noticePushItem").hide();
+                }
+            }
+        });
+    }
+</script>

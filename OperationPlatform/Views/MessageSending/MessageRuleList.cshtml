@@ -1,0 +1,203 @@
+﻿
+@{
+    ViewBag.Title = "消息规则列表";
+}
+
+<link href="~/Scripts/plugins/qtip/jquery.qtip.min.css" rel="stylesheet" />
+
+<div class="panel">
+    <div class="panel-heading page-where msgRule">
+        <div class="panel-title">
+            <div class="cs-wrapper pull-left m-r-10">
+
+                <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" name="ruleType" id="ruleType">
+                    <option value="-99">规则类型</option>
+                    <option value="1">动作触发</option>
+                    <option value="2">定时筛选</option>
+                </select>
+
+            </div>
+
+            <div class="cs-wrapper pull-left m-r-10">
+                <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" name="ruleTarget" id="ruleTarget">
+                    <option value="">任务目标</option>
+                    <option value="提醒">提醒</option>
+                    <option value="告知">告知</option>
+                </select>
+            </div>
+
+            <div class="cs-wrapper pull-left m-r-10">
+                <div class="checkbox check-success">
+                    <input type="checkbox" checked="checked" name="datatyle" value="SmsMark" id="checkbox1">
+                    <label for="checkbox1">短信</label>
+                    <input type="checkbox" value="MobileMark" name="datatyle" id="checkbox2">
+                    <label for="checkbox2">移动端</label>
+                    <input type="checkbox" value="WebMark" name="datatyle" id="checkbox3">
+                    <label for="checkbox3">主站</label>
+                    <input type="checkbox" value="EmailMark" name="datatyle" id="checkbox4">
+                    <label for="checkbox4">邮件</label>
+                </div>
+            </div>
+
+            <div style="float: left; margin-right: 10px; width: 80px">
+                <input class="form-control" type="text" placeholder="名称" name="name" id="name">
+            </div>
+
+            <button type="button" value="select" class="btn btn-default btn-inquire" onclick=" GetMsgRuleList(1) ">查询</button>
+
+            <div class="clearfix"></div>
+        </div>
+    </div>
+    
+    <div class="panel-body no-padding">
+        <div class="table-responsive" id="ruleList">
+            <table class="table table-hover table-condensed  no-footer">
+                <thead>
+                    <tr>
+                        
+                        <th class="text-center" style="width: 45px">目的</th>
+                        <th class="text-center" style="width: 120px">名称</th>
+                        <th class="text-center" style="width: 250px">发送渠道</th>
+                        <th class="text-center" style="width: 350px">内容预览</th>                        
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <div class="dataTables_wrapper" id="ListPageHtml">
+                <div class="dataTables_paginate pagination pull-right">
+                    <ul><li class="prev disabled"><a href="javascript:void(0)"><i class="pg-arrow_left"></i></a></li><li class="active"><a href="javascript:void(0)">1</a></li><li class="next disabled"><a href="javascript:void(0)"><i class="pg-arrow_right"></i></a></li></ul>
+                </div>
+                <div class="dataTablePagText m-l-30"></div>
+            </div>
+            <input type="hidden" id="pageIndex" value="" />
+        </div>
+    </div>
+</div>
+
+<script type="text/html" id="RuleListScript">
+    {{if data.length < 1 }}
+    <tr><td colspan="4" class="DataNull">没有找到对应消息规则</td></tr>
+    {{/if}}
+    {{each data}}
+    <tr>
+        <td align="center">
+            <span title="{{$value.MissionTarget}}">{{$value.MissionTarget}}</span>
+        </td>
+        <td align="center">
+            <span title="{{$value.MissionName}}">{{$value.MissionName}}</span>
+        </td>
+
+        <td align="center">
+            {{if $value.SmsMark==1}}
+            <span>短信&nbsp;</span>
+            {{/if}}
+            {{if $value.MobileMark==1}}
+            <span>移动端&nbsp;</span>
+            {{/if}}
+            {{if $value.WebMark==1}}
+            <span>站内&nbsp;</span>
+            {{/if}}
+            {{if $value.EmailMark==1}}
+            <span>邮件&nbsp;</span>
+            {{/if}}
+        </td>
+                
+        {{if $value.MobileContent!=""}}
+        <td align="center">
+            <span rel="{{$value.MobileContent}}" style="cursor:pointer" class="msgContent">{{$value.MobileTitle}}</span>
+        </td>
+        {{else if $value.WebContent!=""}}
+        <td align="center">
+            <span rel="{{$value.WebContent}}" st style="cursor:pointer" class="msgContent">{{$value.WebTitle}}</span>
+        </td>
+        {{else if $value.SmsContent!=""}}
+        <td align="center">
+            <span rel="{{$value.SmsContent}}" st style="cursor:pointer" class="msgContent">短信无标题</span>
+        </td>
+        {{else if $value.EmailContent!=""}}
+        <td align="center">
+            <span rel="{{$value.EmailContent}}" style="cursor:pointer" class="msgContent">{{$value.EmailTitle}}</span>
+        </td>
+        {{/if}}
+        
+    </tr>
+    {{/each}}
+</script>
+
+
+@section Scripts{
+    @Scripts.Render("~/js/begin/form")
+    <script src="~/Scripts/plugins/artTemplate/template.js"></script>
+    <script src="~/Scripts/plugins/qtip/jquery.qtip.min.js"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function() {
+            GetMsgRuleList(1);
+        });
+
+//pageIndex, int ruleType, string sendMethod, string name, string target
+        function GetMsgRuleList(page) {
+            var url = "/MessageSending/GetMsgRuleList";
+            var postJson = {};
+
+            postJson["pageIndex"] = page;
+
+            var columnList = $(".msgRule .checkbox input:checkbox:checked");
+            var column = new Array();
+            $.each(columnList, function(i, n) {
+                column.push(n.value);
+            });
+
+            if (column.length > 0) {
+                postJson["sendMethod"] = column.join(",");
+            } else {
+                postJson["sendMethod"] = "";
+            }
+            postJson["ruleType"] = $("#ruleType").val();
+            postJson["target"] = $("#ruleTarget").val();
+            postJson["name"] = $("#name").val();
+
+            $.doAjax(url, postJson, function(msg) {
+                if (msg != "null" && msg != "") {
+                    var json = $.parseJSON(msg);
+
+                    $("#ruleList table tbody").html(template("RuleListScript", { "data": json.dataList }));
+
+                    if (page == 1) {
+                        $("#ListPageHtml").attr("rowcount", json.count).attr("maxpage", json.maxPage);
+                        $("#ListPageHtml .dataTablePagText").html("共" + json.count + "条");
+                    }
+                    var pageHtml = $.listPageHtml(page, $("#ListPageHtml").attr("maxpage"), "GetMsgRuleList", 5);
+                    $("#pageIndex").val(page);
+                    $("#ListPageHtml .dataTables_paginate").html(pageHtml);
+
+                    ShowMsgListTips();
+                }
+            }, true);
+        }
+
+        function ShowMsgListTips() {
+            $(".msgContent").qtip({
+                content: {
+                    attr: 'rel'
+                },
+                position: {
+                    my: 'left center',
+                    at: 'right center'
+                },
+                show: {
+                    solo: true
+                },
+                style: {
+                    classes: 'ui-tooltip-shadow ui-tooltip-light'
+                }
+
+            });
+        }
+    </script>
+}
+
+
+
+
+

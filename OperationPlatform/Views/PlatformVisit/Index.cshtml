@@ -1,0 +1,148 @@
+﻿@{
+    ViewBag.Title = "日常回访任务";
+} @section Style{
+
+    @Styles.Render("~/style/form")
+}
+<div class="page-where visitWhere" style=" margin-top:10px;">
+    <div class="page-where-left">
+        <div class="form-group  whereitem">
+            <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" id="TaskStatus" onchange="GetTaskList(1)" style="width:100px">
+                <option value="0">未处理</option>
+                <option value="3">处理成功</option>
+                <option value="2">处理延后</option>
+                <option value="1">任务占用</option>
+            </select>
+        </div>
+        <div class="form-group  whereitem">
+            <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" id="TaskLevel" onchange="GetTaskList(1)" style="width:100px">
+                <option value="all">重要性</option>
+                <option value="0">马上处理</option>
+                <option value="1">特别紧急</option>
+                <option value="2">非常紧急</option>
+                <option value="3">紧急</option>
+                <option value="4">急</option>
+                <option value="5">一般</option>
+                <option value="6">普通</option>
+            </select>
+        </div>
+        <div class="form-group  whereitem">
+            <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" id="TaskSource" onchange="GetTaskList(1)" style="width:100px">
+                <option value="all">信息来源</option>
+                <option value="前台反馈">前台反馈</option>
+                <option value="安卓">安卓</option>
+                <option value="IOS">IOS</option>
+                <option value="系统">系统推荐</option>
+                <option value="商城反馈">商城反馈</option>
+                <option value="论坛反馈">论坛反馈</option>
+            </select>
+        </div>
+        
+
+
+        <div class="clear"></div>
+    </div>
+</div>
+<div class="row column-seperation">
+    <table class="table table-hover table-condensed  no-footer table-border-right" id="ListTable">
+        <thead>
+        <tr>
+            <th style="width: 200px;">店铺名称 </th>
+            <th style="width: 300px;">回访原因</th>
+            <th style="width: 100px;" class="text-center">重要性</th>
+            <th style="width: 110px;" class="text-center">任务状态</th>
+            <th style="width: 120px;" class="text-center">录入时间</th>
+            <th style="width: 120px;" class="text-center">来源</th>
+            <th style="width: 120px;" class="text-center">操作</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <div class="dataTables_wrapper" id="ListPageHtml">
+        <div class="dataTables_paginate pagination">
+            <ul><li class="prev disabled"><a href="javascript:void(0)"><i class="pg-arrow_left"></i></a></li><li class="active"><a href="javascript:void(0)">1</a></li><li class="next disabled"><a href="javascript:void(0)"><i class="pg-arrow_right"></i></a></li></ul>
+        </div>
+        <div class="dataTablePagText"></div>
+    </div>
+
+</div>
+
+<div style="display: none;" id="closeReason">
+    <div class="panel-body">
+        <div class="row m-b-5">
+            关闭理由:
+        </div>
+        <div class="row m-t-0">
+            <textarea id="visitCloseReason" rows="5" cols="100%" style="width: 297px; height: 103px;" class="b-grey m-b-10" name="context"></textarea>
+        </div>        
+    </div>
+</div>
+
+<script type="text/html" id="TaskListScript">
+    {{each listData}}
+    <tr class="odd" role="row">
+        <td class="v-align-middle">{{$value.CompanyName}}【{{$value.accountid}}】</td>
+        <td class="v-align-middle" title="{{#$value.t_mk}}"> {{#$value.t_mk}}</td>
+        <td class="v-align-middle text-center">{{#$value.dt_Level | $levHtml}}</td>
+        <td class="v-align-middle text-center">{{$value.dt_Status | $StatusHtml:$value.dt_Name}}</td>
+        <td class="v-align-middle text-center">{{$value.inertTime}}</td>
+        <td class="v-align-middle text-center">{{$value.dt_Source}}</td>
+        <td class="v-align-middle">
+            <a href="/shopinfo/index/{{$value.accountid}}?td={{$value.id}}" target="_blank">回访</a> |
+            <a href="javascript:void(0)" onclick="CloseVisit('{{$value.id}}','{{$value.accountid}}')">关闭</a>
+        </td>
+    </tr>
+    {{/each}}
+</script>
+@section Scripts{
+    @Scripts.Render("~/js/begin/form")
+<script src="~/Scripts/plugins/artTemplate/template.js"></script>
+<script src="~/Scripts/PlatformVisit/index.js"></script>
+    <script type="text/javascript">
+
+        var timeOut = 0;
+        $(function() {
+            GetTaskList(1);
+        });
+
+        template.helper('$StatusHtml', function (Status, Name) {
+            if (Name == null) {
+                Name = "";
+            }
+            switch (Status) {
+                case 0:
+                    return "正常";
+                case 1:
+                    return "占用[" + Name + "]";
+                case 2:
+                    return "处理延后";
+                case 3:
+                    return "完成";
+                default:
+                    return "未知";
+            }
+        });
+
+        template.helper('$levHtml', function (content) {
+            var num = Number(content);
+            if (num > 80) {
+                return "普通";
+            } else if (num > 70) {
+                return "一般";
+            } else if (num > 50) {
+                return "急";
+            } else if (num > 30 && num <= 50) {
+                return "紧急";
+            } else if (num <= 30 && num > 20) {
+                return "非常紧急";
+            } else if (num <= 20 && num > 10) {
+                return "特别紧急";
+            } else if (num <= 10) {
+                return "<font color='red'>马上处理</font>";
+            } else {
+                return content;
+            }
+        });
+
+    </script>
+}

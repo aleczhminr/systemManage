@@ -1,0 +1,124 @@
+﻿
+@{
+    ViewBag.Title = "积分商城兑换记录";
+}
+
+<div class="page-where integralInput" style="margin-top: 10px;">
+    <div>
+        <div class="pull-left">
+            <div class="page-where-time-input  whereitem" id="insertTime">
+                <div class="input-daterange input-group">
+                    <input type="text" placeholder="统计时间" class="input-sm form-control min-height-37" name="start" id="dateTime" value=""/>
+                </div>
+            </div>
+
+            <button type="button" value="select" class="btn btn-default btn-inquire" onclick=" GetIntegralStat() ">查询</button>
+            <button type="button" value="select" class="btn btn-default btn-inquire" onclick=" AddStat() ">提交统计</button>
+            <div class="clear"></div>
+        </div>
+        <input type="hidden" id="displayOrder" value="">
+        <div class="clear"></div>
+    </div>
+</div>
+
+<div class="integralTable col-md-6">
+    <table class="table table-hover bg-white b-a b-grey">
+        <thead>
+            <tr>
+                <th class="v-align-middle text-center">商品名称</th>
+                <th class="v-align-middle text-center">兑换数</th>
+                <th class="v-align-middle text-center" width="120">访问数</th>
+                <th class="v-align-middle text-center">兑换率</th>
+            </tr>
+        </thead>
+        <tbody id="bodyData"></tbody>
+    </table>
+</div>
+
+<script type="text/html" id="ListTableScript">
+    {{each list}}
+    <tr class="m-b-20">
+        <td class="v-align-middle p-l-30">{{$value.ProductName}}</td>
+        <td class="v-align-middle text-center" id="{{$value.ProductId}}_exchange">
+            {{$value.ExchangeNum}}
+        </td>
+
+        <td class="v-align-middle text-center">
+            <input type="text" value="{{$value.VisitNum}}" class="form-control" update id="{{$value.ProductId}}" @*onkeyup="ChangeRatio('{{$value.ProductId}}')*@" />
+        </td>
+        <td class="v-align-middle text-center" id="{{$value.ProductId}}_ratio">
+            {{$value.Ratio}}%
+        </td>
+
+    </tr>
+    <hr />
+    {{/each}}
+</script>
+
+@section Scripts{
+    @Scripts.Render("~/js/begin/form")
+    <script src="~/Scripts/plugins/artTemplate/template.js"></script>
+    <script src="~/Scripts/IntegralManage/Integral.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('.integralInput .input-daterange').datepicker();
+            $("#dateTime").val(getNowFormatDate());
+            var date = $("#dateTime").val();
+            GetIntegralProduct(date);
+
+        });
+
+        function GetIntegralStat() {
+            var date = $("#dateTime").val();
+            GetIntegralProduct(date);
+        }
+
+        function ChangeRatio(productId) {
+            var exchangeNum = $("#" + productId + "_exchange").val();
+            var visitNum = $("#" + productId).val();
+
+            if (visitNum != "") {
+                $("#" + productId + "_ratio").val(changeTwoDecimal(parseInt(exchangeNum) / parseInt(visitNum)) + "%");
+            }
+        }
+
+        function changeTwoDecimal(x) {
+            var f_x = parseFloat(x);
+            if (isNaN(f_x)) {
+                return x;
+            }
+            var f_x = Math.round(x * 100) / 100;
+
+            return f_x;
+        }
+
+        function AddStat() {
+            var postJson = {};
+            var dic = {};
+
+            $("#bodyData tr input[update]").each(function () {
+                var itemObj = $(this);
+                dic[itemObj.attr("id")] = itemObj.val();
+            });
+
+            postJson["dataDic"] = JSON.stringify(dic);
+            postJson["dateTime"] = $("#dateTime").val();
+
+            console.log(postJson);
+            var url = "/IntegralManage/AddStat";
+
+            $.doAjax(url, postJson, function(msg) {
+                if (msg != "") {
+                    alert("更新成功！");
+
+                } else {
+                    alert("更新出错！");
+                }
+            }, true);
+
+        }
+
+
+    </script>
+}

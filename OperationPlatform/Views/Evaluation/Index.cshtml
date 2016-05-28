@@ -1,0 +1,267 @@
+﻿@{
+    ViewBag.Title = "用户商品评论管理";
+}
+@section Style{
+    @Styles.Render("~/style/form")
+}
+
+<div class="panel">
+    <div class="panel-heading page-where orderWhere">
+        <div class="panel-title">
+
+            <div class="cs-wrapper pull-left m-r-10">
+                <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" name="productType" id="productType">
+                    <option value="-99">商品类别</option>
+                    <option value="1">虚拟商品</option>
+                    <option value="2">实物商品</option>
+                    <option value="3">小京东（暂未开放）</option>
+                </select>
+            </div>
+
+            <div class="cs-wrapper pull-left m-r-10">
+                <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" name="displayType" id="displayType">
+                    <option value="-99">评论是否显示</option>
+                    <option value="0">显示</option>
+                    <option value="1">未处理</option>
+                    <option value="2">不显示</option>
+                </select>
+            </div>
+            <input type="hidden" id="timeType" value="" name="timePeriod" />
+            <div class="btn-group page-where-othertime" style="float: left; margin-right: 10px">
+                <div class="page-where-time-input">
+                    <div class="input-daterange input-group">
+                        <input type="text" class="input-sm form-control" placeholder="评论时间" name="start">
+                        <span class="input-group-addon">to</span>
+                        <input type="text" class="input-sm form-control" placeholder="评论时间" name="end">
+                    </div>
+                </div>
+            </div>
+            <div style="float: left; margin-right: 10px; width: 120px">
+                <input class="form-control" type="text" placeholder="订单号" style="ime-mode:disabled" onkeyup=" this.value=this.value.replace(/\D/gi,'')" name="evaluationID" id="evaluationID">
+            </div>
+            <div style="float: left; margin-right: 10px; width: 120px">
+                <input class="form-control" type="text" placeholder="商品ID" style="ime-mode:disabled" onkeyup="this.value=this.value.replace(/\D/gi,'')" name="busId" id="busId">
+            </div>
+            <div style="float: left; margin-right: 10px; width: 80px">
+                <input class="form-control" type="text" placeholder="店铺ID" style="ime-mode:disabled" onkeyup="this.value=this.value.replace(/\D/gi,'')" name="accId" id="accId">
+            </div>
+            <button type="button" value="select" class="btn btn-default btn-inquire" onclick=" GetEvaluationRecordList(1) ">查询</button>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+
+    <div class="panel-body no-padding">
+        <div class="table-responsive">
+            <table class="table table-hover table-detailed dataTable" id="ListTable">
+                <thead>
+                    <tr>
+                        <th class="text-center width60">评论编号 </th>
+                        <th class="text-center width80">商铺名称</th>
+                        <th class="text-center width80">商品类别</th>
+                        <th class="text-center width80">商品名称</th>
+                        <th class="text-center width60">商品ID</th>
+                        <th class="text-center ">评论内容</th>
+                        <th class="text-center width60">评论分数</th>
+                        <th class="text-center width60">是否显示</th>
+                        <th class="text-center width80">评论时间</th>
+                        <th class="text-center width80">评论备注</th>
+                        <th class="text-center width60">操作</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <div class="dataTables_wrapper m-t-10" id="ListPageHtml">
+                <div class="dataTables_paginate pagination no-padding">
+                    <ul>
+                        <li class="prev disabled">
+                            <a href="javascript:void(0)">
+                                <i class="pg-arrow_left"></i>
+                            </a>
+                        </li>
+                        <li class="active">
+                            <a href="javascript:void(0)">1</a>
+                        </li>
+                        <li class="next disabled">
+                            <a href="javascript:void(0)">
+                                <i class="pg-arrow_right">
+                                </i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="dataTablePagText p-l-20"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div style="display: none;">
+    <div id="confirmShowDiv" style="width: 300px;">
+        <table class="table table-bordered removeBottom">
+            <tr>
+                <th id="content" style="line-height: 60px; text-align: center;"></th>
+            </tr>
+            <tr>
+                <td>
+                    <button id="btnConfirm" class="btn btn-success btn-sm m-l-10 pull-left m-r-10" data-toggle="modal" data-target="#modalSlideUp" onclick=" "></button>
+                    <button id="btnCancel" class="btn btn-sm m-l-10 pull-right m-r-10" data-toggle="modal" data-target="#modalSlideUp" onclick=" "></button>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+<script type="text/html" id="ListTableScript">
+    {{each list}}
+    <tr class="odd" role="row">
+        <td class="v-align-middle text-center">
+            {{$value.id}}
+        </td>
+        <td class="v-align-middle text-center">
+            <a href="/shopinfo/index/{{$value.accid}}" target="_blank" title="{{$value.accountName}}">{{$value.accountName}}</a>
+        </td>
+        {{if $value.productType=="1"}}
+        <td class="v-align-middle text-center">虚拟商品</td>
+        {{else if $value.productType=="2"}}
+        <td class="v-align-middle text-center">实物</td>
+        {{else if $value.productType=="4"}}
+        <td class="v-align-middle text-center">电话卡</td>
+        {{/if}}
+        <td class="v-align-middle text-center">{{$value.productName}}</td>
+        <td class="v-align-middle text-center">{{$value.productID}}</td>
+        <td class="v-align-middle">{{$value.content}}</td>
+        <td class="v-align-middle text-center">{{$value.score}}</td>
+        <td class="v-align-middle text-center">{{$value.statusName}}</td>
+        <td class="v-align-middle text-center">{{$value.createTime}}</td>
+        <td class="v-align-middle text-center">{{$value.remark}}</td>
+        <td class="v-align-middle text-center">
+            <button id="btn_isDisplay" class="btn btn-success btn-sm m-l-10" data-toggle="modal" data-target="#modalSlideUp" name="{{$value.id}}" onclick=" changeStatus({{$value.id}},{{$value.isDisplay}}) ">
+                {{if $value.isDisplay=="0"}}
+                隐藏
+                {{else if $value.isDisplay=="1"}}
+                操作
+                {{else if $value.isDisplay=="2" }}
+                显示
+                {{/if}}
+            </button>
+        </td>
+    </tr>
+    {{/each}}
+</script>
+
+<script src="~/Scripts/plugins/artTemplate/template.js"></script>
+
+@section Scripts{
+    @Scripts.Render("~/js/begin/form")
+    <script type="text/javascript">
+        $(function () {
+            $('.orderWhere .input-daterange').datepicker({ format: 'yyyy-mm-dd' });
+            GetEvaluationRecordList(1);
+        });
+
+        function GetEvaluationRecordList(pageIndex) {
+            var postJson = {};
+            var productType = $("#productType").val();
+            var displayType = $("#displayType").val();
+            var accId = $("#accId").val();
+            var busId = $("#busId").val();
+            var evaluationID = $("#evaluationID").val();
+            var statTime = $(".orderWhere input[name='start']").val();
+            var endTime = $(".orderWhere input[name='end']").val();
+
+            var stDate = new Date();
+            var edDate = new Date();
+            if (statTime.length === 0 && endTime.length === 0) {
+                postJson["start"] = stDate.toLocaleDateString();
+                postJson["end"] = edDate.toLocaleDateString(-1);
+            } else {
+                if (statTime.length > 0) {
+                    postJson["start"] = statTime;
+                } else {
+                    postJson["start"] = stDate.toLocaleDateString();
+                }
+                if (endTime.length > 0) {
+                    postJson["end"] = endTime;
+                } else {
+                    postJson["end"] = edDate.toLocaleDateString();
+                }
+            }
+            postJson["pageIndex"] = pageIndex;
+            postJson["busId"] = busId;
+            postJson["productType"] = productType;
+            postJson["displayType"] = displayType;
+            postJson["accId"] = accId;
+            postJson["evaluationID"] = evaluationID;
+            //console.log(postJson);
+            var url = "/Evaluation/getEvaluationRecord";
+
+            $.doAjax(url, postJson, function (msg) {
+                //console.log(msg);
+                if (msg != "") {
+                    var json = jQuery.parseJSON(msg);
+                    console.log(json);
+                    $("#ListTable tbody").html(template("ListTableScript", { "list": jQuery.parseJSON(json.list) }));
+
+                    if (pageIndex == 1) {
+                        $("#ListPageHtml").attr("rowcount", parseInt(json.RowCount)).attr("maxpage", parseInt(json.PageCount));
+                        $("#ListPageHtml .dataTablePagText").html("共" + parseInt(json.RowCount) + "条");
+                    }
+                    var pageHtml = $.listPageHtml(pageIndex, $("#ListPageHtml").attr("maxpage"), "GetEvaluationRecordList", 5);
+                    $("#ListPageHtml .dataTables_paginate").html(pageHtml);
+                }
+            }, true);
+        }
+
+        function changeStatus(id, type) {
+            var contentText = "";
+            var btnConfirmText = "确认本次操作";
+            var btnCancelText = "取消本次操作";
+            if (type=="0") {
+                contentText = "隐藏本条评论";
+                $("#confirmShowDiv #btnConfirm").attr('onclick', 'postStatus(' + id + ', 2)');
+            }
+            else if(type=="1"){
+                contentText = "请对本条评论操作";
+                btnConfirmText = "显示本条评论";
+                btnCancelText = "隐藏本条评论";
+                $("#confirmShowDiv #btnConfirm").attr('onclick', 'postStatus(' + id + ', 0)');
+                $("#confirmShowDiv #btnCancel").attr('onclick', 'postStatus(' + id + ', 2)');
+            }
+            else if (type=="2") {
+                contentText = "显示本条评论";
+                $("#confirmShowDiv #btnConfirm").attr('onclick', 'postStatus(' + id + ', 0)');
+            }
+            else {
+                return false;
+            }
+            $("#confirmShowDiv #content").html(contentText);
+            $("#confirmShowDiv #btnConfirm").html(btnConfirmText);
+            $("#confirmShowDiv #btnCancel").html(btnCancelText);
+            dialog({
+                id: "confirmShow",
+                title: "操作本条评论",
+                lock: true,
+                background: '#fff', // 背景色
+                opacity: 0.5, // 透明度
+                content: document.getElementById("confirmShowDiv"),
+            }).showModal();
+        }
+
+        function postStatus(id, status) {
+            var postJson = {};
+            postJson["evaluationid"] = id;
+            postJson["status"] = status;
+            var url = "/Evaluation/UpdateEvaluation";
+            $.doAjax(url, postJson, function (msg) {
+                if (msg == "1") {
+                    dialog({
+                        content: '评论显示修改成功',
+                        quickClose: true // 点击空白处快速关闭
+                    }).show();
+                    GetEvaluationRecordList(1);
+                    dialog.list['confirmShow'].close();
+                } else {
+                    alert("评论显示修改处理失败，请联系技术人员");
+                }
+            }, true);
+        }
+    </script>
+}

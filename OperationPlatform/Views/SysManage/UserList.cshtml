@@ -1,0 +1,230 @@
+﻿@{
+    ViewBag.Title = "用户管理";
+}
+@section Style{
+    @Styles.Render("~/style/form")
+}
+<div class="panel">
+    <!-- 容器标题 -->
+    <div class="panel-heading">
+        <!-- 控制组  查询条件位置 -->
+        <div class="panel-controls">
+            <button class="btn btn-complete btn-cons" onclick=" AddManageUser() ">增加账号</button>
+        </div>
+    </div>
+    <!-- 控件容器 -->
+    <div id="UserListListTable" class="panel-body">
+        <!-- 表格本体 -->
+        <table class="table table-hover UserListTableId"></table>
+        <!-- 分页信息 -->
+        <div class="dataTables_wrapper AccountListPageHtmlId" id="ListPageHtml">
+            <div class="dataTablePagText dataTables_info"></div>
+            <div class="dataTables_paginate paging_bootstrap pagination">
+                <ul>
+                    <li class="prev disabled">
+                        <a href="javascript:void(0)">
+                            <i class="pg-arrow_left"></i>
+                        </a>
+                    </li>
+                    <li class="active">
+                        <a href="javascript:void(0)">1</a>
+                    </li>
+                    <li class="next disabled">
+                        <a href="javascript:void(0)">
+                            <i class="pg-arrow_right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="" id="AddDailyCheckDiv" style=" display:none;">
+    <div class="" style="width:300px;">
+        <div class="form-group">
+            <label>登录账号</label>
+            <input class="form-control" type="email" required="" id="userAccount">
+        </div>
+        <div class="form-group">
+            <label>登录密码</label>
+            <input class="form-control" type="email" required="" id="PassWord">
+        </div>
+        <div class="form-group">
+            <label>姓名</label>
+            <input class="form-control" type="email" required="" id="userName">
+        </div>
+        <div class="form-group">
+            <label>电话</label>
+            <input class="form-control" type="email" required="" id="userPhone">
+        </div>
+        <div class="form-group">
+            <label>权限</label>
+            <div>
+                <select id="Psession">
+                    <option value="2">客服</option>
+                    <option value="4">运营</option>
+                    <option value="5">普通客服</option>
+                    <option value="6">客服管理</option>
+                    <option value="7">普通运营</option>
+                    <option value="8">客服运营</option>
+                    <option value="9">临时权限</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script type="text/html" id="UserListListScript">
+    <table class="table table-hover AccountListTableId">
+        <thead>
+            <tr>
+                <th>序号</th>
+                <th>登录账号</th>
+                <th>用户名称</th>
+                <th class="text-center">电话</th>
+                <th class="text-center">部门</th>
+                <th class="text-center">登录次数</th>
+                <th class="text-center">最后登录时间</th>
+                <th class="text-center">状态</th>
+                <th class="text-center">操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{each listData}}
+            <tr>
+                <td class="v-align-middle">{{$value.Id}}</td>
+                <td class="v-align-middle">{{$value.UserName}}</td>
+                <td class="v-align-middle">{{$value.name}}</td>
+                <td class="text-center v-align-middle">{{$value.phone}}</td>
+                <td class="text-center v-align-middle">{{$value.P_sesionName}}</td>
+                <td class="text-center v-align-middle">{{$value.LoginCounter}}</td>
+                <td class="text-center v-align-middle">{{$value.LastLoginTime}}</td>
+                <td class="text-center v-align-middle">{{$value.state | stateFormat}}</td>
+                <td class="text-center v-align-middle">
+                    {{if $value.state==1}}
+                    <a href="javascript:void(0)" onclick="CloseAccount({{$value.Id}})">关闭账号</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                    <a href="javascript:void(0)" onclick="UpdatePermission({{$value.Id}})">修改权限</a>
+                    {{/if}}
+                </td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</script>
+
+@section Scripts{
+    @Scripts.Render("~/js/begin/form")
+    <script src="~/Scripts/plugins/artTemplate/template.js"></script>
+
+    <script type="text/javascript">
+        $(function(){
+            GetUserList(1);
+        });
+
+        function GetUserList(page){
+            var url="/SysManage/GetUserList";
+
+            var postJson={};
+            postJson["page"]=page;
+            postJson["uname"]="";
+
+            $.doAjax(url,postJson,function(msg){
+                if (msg != "null" && msg != "") {
+                    var json = $.parseJSON(msg);
+                    $("#UserListListTable table").replaceWith(template("UserListListScript", json));
+                    if (page == 1) {
+                        $("#ListPageHtml").attr("rowcount", json.rowCount).attr("maxpage", json.maxPage);
+                        $("#ListPageHtml .dataTablePagText").html("共" + json.rowCount + "条");
+                    }
+                    var pageHtml = $.listPageHtml(page, $("#ListPageHtml").attr("maxpage"), "GetUserList", 5);
+                    $("#ListPageHtml .dataTables_paginate").html(pageHtml);
+
+                }
+            },true);
+        }
+        template.helper('stateFormat', function (state) {
+            if(state==1){
+                return "正常";
+            }else{
+                return "已关闭";
+            }
+        });
+
+        function CloseAccount(id){
+            dialog({
+                title: '确认关闭账号',
+                content: '您确认要关闭此账号吗？',
+                ok: function () {
+                    var url="/SysManage/CloseAccount/" + id;
+                    $.doAjax(url,null,function(msg){
+                        if(msg=="1"){
+                            alert("关闭账号成功");
+                            GetUserList(1);
+                        }else{
+                            alert("关闭账号失败");
+                        }
+                    },true);
+                },
+                okValue: '确认',
+                cancel: function () {
+                },
+                cancelValue:"取消"
+            }).show();
+
+
+
+        }
+        function UpdatePermission(id){
+            window.location.href="/SysManage/SetPermission/" + id;
+        }
+
+
+
+        function AddManageUser(){
+            dialog({
+                title:"新增账号",
+                content: document.getElementById("AddDailyCheckDiv"),
+                icon: 'question',
+                okValue: "保存账号",
+                ok: function () {
+                    SaveManageUser();
+                },
+                cancelValue: '关闭',
+                cancel: true //为true等价于function(){}
+            }).showModal();
+        }
+
+        function SaveManageUser(){
+            var postJson={};
+            postJson["account"]=$("#userAccount").val();
+            postJson["pw"]=$("#PassWord").val();
+            postJson["name"]=$("#userName").val();
+            postJson["phone"]=$("#userPhone").val();
+            postJson["session"]=$("#Psession").val();
+
+            var url="/SysManage/AddAccount";
+            $.doAjax(url,postJson,function(msg){
+
+                if(msg>4){
+                    alert("录入成功");
+                    GetUserList(1);
+                }else if(msg==1){
+                    alert("请输入登录账号");
+                }else if(msg==2){
+                    alert("请输入登录账号");
+                }else if(msg==3){
+                    alert("请输入登录账号");
+                }else if(msg==4){
+                    alert("请输入登录账号");
+                }else{
+                    alert("请输入登录账号");
+                }
+
+            },true);
+
+        }
+    </script>
+
+}

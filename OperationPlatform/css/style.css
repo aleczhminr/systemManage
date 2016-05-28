@@ -1,0 +1,452 @@
+/*
+
+* Own styles here
+
+*/
+
+* {
+	font-family: "Microsoft Yahei","微软雅黑","Hiragino Sans GB", "WenQuanYi Micro Hei", Verdana, Arial;
+}
+
+.text-key{
+  color: #ff6600;
+}
+
+.text-status-active {
+
+}
+
+.text-status-inactive {
+
+}
+.table tbody tr td:first-child {
+  /*padding: 8px 18px;*/
+}
+
+.table tbody tr td {
+  padding: 8px 10px;
+  line-height: 30px;
+  height: 30px;
+}
+
+ .cur-p {
+  cursor: pointer;
+ }
+.clear{clear:both}
+.clear:before, .clear:after{
+  display: table;
+  content: " ";
+  }
+.list-inline > li.active {
+	background-color: #e6e6e6;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	-ms-border-radius: 5px;
+	-o-border-radius: 5px;
+	border-radius: 5px;
+}
+#nvd3-date svg, 
+#nvd3-reg svg, 
+#nvd3-sales svg, 
+#nvd3-mem svg, 
+#nvd3-sku svg, 
+#nvd3-sms svg, 
+#nvd3-orders svg {
+  height: 500px;
+}
+
+#bullet_act svg,
+#bullet_sales svg,
+#bullet_mem svg,
+#bullet_goods svg {
+	margin-left: 20px;
+}
+
+.dataTablePagText{font-size:12px;margin-left: 20px;}
+
+.LoadingBackground{}
+.LoadingProgressBar{
+position: absolute;
+top: 40px;
+left: 45%;
+z-index: 99999;
+background-color: #FFFEB4;
+border: 1px solid #F9E67F;
+background: #FFFFE1;
+line-height: 25px;
+text-align: center;
+color: #918300;
+width: 160px;
+}
+.text-center{text-align:center}
+.progress .determinate {
+top: 0;
+bottom: 0;
+height: 5px;
+line-height: 5px;
+background-color: #42A5F5;
+-webkit-transition: width .3s linear;
+transition: width .3s linear;
+}
+/*.page-container .page-content-wrapper{background-color:#fff;}
+body.menu-pin .page-container .page-content-wrapper .content {padding-left:270px; padding-right:20px;}*/
+/*.page-container .page-content-wrapper .content{padding-left:20px; padding-right:20px;}*/
+
+.ButtonList{padding:20px 0px}
+
+.row100{width:100px;}
+
+.contentShow{}
+.contentShow .td{ width:auto;}
+.contentShow .titleLabel{ display:inline-block;  margin-left:5px; margin-right:5px; min-width:100px;}
+.contentShow .txtRight{text-align:right; min-width:80px;}
+.contentShow .itemList{width:300px; float:left;}
+ .help {
+font-size: 12px;
+color: rgba(98,98,98,.55);
+}
+ 
+.contentShow.companyAddress{}
+.contentShow.companyAddress .itemList{width:auto; padding-left:10px;}
+.contentShow.companyAddress .itemList .titleLabel{width:auto;}
+.ShopSetConfig{ float:right;margin-right:20px;margin-top: 9px;}
+
+.nav-tabs~.tab-conten-padding0{padding:0px;}
+
+.page-where{ margin-top: 10px; margin-bottom: 10px;}
+.page-where-othertime{}
+.page-where-othertime .input-sm{height:35px;}
+.page-where-othertime  .input-daterange,.whereitem .input-daterange{width:230px;}
+/*.border-right0{border-right-width:0px;}*/
+.page-where .btn-select{
+	background-color: #f0f0f0;
+	border-color: #e6e6e6;
+	color: #2c2c2c;
+}
+.page-where  .btn-group>.btn.btn-inquire{
+	margin-left:20px;
+	-webkit-border-bottom-left-radius: 3px;
+	-moz-border-bottom-left-radius: 3px;
+	-ms-border-bottom-left-radius: 3px;
+	-o-border-bottom-left-radius: 3px;
+	border-bottom-left-radius: 3px;
+	-webkit-border-top-left-radius: 3px;
+	-moz-border-top-left-radius: 3px;
+	-ms-border-top-left-radius: 3px;
+	-o-border-top-left-radius: 3px;
+	border-top-left-radius: 3px;
+}
+
+.page-where-input{}
+.page-where-time-input {float: left; margin-left: 5px;}
+.page-where .width200,.width200{width:200px;}
+.page-where .width120,.width120{width:120px;}
+.page-where .width80,.width80{width:80px;}
+.page-where .width60,.width60{width:60px;}
+.page-where .page-where-left{ float:left;}
+.page-where .whereitem{ float:left; margin-right: 10px;}
+.page-where .page-where-left .whereitem{
+	float:left;
+	margin-right:20px;
+}
+.page-where .pull-left .whereitem{
+	float:left;
+	margin-right:20px;
+}
+.chartDiv{
+  width:98%;
+  min-height:450px;
+  border: 1px solid #ddd;
+  margin-top:10px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.chartDiv.no-b{
+  border: none;
+}
+
+.pirChartDiv {
+    width:98%;
+	min-height:300px;
+	margin-top:10px;
+}
+
+ div.cs-skin-slide.cs-active .cs-backdrop{box-shadow:none;}
+ .cs-select.cs-active .cs-options{border:1px solid #ccc;}
+  /*.table-border-right{border-left: 1px solid #ddd;border-top: 1px solid #ddd;}*/
+ /*.table-border-right td,.table-border-right th{border-right: 1px solid #ddd; }*/
+ /*.table-border-right tbody tr td,.table.table-border-right thead tr th{padding:10px;}*/
+
+.cs-skin-slide .cs-options {
+    left:0px;
+    -webkit-transform: translate3d(0%,-50%,0);
+    transform: translate3d(0%,-50%,0);
+}
+.whereitem .input-group-addon .cs-backdrop{border-width:0px;} 
+.min-height-37{min-height:37px;}
+.minHeight37{min-height:37px;}
+
+.fs-12 td,.fs-12 th{font-size:12px!important;}
+.disabledTr{color:#ccc}
+.disabledTr a{color:#ccc}
+
+#seachCompany .btn{margin-left: 30px;
+width: 20px;
+min-width: 68px;
+text-align: center;
+margin-right: 0px;
+padding-left: 24px;}
+#seachCompany .cs-backdrop{border-width:0px;}
+
+/*.table tr:nth-child(odd) td {
+  background-color: #f3f5f7;
+}*/
+.DataNull{text-align:center; line-height:30px;}
+
+.table tr td:nth-child(2n+2) {
+  background-color: #fbfbfb;
+}
+
+#orderInfoListTable > tbody > tr.noHover:hover > td{background-color: #fff!important;}
+#orderInfoListTable > tbody > tr:hover > td > table > tbody > tr > td {background-color: #f3f5f7!important;}
+.tableGoTable {
+    border-bottom: 2px solid #ddd;
+    margin-top: 0px;
+    border-top-width: 0px;
+    align-content: center;
+    text-align: center;
+    margin-left: 5%;
+    margin-right: 5%;
+    width: 90%;
+}
+#seachCompany{}
+#seachCompany .btn{
+	margin-left: 30px;
+	width: 20px;
+	min-width: 68px;
+	text-align: center;
+	margin-right: 0px;
+	padding-left: 24px;
+}
+
+#seachCompany .cs-backdrop{border-width:0px;}
+
+.DataNull{
+	text-align:center;
+	line-height:30px;
+}
+.tableGoTable td,.tableGoTable th{text-align:left;}
+
+.table-double-down{
+text-align: center;
+width: 91px;
+margin: 0 auto 0;
+background-color: #fff;
+margin-top: -1px;
+border-bottom: 1px solid rgba(230,230,230,.7);
+border-left: 1px solid rgba(230,230,230,.7);
+border-right: 1px solid rgba(230,230,230,.7);
+cursor:pointer;
+}
+.table.table-hover tbody .noHover:hover td{background-color: #FFF!important;}
+.tableGoTable{
+	border-bottom: 2px solid #ddd;
+	margin-top: 0px;
+	border-top-width: 0px;
+	align-content: center;
+	text-align: center;
+	margin-left: 5%;
+	margin-right: 5%;
+	width: 90%;
+	border-right: 2px solid #ddd;
+	margin-bottom: 40px;
+}
+.tableGoTable td,.tableGoTable th{text-align:left;}
+
+h1, h2, h3, h4, h5, h6,
+.panel .panel-heading .panel-title,
+.page-sidebar .sidebar-menu .menu-items>li ul.sub-menu>li>a,
+.table thead tr th,
+.form-control,
+.btn {
+  font-family: "Microsoft Yahei","微软雅黑","Hiragino Sans GB", "WenQuanYi Micro Hei", Verdana, Arial;
+}
+.margin-right-10 {
+    margin-right: 10px;
+}
+
+.easyPieChart {
+  position: relative;
+  display: inline-block;
+  width: 120px;
+  height: 120px;
+  margin-top: 20px;
+  text-align: center;
+}
+.easyPieChart canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.percent {
+  display: inline-block;
+  line-height: 120px;
+  z-index: 2;
+  font-size: 36px;
+}
+
+.easyPieChart h6 {
+  display: block;
+  font-size: 20px;
+}
+
+.percent:after {
+  font-size: 60px;
+  content: '%';
+  margin-left: 0.1em;
+  font-size: .8em;
+}
+
+.progress-list .status {
+  display: inline-block;
+  background-color: #ebeef2;
+  font-size: 9px;
+  padding: 6px;
+  margin-top: 10px;
+}
+
+.progress {
+  height: 7px;
+  margin-bottom: 4px;
+}
+
+.progress-rotate {
+  -webkit-transform: rotate(270deg);
+  -ms-transform: rotate(270deg);
+  -o-transform: rotate(270deg);
+  transform: rotate(270deg);
+}
+  
+.progress-rotate .progress {
+  width: 110px;
+}
+
+.max-h-3 {
+  max-height: 300px;
+}
+
+.android {
+  color: #99cc33;
+}
+
+.v-align-middle {
+  vertical-align: middle!important;
+}
+
+table.dataTable thead th {
+  border-bottom: 1px solid #e6e6e6!important;
+}
+
+.sink {
+  position: absolute;
+  bottom: 0;
+}
+
+.data-attachment {
+  height: 60px;
+}
+.data-attachment img {
+  margin-top: 8px;
+  margin-right: 10px;
+}
+.table tr.deal-success td {
+    color: #ccc;
+    background-color: #fafafa;
+}
+
+/*.table tr.deal-mobile tr{
+    border: red;
+    border-color: red;
+}*/
+
+.shop-profiles .row {
+  border-bottom: 1px dashed #e6e6e6;
+  margin-bottom: 15px;
+}
+.shop-profiles .row:last-child {
+  margin-bottom: 0;
+}
+.shop-profiles .row p {
+  margin-bottom: 0;
+}
+
+.select-puppet select {
+  height: 35px;
+  padding: 6px 33px 6px 17px;
+  line-height: 23px;
+  border: 1px solid rgba(0,0,0,.07);
+}
+.select-puppet select option {
+  border: 1px solid rgba(0,0,0,.07);
+}
+
+/*metro Js*/
+.data-tile {
+  overflow: hidden;
+  position: relative;
+  height: 100%;
+  z-index: 20;
+}
+.smsReviewArea{
+    min-height: 65px!important;
+}
+
+.smsReviewTitle {
+    font-size: 16px!important;
+    height: 36px!important;
+    line-height: 36px!important;
+    float: left;
+}
+.smsReviewAutoBtn{
+    font-size: 16px!important;
+    height: 36px!important;
+    line-height: 36px!important;
+}
+
+.smsNoticeText {
+    float: left;
+    margin-left: 20px;
+    margin-bottom: 0px;
+}
+
+.smsNoticeText .textTipsDate{
+    color:#999;
+    margin-left:10px;
+}
+.smsNoticeText .textTipsContent {
+    cursor: help;
+}
+.smsNoticeText .textSaveBtn {
+    color: #38A5FC;
+    margin-left: 10px;
+}
+
+.smsNoticeText .close{
+    right: 0px;
+}
+
+.newItem {
+    display:none
+}
+
+.AccountListPageHtmlId ul{margin-bottom:0px;}
+.AccountListPageHtmlId .dataTables_info{margin-top:0px;}
+.AccountListPageHtmlId .pagination{margin-top:0px;}
+.AccountListPageHtmlId .dataTables_paginate.paging_bootstrap.pagination, .dataTables_wrapper.AccountListPageHtmlId  .dataTables_info{margin-top:0px;}
+
+.sysAccounttable .bootstrap-tagsinput {
+  margin-bottom: 0;
+  border: 0!important;
+  background-color: transparent!important;
+  box-shadow: none;
+}

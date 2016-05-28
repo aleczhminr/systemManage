@@ -1,0 +1,23 @@
+﻿
+.ShipmentsShow{
+    width: 300px;
+}
+.ShipmentsShow .ShipmentsItem{
+    line-height: 36px;
+    padding: 5px;
+}
+.ShipmentsShow .ShipmentsItem .title{
+    font-weight: bold;
+    width: 75px;
+    text-align: right;float:left;
+}
+.ShipmentsShow .ShipmentsItem .context{
+  float:left;
+  padding-left: 10px;
+}
+.NullTipe{  font-style: italic;  color: #ccc;}
+
+
+.AuditHtml{width:550px; height:300px;}
+
+#edui_fixedlayer{z-index:99540!important;} 

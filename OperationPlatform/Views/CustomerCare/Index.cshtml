@@ -1,0 +1,74 @@
+﻿@{
+    ViewBag.Title = "客服数据统计";
+}
+@section Style{
+
+    @Styles.Render("~/style/form")
+    <link href="~/css/ShopInfo/ShopInfo.css" rel="stylesheet" />
+    <link href="~/css/plugins/summernote/summernote.css" rel="stylesheet" />
+}
+
+<div class="panel panel-transparent servicestat">
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs nav-tabs-fillup">
+        <li class="active">
+            <a data-toggle="tab" href="#slide1" onclick="PageLoad(0)"><span>客服数据汇总</span></a>
+        </li>
+        <li>
+            <a data-toggle="tab" href="#slide2" onclick="PageLoad(1)"><span>客服订单数据分析</span></a>
+        </li>
+        <li>
+            <a data-toggle="tab" href="#slide3" onclick="PageLoad(2)"><span>回访数据分析</span></a>
+        </li>
+    </ul>
+    <!-- Tab panes -->
+    <div class="tab-content no-padding ">
+        <div class="tab-pane slide-left active pageIndex" id="slide1">
+
+        </div>
+        <div class="tab-pane slide-left pageIndex" id="slide2">
+
+        </div>
+        <div class="tab-pane slide-left pageIndex" id="slide3">
+
+        </div>
+    </div>
+</div>
+
+<input type="hidden" value="@ViewBag.AccId " id="ShopInfo" />
+<input type="hidden" value="@ViewBag.TaskDailyId" id="taskDailyId"/>
+
+@section Scripts{
+    @Scripts.Render("~/js/begin/form")
+    <script src="~/Scripts/plugins/summernote/js/summernote.min.js"></script>
+    <script type="text/javascript">
+    $(function () {
+        PageLoad(0);
+    });
+    function PageLoad(e,postData) {
+        var url = "";
+        var html = $.trim($(".servicestat .tab-content .tab-pane.pageIndex").eq(e).html());
+        if (html != "") {
+            return false;
+        }
+        switch (e) {
+            case 0://客服数据汇总
+                url = "/CustomerCare/ServiceReview";
+                break;
+            case 1://客服订单数据分析
+                url = "/CustomerCare/ServiceOrder";
+                break;
+            case 2://回访数据分析
+                url = "/CustomerCare/VisitAnalyze";
+                break;
+            default:
+                url = "/CustomerCare/ServiceReview";
+                break;
+        }
+
+        $.doAjax(url, postData, function (msg) {
+            $(".servicestat .tab-content .tab-pane.pageIndex").eq(e).html(msg);
+        });
+    }
+    </script>
+}

@@ -1,0 +1,214 @@
+﻿
+ .clear{clear:both;}
+
+  .WhereBody{padding:20px;padding-bottom: 0px;}
+ .WhereItemList{}
+ .WhereItemSliderList{ margin-top:5px;}
+
+ .WhereTitle{float:left; padding:0px 5px; line-height:26px;width: 80px;text-align: right;}
+ .SliderBody {width:500px; float:left;margin-top: 7px;margin-left: 15px;margin-right: 30px;}
+ .MinValue{width:65px; float:left;}
+ .MinValueText{width:50px; padding-left:3px; padding-right:3px}
+ .MaxValue{width:65px; float:left;}
+ .MaxValueText{width:55px; padding-left:3px;padding-right:3px}
+
+ .WhereItemOtherList{ padding-bottom:10px; border-bottom:1px solid #dfdfdf;}
+ .OtherList{padding:3px 5px; margin:5px;  background-color:#eafbfe;color: #000; float:left; border:1px solid #6dc5dc; cursor:pointer;}
+
+ .SelectWhereBody{width: 500px;height:100%;background-color:#FFF;position: fixed;right: 0px;top: 0px;z-index: 1020;overflow: hidden;
+    -moz-box-shadow: -3px 0px 8px rgba(0,0,0,0.1);
+    -webkit-box-shadow: -3px 0px 8px rgba(0,0,0,0.1);
+    box-shadow: -3px 0px 8px 0px rgba(0,0,0,0.1);
+    *border-left: 2px solid #eee; padding-top:20px; }
+
+ .SelectOtherWhere{ padding-top: 10px; padding-left:20px; padding-bottom:10px;}
+ .SelectSliderList {
+    padding-top: 10px;
+    padding-left: 20px;
+    padding-bottom: 10px;
+    max-height: 500px;
+    overflow-y: auto;
+    zoom: 1;
+}
+
+ .SelectWhereBody .SelectWhereTitle{font-weight: bold;border-bottom:1px solid #ccc; padding-left:20px;padding-bottom: 5px;padding-top:5px;cursor:pointer;}
+ .SelectWhereBody .SelectWhereTitle.HideCss {color:#a5a5a5;}
+
+ .SelectList{float:left;padding:5px 8px;border: solid 1px #eee;background: #f9f9f9; margin:5px;color: #000; cursor:pointer;}
+.SelectList:hover{background-color: #0055cc;border-color: #eafbfe;color: #fff;text-decoration: none;}
+
+.SelectListSelect{background-color:#0055cc;color: #fff; border:1px solid #6dc5dc;}
+
+
+.SelectTime{width:350px;line-height: 26px;}
+.SelectTime .MinTime{ float:left;}
+.SelectTime .MinTime .MinTimeValue{width:100px; padding-left:5px; padding-right:5px; text-align:center;}
+.SelectTime .TitleTime{width:145px; text-align:center; float:left;}
+.SelectTime .MaxTime{float:left;}
+.SelectTime .MaxTime .MaxTimeValue{width:100px; padding-left:5px; padding-right:5px; text-align:center;}
+
+.OrderProjectList{max-width:500px; max-height: 200px; overflow: auto;}
+
+/*Caron add [Agent][2014-12-25]*/
+.AgentList{max-width:500px;}
+
+.WhereItemSliderList .ItemSliderList{width:800px; float:left;}
+.WhereItemSliderList .WhereButtonList{float:left;}
+
+.SelectWhereBody .titleClose {position: absolute;top: 20px;right: 20px;font-weight: bold;line-height: 18px;color: #cfcfcf;cursor: pointer;font-size: 28px;}
+.SelectWhereBody .titleClose:hover {color: #999;}
+
+
+
+.DataNullJson,.table tbody tr td.DataNullJson{ height:50px!important; line-height:50px!important; text-align:center; font-size:18px; font-weight:bold;}
+
+.Hint{background: url('/img/FiltrateData/hint.png') no-repeat center right;display: inline-block;padding-right: 15px;}
+
+
+#RequstDataTable td{border-left:1px solid #dcdcdc;white-space: nowrap;text-overflow: ellipsis;overflow: hidden; padding-left:6px; padding-right:6px;}
+#RequstDataTable th{text-align:center;}
+
+
+.TdCompanyName{
+    width: 150px;
+}
+.TdLoginTimeLast{
+    width: 102px;
+    text-align: center;
+}
+.TdLoginTimeWeb{
+    width: 50px;
+    text-align: center;
+}
+.TdPhoneNumber{
+    width: 55px;
+    text-align: center;
+}
+.TdUserEmail{
+    width: 100px;
+    text-align: center;
+}
+.TdUserRealName{
+    width: 45px;
+    text-align: center;
+}
+.Tdactive{
+    width: 50px;
+    text-align: center;
+}
+.TdallCount{
+    width: 50px;
+    text-align: center;
+}
+.Tdaotjb{
+    width: 35px;
+    text-align: center;
+}
+.TdaotjbEndtime{
+    width: 102px;
+    text-align: center;
+}
+.TdRegTime{
+    width: 102px;
+    text-align: center;
+}
+.Tddxunity{
+    width: 50px;
+    text-align: center;
+}
+.TdgoodsNum{
+    width: 50px;
+    text-align: center;
+}
+.TdorderMoney{
+    width: 50px;
+    text-align: center;
+}
+.TdoutlayNum{
+    width: 50px;
+    text-align: center;
+}
+.TdreturnInsertTime{
+    width: 60px;
+    text-align: center;
+}
+.TdsaleNum{
+    width: 50px;
+    text-align: center;
+}
+.TdsmsNum{
+    width: 77px;
+    text-align: center;
+}
+.TduserCount{
+    width: 75px;
+    text-align: center;
+}
+.TduserNum{
+    width: 51px;
+    text-align: center;
+}
+.TdagentName{
+    width: 51px;
+    text-align: center;
+}
+
+.TableThSet{height: 40px; line-height:20px;}
+.TableThSet .ThList{ height: 40px; line-height: 37px; padding-left:37px;}
+.SetttingIco{ background:url('/img/FiltrateData/Settings.png') no-repeat  center center; width:16px; height:16px; float:left; margin-top: 11px; margin-left: 10px; cursor:pointer;}
+.ThItemList{ float:left; margin-right: 13px;}
+.ThItemList label{
+    line-height: 20px;
+    height: 20px;
+    display: inline-block;
+}
+.ThItemList input{
+    margin: 0px;
+    border: 0px;
+    padding: 0px;
+    vertical-align: middle; margin-right:3px;
+}
+
+.SelectWhereContent{margin-bottom:30px;}
+
+
+.ExcludeContent{width:410px;height:210px;}
+.ExcludeContent textarea{width:400px;height:200px;}
+.ExcludeTitle{ color:#dfdfdf;}
+
+
+
+
+.AddWhere{padding: 10px 8px;border: solid 1px #eee; margin: 0px 5px;color: #000; cursor:pointer; float:left;margin-left: 0px;}
+
+
+.WhereLogic{
+    border: 1px solid #dfdfdf;
+    margin-right: 10px;margin-bottom: 10px;
+}
+.WhereLogicSelect{border-color:#0055cc;}
+.AndBrackets{
+    float: left;
+}
+.AndBefore{
+    float: left;padding:5px 0px; margin:5px;color: #000;
+    font-weight: bold;
+}
+.LogicContent{
+    float: left;
+}
+.AndBack{
+    float: left;
+    padding: 5px 0px; margin:5px;color: #000;
+}
+
+
+.AccomplishButtonList{
+padding-left: 20px;
+padding-bottom: 10px;}
+
+.AccomplishButtonList .AButton{ margin-top:10px; margin-right:20px;}
+.AccomplishButtonList .AddWhere{   margin-left: 25px;margin-top: 6px;}
+.AccomplishButtonList .AccomplishButton{ float:left;}
+
+.dropdown-menu{z-index: 1100!important;}

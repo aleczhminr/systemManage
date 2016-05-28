@@ -1,0 +1,376 @@
+﻿@model IEnumerable<Model.SmsNotifyItem>
+
+@{
+    ViewBag.Title = "短信审核";
+}
+
+@section Style{
+    @Styles.Render("~/style/form")
+}
+
+@using (Ajax.BeginForm("SmsReview", new AjaxOptions()))
+{
+    <div class="page-where" style="margin-top: 10px;">
+        <div class="btn-group" style="float: left; margin-right: 10px">
+            <button type="button" class="btn btn-default btn-select" value="7" onclick=" whereTimeButtonClick(this) ">最近7天</button>
+            <button type="button" class="btn btn-default" value="15" onclick=" whereTimeButtonClick(this) ">最近15天</button>
+            <button type="button" class="btn btn-default" value="30" onclick=" whereTimeButtonClick(this) ">最近30天</button>
+            <button type="button" class="btn btn-default" value="other" onclick=" whereTimeButtonClick(this) ">其他时间</button>
+        </div>
+        <input type="hidden" id="timeType" value="" name="timePeriod" />
+        <div class="btn-group page-where-othertime" style="display: none; float: left; margin-right: 10px">
+            <button type="button" value="return" class="btn btn-default border-right0" onclick=" whereTimeButtonClick(this) ">返回</button>
+            <div class="pull-left">
+                <div class="input-daterange input-group">
+                    <input type="text" class="input-sm form-control" name="start">
+                    <span class="input-group-addon">to</span>
+                    <input type="text" class="input-sm form-control" name="end">
+                </div>
+            </div>
+        </div>
+        <input type="submit" value="查询" class="btn btn-default btn-inquire" />
+    </div>
+}
+
+
+@using (Ajax.BeginForm("Review", new AjaxOptions()))
+{
+    <div class="modal fade slide-up disable-scroll" id="modalSlideUp" tabindex="-1" role="dialog" aria-labelledby="modalSlideUpLabel" aria-hidden="false">
+        <div class="modal-dialog ">
+            <div class="modal-content-wrapper">
+                <div class="modal-content">
+                    <div class="modal-header clearfix text-left">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                            <i class="pg-close fs-14"></i>
+                        </button>
+
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" value="" id="notifyId" name="notifyId">
+                        <div class="radio radio-success">
+                            审核选项:
+                            <input type="radio" checked="checked" value="yes" name="radio1" id="radio2Yes" onchange=" reviewSmsType(this) ">
+                            <label for="radio2Yes">审核通过</label>
+                            <input type="radio" value="no" name="radio1" id="radio2No" onchange=" reviewSmsType(this) ">
+                            <label for="radio2No">拒绝发送</label>
+                        </div>
+                        <!-- 2审核通过 3拒绝发送 -->
+                        <input type="hidden" value="2" name="reviewType" id="reviewType">
+                        <textarea id="rejectDesc" placeholder="审核备注" style="height: 150px; width: 300px; display: none" name="reviewDesc" aria-valuetext=""></textarea>
+
+
+                        <div class="radio radio-primary">
+                            短信通道:
+                            <input type="radio" checked="checked" value="yes" name="radio2" id="dafaultChannel" onchange=" changeChannel(this) " onclick=" hideSelect() ">
+                            <label for="dafaultChannel">默认通道</label>
+                            <input type="radio" value="no" name="radio2" id="changeChannel" onchange=" changeChannel(this) " onclick=" showSelect() ">
+                            <label for="changeChannel">调整通道</label>
+                        </div>
+                        <input type="hidden" value="0" name="channelType">
+
+                        <div style="display: none;" id="selectGroup">
+                            <div class="cs-wrapper" style="display: block; margin-bottom: 10px;">
+                                <div tabindex="0">
+                                    移动通道:
+                                    <select class="cs-select cs-skin-slide sms-channel-list" data-init-plugin="cs-select" name="mobile">
+                                        <option value="0">正在加载</option>
+                                    </select> 
+                                </div>
+                            </div>
+                            <div class="cs-wrapper" style="display: block; margin-bottom: 10px">
+                                <div tabindex="0">
+                                    联通通道:
+                                    <select class="cs-select cs-skin-slide sms-channel-list" data-init-plugin="cs-select" name="unicom">
+                                        <option value="0">正在加载</option>
+                                    </select> 
+                                </div>
+                            </div>
+                            <div class="cs-wrapper" style="display: block; margin-bottom: 10px">
+                                <div tabindex="0">
+                                    电信通道:
+                                    <select class="cs-select cs-skin-slide sms-channel-list" data-init-plugin="cs-select" name="telecom">
+                                        <option value="0">正在加载</option>
+                                    </select> 
+                                </div>
+                            </div>
+                        </div>
+                        <input type="submit" value="确认" class="btn btn-success btn-cons" style="float: right;" />
+                        <div style="clear: both"></div>
+                    </div>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+    </div>
+}
+
+<table class="table table-hover table-condensed  no-footer table-border-right fs-12">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.StoreName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UserCnt)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TotalSmsCnt)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RealSmsCnt)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FailCnt)
+            </th>
+            <th style="width:25%">
+                @Html.DisplayNameFor(model => model.SmsContent)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SmsStatus)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SubmitTime)
+            </th>
+
+            <th>
+                @Html.DisplayNameFor(model => model.ReviewName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ReviewDesc)
+            </th>
+            <th style="width: 140px;">详细</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    <a href="/shopinfo/index/@Html.DisplayFor(modelItem => item.AccId)" target="_blank">@Html.DisplayFor(modelItem => item.StoreName)</a>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.UserCnt)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TotalSmsCnt)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.RealSmsCnt)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FailCnt)
+                </td>
+                <td style="white-space:initial;">
+                    @Html.DisplayFor(modelItem => item.SmsContent)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SmsStatus)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SubmitTime)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ReviewName)
+                </td>
+                @if (item.Review == 1)
+                {
+                    <td>
+                        <button class="btn btn-primary btn-sm" data-toggle="modal" onclick='$("#notifyId").val( @Html.DisplayFor(modelItem => item.Id));' data-target="#modalSlideUp">
+                            审核处理
+                        </button>
+                    </td>
+                }
+                else if (item.Review == 2)
+                {
+                    <td>
+                        已审核
+                    </td>
+                }
+                else
+                {
+                    <td style="cursor:help" title="@item.ReviewDesc">
+                        已拒绝(
+                        <span>
+                            @item.ReviewDesc
+                        </span>
+                        @*@Html.DisplayFor(modelItem => item.ReviewDesc)*@
+                        )
+                    </td>
+                }
+                <td>
+                    @Html.ActionLink("修改内容", "Edit", new { id = item.Id }) |
+                    <a href="javascript:void(0)" onclick="SmsInfoDetailsList(1,@Html.DisplayFor(modelItem => item.AccId),@Html.DisplayFor(modelItem => item.Id))">详情</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<input type="hidden" value="" id="selectSmsAccid" />
+<input type="hidden" value="" id="selectSmsId" />
+<div id="smsInfoDetailsList" style="display:none;">
+    <div>
+        <input class="form-control width200" style="float:left;" type="text" placeholder="电话号码" id="selectSmsPhone"> <input type="button" value="查询" class="btn btn-default btn-inquire" style="float:left; margin-left:20px;" onclick="SmsInfoDetailsList(1)" />
+        <div class="clear"></div>
+    </div>
+    <table class="table table-hover table-condensed  no-footer table-border-right fs-12" style="width:auto;;">
+        <thead>
+            <tr>
+                <th style="width:80px;">电话号码</th>
+                <th style="width:200px;">短信内容</th>
+                <th style="width: 85px;">发送状态</th>
+                <th style="width:120px;">发送时间</th>
+                <th style="width: 85px;">发送通道</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <div class="dataTables_wrapper ListPageHtml">
+        <div class="dataTables_paginate pagination">
+            <ul><li class="prev disabled"><a href="javascript:void(0)"><i class="pg-arrow_left"></i></a></li><li class="active"><a href="javascript:void(0)">1</a></li><li class="next disabled"><a href="javascript:void(0)"><i class="pg-arrow_right"></i></a></li></ul>
+        </div>
+        <div class="dataTablePagText"></div>
+    </div>
+
+</div>
+<script type="text/html" id="smsInfoDetailsListScript">
+    {{each detailList}}
+    <tr>
+        <td>{{$value.phoneNum}}</td>
+        <td>{{$value.smsContent}}</td>
+        <td title="{{$value.errDesc}}">{{$value.smsStatusName}}</td>
+        <td>{{$value.sendtime}}</td>
+        <td>{{$value.smsChannel}}</td>
+    </tr>
+    {{/each}}
+</script>
+
+<script type="text/html" id="ChannelList_Tpl">
+    {{each Channel}}
+        <option value="{{$value.ChannelId}}">{{$value.ChannelName}}</option>
+    {{/each}}
+</script>
+
+@section Scripts{
+    @Scripts.Render("~/js/begin/form")
+<script src="~/Scripts/plugins/artTemplate/template.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            $('#datepicker-range').datepicker({ format: 'yyyy-mm-dd' });
+            $('#daterangepicker').datepicker({ format: 'yyyy-mm-dd' });
+            $('.page-where .page-where-othertime .input-daterange').datepicker({ format: 'yyyy-mm-dd' });
+            GetChannel();
+        });
+
+        function GetChannel() {
+            var url = "/sms/GetSmsChannel";
+            $.doAjax(url, null, function (data) {
+                if (data != "error") {
+                    var json = $.parseJSON(data);
+                    var strHtml = template("ChannelList_Tpl", json);
+                    $(".sms-channel-list").html(strHtml);
+                }
+            }, false);
+        }
+
+        function whereTimeButtonClick(obj) {
+            var value = obj.value;
+            if (value == "return") {
+                $(".btn-group").show().filter(".page-where-othertime").hide();
+            } else {
+                $(obj).parent().find(".btn-select").removeClass("btn-select");
+                $(obj).addClass("btn-select");
+                if (value == "other") {
+                    $(".btn-group").hide().filter(".page-where-othertime").show();
+                }
+            }
+            $("#timeType").val(value);
+        }
+
+        function reviewSmsType(obj) {
+            var value = obj.value;
+            if (value == "yes") {
+                $("#reviewType").val("2");
+                $("#rejectDesc").hide();
+            } else {
+                $("#reviewType").val("3");
+                $("#rejectDesc").show();
+            }
+        }
+
+        function changeChannel(obj) {
+            var value = obj.value;
+            if (value == "yes") {
+                $("#channelType").val("0");
+                $("#selectGroup").hide();
+            } else {
+                $("#channelType").val("1");
+                $("#selectGroup").show();
+            }
+        }
+
+        function showSelect() {
+            $("#selectGroup").show();
+        }
+
+        function hideSelect() {
+            $("#selectGroup").hide();
+        }
+        function SmsInfoDetailsList(page, accid, smsid) {
+            if (accid != null) {
+                $("#selectSmsAccid").val(accid);
+            } else {
+                accid = $("#selectSmsAccid").val();
+            }
+            if (smsid != null) {
+                $("#selectSmsId").val(smsid);
+            } else {
+                smsid = $("#selectSmsId").val();
+            }
+            if (page < 1) {
+                page = 1;
+            }
+
+            var url = "/Sms/GetSmsDetailList";
+            var postJson = {};
+            postJson["page"] = page;
+            postJson["noticeid"] = smsid;
+            postJson["accid"] = accid;
+
+            var phone = $("#selectSmsPhone").val();
+            if (phone.length > 0) {
+                postJson["phone"] = phone;
+            }
+
+            $.doAjax(url, postJson, function (msg) {
+                if (msg != "") {
+                    var json = $.parseJSON(msg);
+                    var html = template("smsInfoDetailsListScript", json);
+                    $("#smsInfoDetailsList table tbody").html(html);
+                    if (page == 1) {
+
+                        var maxRow = json.smsCnt;
+                        var maxPage = Math.ceil(maxRow / 15);
+                        $("#smsInfoDetailsList .ListPageHtml").attr("rowcount", maxRow).attr("maxpage", maxPage);
+                        $("#smsInfoDetailsList .ListPageHtml .dataTablePagText").html("共" + maxRow + "条");
+                    }
+
+
+                    var pageHtml = $.listPageHtml(page, $("#smsInfoDetailsList .ListPageHtml").attr("maxpage"), "SmsInfoDetailsList", 5);
+                    $("#smsInfoDetailsList .ListPageHtml .dataTables_paginate").html(pageHtml);
+
+
+                    dialog({
+                        id: "smsSmsContext",
+                        title: "信息详情",
+                        lock: true,
+                        opacity: 0.57,	// 透明度
+                        content: document.getElementById("smsInfoDetailsList"),
+                        cancel: true
+                    }).showModal();
+                }
+            }, true);
+
+        }
+    </script>
+}

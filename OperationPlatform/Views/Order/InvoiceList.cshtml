@@ -1,0 +1,270 @@
+﻿@{
+    ViewBag.Title = "发票信息";
+}
+@section Style{
+    @Styles.Render("~/style/form")
+}
+
+<div class="panel">
+    <div class="panel-heading page-where invoiceWhere">
+        <div class="panel-title">
+            <div class="form-group  whereitem">
+                <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" id="invoiceStatus" onchange="" style="width: 100px">
+                    <option value="-1">发票状态</option>
+                    <option value="1">已开发票</option>
+                    <option value="0">未开发票</option>
+                </select>
+            </div>
+
+            <div class="pull-left  whereitem" id="invoiceTime">
+                <div class="input-daterange input-group">
+                    <input type="text" placeholder="起始时间" class="input-sm form-control" name="start" />
+                    <span class="input-group-addon">to</span>
+                    <input type="text" placeholder="结束时间" class="input-sm form-control" name="end" />
+                </div>
+            </div>
+            <div class=" whereitem">
+                <input type="text" placeholder="店铺ID" class="form-control width120" id="accId" onkeyup="">
+            </div>
+
+            <button type="button" value="select" class="btn btn-default btn-inquire" onclick="GetInvoiceList(1)">查询</button>
+            <button type="button" value="select" class="btn btn-default btn-inquire" onclick="ExportInvoice()">导出发票信息</button>
+            <div class="clear"></div>
+        </div>
+    </div>
+
+    <div class="panel-body no-padding">
+        <div class="row column-seperation">
+            <table class="table table-hover table-border-right" id="ListTable">
+                <thead>
+                    <tr>
+                        <th>店铺名称 </th>
+                        <th>店主名称</th>
+                        <th>订单状态</th>
+                        <th>发票抬头</th>
+                        <th class="text-center">发票金额</th>
+                        <th>发票地址</th>
+                        <th class="text-center">发票状态</th>
+                        <th class="text-center">购买时间</th>
+                        <th class="text-center">操作</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <div class="dataTables_wrapper" id="ListPageHtml">
+                <div class="dataTables_paginate pagination no-padding">
+                    <ul><li class="prev disabled"><a href="javascript:void(0)"><i class="pg-arrow_left"></i></a></li><li class="active"><a href="javascript:void(0)">1</a></li><li class="next disabled"><a href="javascript:void(0)"><i class="pg-arrow_right"></i></a></li></ul>
+                </div>
+                <div class="dataTablePagText p-l-20"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div style="display: none;">
+    <div class="" id="invoiceDiv" style="width: 300px;">
+        <table class="table table-bordered removeBottom">
+            <tr>
+                <th style="line-height: 26px; text-align: right;">发票号：</th>
+                <td><input id="number" class="span1 removeBottom" style="width: 180px;" type="text" /></td>
+            </tr>
+            <tr>
+                <th style="line-height: 26px; text-align: right;">快递单号</th>
+                <td><input id="express" class="span1 removeBottom" style="width: 180px;" type="text" /></td>
+            </tr>
+            <tr>
+                <th style="line-height: 26px; text-align: right;">备注</th>
+                <td><input id="remark" class="span1 removeBottom" style="width: 180px;" type="text" /></td>
+            </tr>
+            <input type="hidden" id="inId" value="" name="inId">
+        </table>
+    </div>
+</div>
+
+@*<div class="hidden" id="invoiceDiv" tabindex="-1" role="dialog" aria-hidden="false">
+
+        <div class="">
+            <label for="number">发票号</label>
+            <input class="form-control" type="text" placeholder="" id="number" value="" name="number">
+            <label for="remark">快递单号</label>
+            <input class="form-control" type="text" placeholder="" id="express" value="" name="express">
+            <label for="remark">备注</label>
+            <input class="form-control" type="text" placeholder="" id="remark" value="" name="remark">
+            <input type="hidden" id="inId" value="" name="inId">
+
+            <div class="clear"></div>
+        </div>
+    </div>*@
+
+
+<script type="text/html" id="ListTableScript">
+    {{each list}}
+    <tr class="odd" role="row">
+        <td>
+            <a href="/shopinfo/index/{{$value.accId}}" targe target="_blank" title="{{$value.CompanyName}}">{{$value.CompanyName}}</a>
+        </td>
+        <td class="v-align-middle">{{$value.UserRealName}}</td>
+        <td>{{$value.orderStatName}}</td>
+        <td>{{$value.invoiceName}}</td>
+        {{if $value.invoiceMoney>100}}
+        <td class="v-align-middle text-center" style="color: red">{{$value.invoiceMoney}}</td>
+        {{else}}
+        <td class="v-align-middle text-center" style="color: green">{{$value.invoiceMoney}}</td>
+        {{/if}}
+        <td class="v-align-middle" title="{{$value.invoiceAddress}}">{{$value.invoiceAddress}}</td>
+        <td class="v-align-middle text-center">{{$value.invoiceStatusName}}</td>
+        <td class="v-align-middle text-center">{{$value.createDate}}</td>
+        <td class="v-align-middle text-center">
+            @*<a href="/Order/Details/{{$value.id}}" targe target="_blank">查看详情</a>*@
+            {{if $value.invoiceStatus==1 && ($value.invoiceExpress!=null || $value.invoiceExpress!='')}}
+            <button class="btn btn-sm m-l-10" name="{{$value.id}}" onclick=" addNum(this)">
+                {{if ($value.invoiceNo!=null || $value.invoiceNo!='') || ($value.invoiceExpress!=null || $value.invoiceExpress!='')}}
+                更新发票信息
+                {{else}}
+                开发票
+                {{/if}}
+            </button>
+            {{else if $value.invoiceStatus!=1}}
+            <button class="btn btn-success btn-sm m-l-10" name="{{$value.id}}" onclick=" addNum(this) ">
+                开发票
+            </button>
+            {{else}}
+            <button class="btn btn-sm m-l-10" name="{{$value.id}}" disabled="disabled">
+                已开发票
+            </button>
+            {{/if}}
+        </td>
+    </tr>
+    {{/each}}
+</script>
+
+<script src="~/Scripts/plugins/artTemplate/template.js"></script>
+
+@section Scripts{
+    @Scripts.Render("~/js/begin/form")
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.invoiceWhere .input-daterange').datepicker();
+            GetInvoiceList(1);
+        });
+
+        function ExportInvoice() {
+            var statTime = $(".invoiceWhere input[name='start']").val();
+            var endTime = $(".invoiceWhere input[name='end']").val();
+
+            if (statTime == "" || endTime == "") {
+                alert("导出出错（未定义起始或者终止时间）");
+            } else
+                window.open("/Order/ExportOrder?stDate=" + statTime + "&edDate=" + endTime);
+        }
+
+        function GetInvoiceList(pageIndex) {
+            var postJson = {};
+            //DateTime stDate, DateTime edDate, int pageIndex = 1, int pageSize = 15, int transactionStatus = 1,int invoiceStatus = -99, string accId = ""
+            postJson["pageIndex"] = pageIndex;
+            //var transactionStatus = $("#transactionStatus").val();
+            var invoiceStatus = $("#invoiceStatus").val();
+
+            var statTime = $(".invoiceWhere input[name='start']").val();
+            var endTime = $(".invoiceWhere input[name='end']").val();
+
+            var stDate = new Date();
+            var edDate = new Date();
+
+            if (statTime.length > 0) {
+                postJson["stDate"] = statTime;
+            } else {
+                postJson["stDate"] = stDate.toLocaleDateString();
+            }
+            if (endTime.length > 0) {
+                postJson["edDate"] = endTime;
+            } else {
+                postJson["edDate"] = edDate.toLocaleDateString();
+            }
+
+            var accId = $("#accId").val();
+
+            //postJson["transactionStatus"] = transactionStatus;
+            postJson["invoiceStatus"] = invoiceStatus;
+            postJson["accId"] = accId;
+
+            var url = "/Order/GetInvoiceList";
+
+            $.doAjax(url, postJson, function (msg) {
+                if (msg != "") {
+                    var json = jQuery.parseJSON(msg);
+                    $("#ListTable tbody").html(template("ListTableScript", { "list": json.Data }));
+
+                    if (pageIndex == 1) {
+                        $("#ListPageHtml").attr("rowcount", json.RowCount).attr("maxpage", json.PageCount);
+                        $("#ListPageHtml .dataTablePagText").html("共" + json.RowCount + "条");
+                    }
+                    var pageHtml = $.listPageHtml(pageIndex, $("#ListPageHtml").attr("maxpage"), "GetInvoiceList", 5);
+                    $("#ListPageHtml .dataTables_paginate").html(pageHtml);
+                }
+            }, true);
+        }
+
+        function addNum(obj) {
+            var inId = obj.name;
+            $("#inId").val(inId);
+
+            //获取发票信息
+            var url = "/Order/GetInvoiceInfo";
+            var postJson = {};
+            postJson["id"] = inId;
+
+            $.doAjax(url, postJson, function (msg) {
+                if (msg != "") {
+                    var json = jQuery.parseJSON(msg);
+
+                    $("#number").val(json.invoiceNo);
+                    $("#express").val(json.invoiceExpress);
+                    $("#remark").val(json.invoiceRemark);
+
+                    ShowConfirmDiv();
+                } else {
+                    ShowConfirmDiv();
+                }
+            }, true);
+        }
+
+        function ShowConfirmDiv() {
+            dialog({
+                id: "invoiceDivdialog",
+                title: "发票信息",
+                lock: true,
+                background: '#fff', // 背景色
+                opacity: 0.5, // 透明度
+                content: document.getElementById("invoiceDiv"),
+                ok: function () {
+                    var ur = "/Order/TakeInvoice";
+                    var rm = $("#remark").val();
+                    var ex = $("#express").val();
+                    var no = $("#number").val();
+                    var inId = $("#inId").val();
+
+                    var postJson = {};
+                    postJson["inId"] = inId;
+                    postJson["remark"] = rm;
+                    postJson["express"] = ex;
+                    postJson["number"] = no;
+
+                    $.doAjax(ur, postJson, function (msg) {
+                        if (msg != "") {
+                            dialog({
+                                content: msg,
+                                quickClose: true // 点击空白处快速关闭
+                            }).show();
+                            GetInvoiceList(1);
+                        } else {
+                            alert("订单处理失败，请联系技术人员");
+                        }
+                    }, true);
+
+
+                }
+            }).showModal();
+        }
+    </script>
+}

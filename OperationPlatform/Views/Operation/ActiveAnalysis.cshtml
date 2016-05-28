@@ -1,0 +1,261 @@
+﻿
+@{
+    ViewBag.Title = "活跃分析";
+}
+
+@section Style{
+    @Styles.Render("~/style/form")
+}
+<div class="page-where activeanalysisWhere" style="margin-top: 10px;">
+    <div class="btn-group">
+        <button type="button" class="btn btn-default btn-select" value="7" onclick=" growUpwhereTimeButtonClick(this) ">最近7天</button>
+        <button type="button" class="btn btn-default" value="15" onclick=" growUpwhereTimeButtonClick(this) ">最近15天</button>
+        <button type="button" class="btn btn-default" value="30" onclick=" growUpwhereTimeButtonClick(this) ">最近30天</button>
+        <button type="button" class="btn btn-default" value="90" onclick=" growUpwhereTimeButtonClick(this) ">最近三个月</button>
+        <button type="button" class="btn btn-default" value="other" onclick=" growUpwhereTimeButtonClick(this) ">其他时间</button>
+    </div>
+    <div class="btn-group page-where-othertime" style="display: none;">
+        <button type="button" value="return" class="btn btn-default border-right0" onclick=" growUpwhereTimeButtonClick(this) ">返回</button>
+        <div class="page-where-time-input">
+            <div class="input-daterange input-group">
+                <input type="text" placeholder="开始时间" class="input-sm form-control" name="start"/>
+                <span class="input-group-addon">to</span>
+                <input type="text" placeholder="结束时间" class="input-sm form-control" name="end"/>
+            </div>
+        </div>
+        <button type="button" value="select" class="btn btn-default btn-inquire" onclick=" GetActiveData() ">查询</button>
+    </div>
+    <div class="page-where-right">
+        <div class="checkbox check-success">
+            <input type="checkbox" checked="checked" value="active" id="checkbox1">
+            <label for="checkbox1">活跃用户</label>
+            <input type="checkbox" value="login" id="checkbox2">
+            <label for="checkbox2">当天登录</label>
+            <input type="checkbox" value="faithful" id="checkbox3">
+            <label for="checkbox3">忠实用户</label>
+            <input type="checkbox" value="dormancy" id="checkbox4">
+            <label for="checkbox4">休眠用户</label>
+            <input type="checkbox" value="outflow" id="checkbox5">
+            <label for="checkbox5">流失用户</label>
+            @*<input type="checkbox" value="stration" id="checkbox6">
+            <label for="checkbox6">签到用户</label>*@
+        </div>
+    </div>
+</div>
+
+    <div id="summaryActive" class="col-md-12 col-sm-12 col-xs-12" style="margin: 10px">
+
+    </div>
+
+<div id="growUpflashcontenttd" class="chartDiv">
+
+</div>
+<div class="m-t-20" id="ActiveAnlysisButton">
+    <button class="btn btn-default btn-lg btn-larger" onclick="ActiveAnlysisButtonClick()">查看列表详情</button>
+</div>
+<div class="row column-seperation m-t-20" id="actvieanalysisTableList">
+    <table class="table table-hover no-footer" >
+        <thead>
+            <tr>
+                <th class="text-center">日期</th>
+                <th class="text-center">当前登录</th>
+                <th class="text-center">当日注册</th>
+                <th class="text-center">新注册状态</th>
+                <th class="text-center">需关怀</th>
+                <th class="text-center">活跃</th>
+                <th class="text-center">忠实</th>
+                <th class="text-center">休眠</th>
+                <th class="text-center">流失</th>
+            </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
+    <div class="dataTables_wrapper" id="ListPageHtml">
+        <div class="dataTables_paginate pagination">
+            <ul><li class="prev disabled"><a href="javascript:void(0)"><i class="pg-arrow_left"></i></a></li><li class="active"><a href="javascript:void(0)">1</a></li><li class="next disabled"><a href="javascript:void(0)"><i class="pg-arrow_right"></i></a></li></ul>
+        </div>
+        <div class="dataTablePagText"></div>
+    </div>
+</div>
+
+<script type="text/html" id="ActiveAnalysisTableTrScript">
+    {{if listData.length < 1 }}
+    <tr><td colspan="9" class="DataNull">可能这几天没有数据</td></tr>
+    {{/if}}
+    {{each listData}}
+    <tr>
+        <td align="center">
+            {{$value.ShowDate}}
+        </td>
+        <td align="center">
+            <a class="byrulerget" target="_blank" class="help">{{$value.LoginUsr}}</a>
+            <span style="color: #999">{{$value.LoginUsr |baifenbi:$value.AllUsr}}%</span>
+        </td>
+        <td align="center">
+            <a class="byrulerget" target="_blank" class="help">{{$value.RegUsr}}</a>
+            @*<span style="color: #999">{{$value.RegUsr |baifenbi:$value.AllUsr}}%</span>*@
+        </td>
+        <td align="center">
+            <a class="byrulerget" target="_blank" class="help">{{$value.NewReg}}</a>
+            <span style="color: #999">{{$value.NewReg |baifenbi:$value.AllUsr}}%</span>
+        </td>
+        <td align="center">
+            <a class="byrulerget" target="_blank" class="help">{{$value.RegAttention + $value.Attention}}</a>
+            @*<span style="color: #999">{{$value.ra | baifenbi:$value.an,$value.atten }}%</span>*@
+            <span>【{{$value.RegAttention }} | {{$value.Attention}}】</span>
+        </td>
+        <td align="center">
+            <a class="byrulerget" target="_blank" class="help">{{$value.ActiveUsr}}</a>
+            <span style="color: #999">{{$value.ActiveUsr |baifenbi:$value.AllUsr}}%</span>
+        </td>
+        <td align="center">
+            <a class="byrulerget" target="_blank" class="help">{{$value.FaithUsr}}</a>
+            <span style="color: #999">{{$value.FaithUsr |baifenbi:$value.AllUsr}}%</span>
+        </td>
+        <td align="center">
+            <a class="byrulerget" target="_blank" class="help">{{$value.SleepUsr}}</a>
+            <span style="color: #999">{{$value.SleepUsr |baifenbi:$value.AllUsr}}%</span>
+        </td>
+        <td align="center">
+            <a class="byrulerget" target="_blank" class="help">{{$value.OutUsr}}</a>
+            <span style="color: #999">{{$value.OutUsr |baifenbi:$value.AllUsr}}%</span>
+        </td>
+    </tr>
+    {{/each}}
+</script>
+
+
+@section Scripts{
+    @Scripts.Render("~/js/begin/form")
+    <script src="~/Scripts/plugins/asset/echarts-all.js"></script>
+    <script src="~/Scripts/Operation/Operation.js"></script>
+    <script src="~/Scripts/plugins/summernote/js/summernote.min.js"></script>
+    <script src="~/Scripts/plugins/artTemplate/template.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('.activeanalysisWhere .page-where-othertime .input-daterange').datepicker();
+
+            $(".activeanalysisWhere .page-where-right input:checkbox").click(function() {
+                GetActiveAnalysisChart();
+                GetActiveSummary();
+            });
+            GetActiveAnalysisChart();
+            GetActiveSummary();
+        });
+
+
+        template.helper('baifenbi', function(now, all, qt) {
+
+            var c = 0;
+            var s = 1;
+            var baifen = 0;
+            if (!isNaN(now)) {
+                c = Number(now);
+            }
+            if (!isNaN(qt)) {
+                c += Number(qt);
+            }
+            if (!isNaN(all)) {
+                s = Number(all);
+            }
+            baifen = c / s * 100;
+            return baifen.toPrecision(3);
+        });
+
+        function GetActiveData() {
+            GetActiveAnalysisChart();
+            GetActiveSummary();
+        }
+
+        function growUpwhereTimeButtonClick(obj) {
+            var value = obj.value;
+            if (value == "return") {
+                $(".activeanalysisWhere .btn-group").show().filter(".page-where-othertime").hide();
+            } else {
+                $(obj).parent().find(".btn-select").removeClass("btn-select");
+                $(obj).addClass("btn-select");
+                if (value == "other") {
+                    $(".activeanalysisWhere .btn-group").hide().filter(".page-where-othertime").show();
+                } else {
+                    GetActiveAnalysisChart();
+                    GetActiveSummary();
+                }
+            }
+        }
+
+
+        var myChart = echarts.init(document.getElementById('growUpflashcontenttd'));
+
+        var option = {
+            color:
+            [
+                '#87cefa', '#ff7f50', '#da70d6', '#32cd32', '#6495ed',
+                '#ff69b4', '#ba55d3', '#cd5c5c', '#ffa500', '#40e0d0',
+                '#1e90ff', '#ff6347', '#7b68ee', '#00fa9a', '#ffd700',
+                '#6b8e23', '#ff00ff', '#3cb371', '#b8860b', '#30e0e0'
+            ],
+            title: {
+                text: '活跃率分析',
+                textAlign: "center",
+                x: "center"
+            },
+            tooltip: {
+                show: true,
+                trigger: 'axis'
+            },
+            legend: {
+                data: [
+                    '暂无数据'
+                ],
+                y: "bottom"
+            },
+            toolbox: {
+                show: true,
+                feature: {
+                    mark: { show: true },
+                    dataView: { show: true, readOnly: false },
+                    magicType: { show: true, type: ['line', 'bar'] },
+                    restore: { show: true },
+                    saveAsImage: { show: true }
+                }
+            },
+            dataZoom: { show: true, realtime: true, y: 36, height: 20, start: 0, end: 100 },
+            calculable: false,
+            grid: { y: 60, y2: 70, x2: 20 },
+            xAxis: [
+                {
+                    type: 'category',
+                    boundaryGap: false,
+                    axisLine: { show: true }, //坐标轴线
+                    axisTick: { show: true }, //坐标轴小标记
+                    axisLabel: { show: true }, //坐标轴文本标签
+                    splitArea: { show: false }, //分隔区域
+                    splitLine: { show: true }, //分隔线
+                    data: ['0', '0', '0', '0', '0', '0', '0']
+                }
+            ],
+            yAxis: [
+                {
+                    type: 'value'
+                }
+            ],
+            axis: { scale: true },
+            series: [
+                {
+                    name: '暂无数据',
+                    type: 'line',
+                    symbol: 'Circle',
+                    data: [0, 0, 0, 0, 0, 0, 0]
+                }
+            ]
+        };
+
+
+        // 为echarts对象加载数据
+        myChart.setOption(option);
+    </script>
+}
+
+
